@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Your Scan Results | SpamCallStop</title>
-<meta name="description" content="See every data broker site exposing and selling your phone number.">
+<meta name="description" content="See every site exposing and selling your phone number, then remove it.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -14,7 +14,7 @@
 <header class="bar">
   <div class="bar-in">
     <a href="index.html" class="word">Spam<span class="cr">Call</span>Stop<span class="cg">.com</span></a>
-    <span class="secure"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 10V8a6 6 0 0112 0v2" stroke="#6B6B72" stroke-width="2"/><rect x="4" y="10" width="16" height="10" rx="2" stroke="#6B6B72" stroke-width="2"/></svg> Private &amp; secure</span>
+    <span class="secure"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 10V8a6 6 0 0112 0v2" stroke="#6B6B72" stroke-width="2"/><rect x="4" y="10" width="16" height="10" rx="2" stroke="#6B6B72" stroke-width="2"/></svg> Private and secure</span>
   </div>
 </header>
 <div class="progress">
@@ -34,7 +34,7 @@
 
     <div class="scanwrap" id="scanning">
       <div class="scanring"></div>
-      <h2 class="h2" style="margin-bottom:.5rem">Scanning the data broker sites&hellip;</h2>
+      <h2 class="h2" style="margin-bottom:.5rem">Scanning the sites that sell your number&hellip;</h2>
       <p class="muted" id="scanphone">Checking where <b>your number</b> is listed for sale.</p>
       <div class="scanbar"><i id="scanfill"></i></div>
       <p class="feedline" id="feed">Connecting&hellip;</p>
@@ -44,38 +44,28 @@
       <div class="center">
         <span class="overline">Scan complete</span>
         <h1 class="display" style="margin:.6rem 0 .3rem">Your number was found on<br><span class="accent"><span id="count">0</span> sites</span> selling it.</h1>
-        <p class="lead muted" style="max-width:40ch;margin:.6rem auto 0">This is exactly why the spam and scam calls won&rsquo;t stop. Every list you&rsquo;re on is another reason your phone rings.</p>
-        <div style="margin-top:1.6rem">
-          <a class="btn btn--accent btn--lg" href="offer.html">Remove me from all <span id="countcta2">47</span> sites &rarr;</a>
-          <p class="fine" style="margin-top:.7rem">Takes about a minute. Free scan, no commitment to continue.</p>
-        </div>
+        <p class="lead muted" style="max-width:42ch;margin:.6rem auto 0">These are the sites feeding your number to telemarketers and scammers. Here is everywhere it is exposed.</p>
       </div>
 
-      <div class="infotags">
-        <span class="infotag"><span class="x">&#10005;</span>Your phone number</span>
-        <span class="infotag"><span class="x">&#10005;</span>Listed publicly</span>
-        <span class="infotag"><span class="x">&#10005;</span>Sold to telemarketers</span>
-        <span class="infotag"><span class="x">&#10005;</span>Sold to scam callers</span>
-      </div>
-
-      <div class="exposed">
-        <div class="exhead"><span>Site exposing your number</span><span>Status</span></div>
+      <div class="exposed locked" style="margin-top:1.6rem">
+        <div class="exhead"><span>Sites exposing your number</span><span>Status</span></div>
         <div class="exrow"><div><div class="exsite">Whitepages</div><div class="exsub">Your phone number, listed publicly</div></div><span class="exbadge">Exposed</span></div>
         <div class="exrow"><div><div class="exsite">Spokeo</div><div class="exsub">Your number, sold to callers</div></div><span class="exbadge">Exposed</span></div>
-        <div class="exrow"><div><div class="exsite">MyLife</div><div class="exsub">Your number, searchable by anyone</div></div><span class="exbadge">Exposed</span></div>
         <div class="exrow"><div><div class="exsite">Radaris</div><div class="exsub">Your number, shared with call centers</div></div><span class="exbadge">Exposed</span></div>
         <div class="exrow"><div><div class="exsite">BeenVerified</div><div class="exsub">Your number, up for sale</div></div><span class="exbadge">Exposed</span></div>
         <div class="exrow"><div><div class="exsite">Intelius</div><div class="exsub">Your number, on their call lists</div></div><span class="exbadge">Exposed</span></div>
+        <div class="exrow"><div><div class="exsite">PeopleFinders</div><div class="exsub">Your number, searchable by anyone</div></div><span class="exbadge">Exposed</span></div>
         <div class="exmore" id="exmore">+ 41 more sites found</div>
+        <div class="lockcta">
+          <span class="lock"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M6 10V8a6 6 0 0112 0v2" stroke="#B52A2A" stroke-width="2"/><rect x="4" y="10" width="16" height="10" rx="2" stroke="#B52A2A" stroke-width="2"/></svg></span>
+          <b>Your full exposure report is locked.</b>
+          <span class="sub">Unlock it and we will remove your number from every site we found, then keep it off for good.</span>
+          <button class="btn btn--accent btn--lg" onclick="openPaywall()">Remove My Number &rarr;</button>
+        </div>
       </div>
 
       <div class="risk">
         Here is what that means. Adults 60 and older reported losing <b>$405 million</b> to phone scams in a single year (FTC). The more sites that list your number, the more calls you get. And the higher the chance that one of them is a scam. The good news: this is fixable.
-      </div>
-
-      <div class="center" style="margin-top:2rem">
-        <a class="btn btn--accent btn--lg" href="offer.html">Remove me from all <span id="countcta">47</span> sites &rarr;</a>
-        <p class="fine" style="margin-top:.9rem">Takes about a minute. Free scan, no commitment to continue.</p>
       </div>
 
       <p class="demo-note">Prototype: this scan uses sample data to show how it works. The real version checks the actual sites for your number.</p>
@@ -84,17 +74,46 @@
   </div>
 </section>
 
+<div id="paywall" class="modal" hidden>
+  <div class="modal-backdrop" onclick="closePaywall()"></div>
+  <div class="modal-card">
+    <button class="modal-x" aria-label="Close" onclick="closePaywall()">&times;</button>
+    <span class="modal-urgency">Your number is on <span class="pwcount">47</span> sites right now</span>
+    <h2 class="h2" style="margin-bottom:.4rem">Make the spam calls stop. <span class="accent">For good.</span></h2>
+    <p class="muted" style="margin-bottom:.2rem">We take your number off every site we found and keep it off, day and night. You do nothing but tell us your number once.</p>
+    <ul class="mstack">
+      <li><span>Scan of hundreds of broker sites</span><span class="v">$199</span></li>
+      <li><span>Done for you removal</span><span class="v">$499 / yr</span></li>
+      <li><span>Around the clock removal, for good</span><span class="v">$399 / yr</span></li>
+      <li><span>Plain English report every month</span><span class="v">$99 / yr</span></li>
+      <li><span>Bonus: Do Not Call signup and scam alerts</span><span class="v">$128</span></li>
+    </ul>
+    <div class="mprice">
+      <div class="was">Total value $1,573 / yr</div>
+      <div class="now">$19<span> / month</span></div>
+      <div class="muted" style="font-size:.9rem">or $190 a year (2 months free). Cancel anytime.</div>
+    </div>
+    <button class="btn btn--accent btn--lg btn--block" onclick="goCheckout()">Remove My Number &rarr;</button>
+    <div class="mtrust">
+      <span>&#10003; 30 day money back</span>
+      <span>&#10003; Secure checkout</span>
+      <span>&#10003; Cancel anytime</span>
+    </div>
+    <p class="fine center" style="margin-top:.8rem">If it does not work, you do not pay. Backed by our 30 day money back guarantee.</p>
+  </div>
+</div>
+
 <footer>
   <div class="container">
     <div class="foot">
       <div style="max-width:300px">
         <a href="index.html" class="word2">Spam<span class="cr">Call</span>Stop<span class="cg">.com</span></a>
-        <p>We get your phone number off the data broker lists and keep it off, so the scam calls stop.</p>
+        <p>We get your phone number off the lists and keep it off, so the scam calls stop.</p>
       </div>
       <div><h4>SpamCallStop</h4><a href="index.html">Home</a><a href="offer.html">Pricing</a></div>
       <div><h4>Trust</h4><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Service</a></div>
     </div>
-    <p class="disclaimer">&copy; 2026 SpamCallStop. Not affiliated with any data broker named above; names are used only to describe the sites we help remove you from. Statistics from the U.S. Federal Trade Commission. Prototype for demonstration.</p>
+    <p class="disclaimer">&copy; 2026 SpamCallStop. Not affiliated with any site named above; names are used only to describe the sites we help remove you from. Statistics from the U.S. Federal Trade Commission. Prototype for demonstration.</p>
   </div>
 </footer>
 
@@ -113,7 +132,7 @@
     var pretty = d.length===10 ? '('+d.slice(0,3)+') '+d.slice(3,6)+'-'+d.slice(6) : phone;
     document.getElementById('scanphone').innerHTML = 'Checking where <b>'+pretty+'</b> is listed for sale.';
   }
-  var brokers = ['whitepages.com','spokeo.com','mylife.com','radaris.com','beenverified.com','intelius.com','truepeoplesearch.com','peoplefinders.com','fastpeoplesearch.com','instantcheckmate.com','clustrmaps.com','usphonebook.com'];
+  var brokers = ['whitepages.com','spokeo.com','radaris.com','beenverified.com','intelius.com','peoplefinders.com','truepeoplesearch.com','fastpeoplesearch.com','usphonebook.com','clustrmaps.com','nuwber.com','thatsthem.com'];
   var feed = document.getElementById('feed'), fill = document.getElementById('scanfill');
   var i = 0, pct = 0;
   var iv = setInterval(function(){
@@ -127,14 +146,17 @@
     document.getElementById('scanning').style.display = 'none';
     document.getElementById('results').style.display = 'block';
     var el = document.getElementById('count'), n = 0;
-    var c = setInterval(function(){
-      n += 1; if(n > SITES){ clearInterval(c); return; }
-      el.textContent = n;
-    }, 26);
-    document.getElementById('countcta').textContent = SITES;
-    document.getElementById('countcta2').textContent = SITES;
+    var c = setInterval(function(){ n += 1; if(n > SITES){ clearInterval(c); return; } el.textContent = n; }, 26);
     document.getElementById('exmore').textContent = '+ ' + (SITES - 6) + ' more sites found';
+    var pw = document.querySelector('.pwcount'); if(pw) pw.textContent = SITES;
   }
+  function openPaywall(){ document.getElementById('paywall').hidden = false; document.body.style.overflow = 'hidden'; }
+  function closePaywall(){ document.getElementById('paywall').hidden = true; document.body.style.overflow = ''; }
+  function goCheckout(){
+    try { sessionStorage.setItem('scstop_plan','Solo'); sessionStorage.setItem('scstop_billing','m'); sessionStorage.setItem('scstop_price','19'); } catch(e){}
+    location.href = 'checkout.html';
+  }
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closePaywall(); });
 </script>
 </body>
 </html>
