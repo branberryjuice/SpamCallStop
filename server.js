@@ -63,6 +63,9 @@ app.use((req, res) => {
   res.status(404).sendFile(path.join(STATIC_DIR, 'index.html'));
 });
 
+// Make sure the customer table exists before we start taking traffic.
+require('./lib/customers').init().catch((e) => console.error('[db] init failed:', e.message));
+
 app.listen(PORT, () => {
   console.log(`SpamCallStop server listening on port ${PORT}`);
 });
