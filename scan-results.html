@@ -49,12 +49,12 @@
 
       <div class="exposed locked" style="margin-top:1.6rem">
         <div class="exhead"><span>Sites exposing your number</span><span>Status</span></div>
-        <div class="exrow"><div><div class="exsite">Whitepages</div><div class="exsub">Your phone number, listed publicly</div></div><span class="exbadge">Exposed</span></div>
-        <div class="exrow"><div><div class="exsite">Spokeo</div><div class="exsub">Your number, sold to callers</div></div><span class="exbadge">Exposed</span></div>
-        <div class="exrow"><div><div class="exsite">Radaris</div><div class="exsub">Your number, shared with call centers</div></div><span class="exbadge">Exposed</span></div>
-        <div class="exrow"><div><div class="exsite">BeenVerified</div><div class="exsub">Your number, up for sale</div></div><span class="exbadge">Exposed</span></div>
-        <div class="exrow"><div><div class="exsite">Intelius</div><div class="exsub">Your number, on their call lists</div></div><span class="exbadge">Exposed</span></div>
-        <div class="exrow"><div><div class="exsite">PeopleFinders</div><div class="exsub">Your number, searchable by anyone</div></div><span class="exbadge">Exposed</span></div>
+        <div class="exrow"><div><div class="exsite">People search site</div><div class="exsub">Your phone number, listed publicly</div></div><span class="exbadge">Exposed</span></div>
+        <div class="exrow"><div><div class="exsite">Background check site</div><div class="exsub">Your number, sold to callers</div></div><span class="exbadge">Exposed</span></div>
+        <div class="exrow"><div><div class="exsite">Phone directory</div><div class="exsub">Your number, shared with call centers</div></div><span class="exbadge">Exposed</span></div>
+        <div class="exrow"><div><div class="exsite">Public records site</div><div class="exsub">Your number, up for sale</div></div><span class="exbadge">Exposed</span></div>
+        <div class="exrow"><div><div class="exsite">Lead list seller</div><div class="exsub">Your number, on their call lists</div></div><span class="exbadge">Exposed</span></div>
+        <div class="exrow"><div><div class="exsite">Data broker</div><div class="exsub">Your number, searchable by anyone</div></div><span class="exbadge">Exposed</span></div>
         <div class="exmore" id="exmore">+ 41 more sites found</div>
         <div class="lockcta">
           <span class="lock"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M6 10V8a6 6 0 0112 0v2" stroke="#B52A2A" stroke-width="2"/><rect x="4" y="10" width="16" height="10" rx="2" stroke="#B52A2A" stroke-width="2"/></svg></span>
@@ -91,15 +91,15 @@
     <div class="mprice">
       <div class="was">Total value $1,573 / yr</div>
       <div class="now">$19<span> / month</span></div>
-      <div class="muted" style="font-size:.9rem">or $190 a year (2 months free). Cancel anytime.</div>
+      <div class="muted" style="font-size:.9rem">or <span style="text-decoration:line-through">$228</span> $190 a year (2 months free). Cancel anytime.</div>
     </div>
     <button class="btn btn--accent btn--lg btn--block" onclick="goCheckout()">Remove My Number &rarr;</button>
     <div class="mtrust">
-      <span>&#10003; 30 day money back</span>
+      <span>&#10003; We never sell your number</span>
       <span>&#10003; Secure checkout</span>
       <span>&#10003; Cancel anytime</span>
     </div>
-    <p class="fine center" style="margin-top:.8rem">If it does not work, you do not pay. Backed by our 30 day money back guarantee.</p>
+    <p class="fine center" style="margin-top:.8rem">No long contract. Cancel anytime. We never sell your number.</p>
   </div>
 </div>
 
@@ -132,7 +132,7 @@
     var pretty = d.length===10 ? '('+d.slice(0,3)+') '+d.slice(3,6)+'-'+d.slice(6) : phone;
     document.getElementById('scanphone').innerHTML = 'Checking where <b>'+pretty+'</b> is listed for sale.';
   }
-  var brokers = ['whitepages.com','spokeo.com','radaris.com','beenverified.com','intelius.com','peoplefinders.com','truepeoplesearch.com','fastpeoplesearch.com','usphonebook.com','clustrmaps.com','nuwber.com','thatsthem.com'];
+  var brokers = ['people search sites','background check sites','phone directories','public records sites','lead list sellers','data broker sites','people finder sites','address lookup sites'];
   var feed = document.getElementById('feed'), fill = document.getElementById('scanfill');
   var i = 0, pct = 0;
   var iv = setInterval(function(){
