@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>You're protected | SpamCallStop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="bar">
+  <div class="bar-in">
+    <a href="index.html" class="word">Spam<span class="cr">Call</span>Stop<span class="cg">.com</span></a>
+    <span class="secure"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#1F7A4D" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Active</span>
+  </div>
+</header>
+<div class="progress">
+  <div class="progress-in">
+    <span class="pstep done"><span class="pdot">&#10003;</span><span class="plabel">Scan</span></span>
+    <span class="psep"></span>
+    <span class="pstep done"><span class="pdot">&#10003;</span><span class="plabel">Results</span></span>
+    <span class="psep"></span>
+    <span class="pstep done"><span class="pdot">&#10003;</span><span class="plabel">Plan</span></span>
+    <span class="psep"></span>
+    <span class="pstep done"><span class="pdot">&#10003;</span><span class="plabel">Done</span></span>
+  </div>
+</div>
+
+<section>
+  <div class="narrow center">
+    <div class="bigcheck">
+      <svg width="44" height="44" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#1F7A4D" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+    </div>
+    <span class="overline" style="color:var(--green)">You're in</span>
+    <h1 class="display" style="margin:.5rem 0 .5rem">You're protected. <span class="accent">Welcome.</span></h1>
+    <p class="lead muted" id="welcome" style="max-width:48ch;margin:0 auto">We have got it from here. Your number is on its way off the lists, and we will keep it that way.</p>
+  </div>
+</section>
+
+<section class="surface">
+  <div class="container">
+    <div class="sec-head"><span class="overline">What happens next</span><h2 class="h2">You do not lift a finger.</h2></div>
+    <div class="tsteps">
+      <div class="tstep"><div class="n">1</div><h3>We start within 24 to 48 hours</h3><p>Our team begins removing your number from every site we found. You do nothing.</p></div>
+      <div class="tstep"><div class="n">2</div><h3>Your first report in about a week</h3><p>We will email you a simple report showing what we removed and where. Watch your inbox.</p></div>
+      <div class="tstep"><div class="n">3</div><h3>We keep watching, for good</h3><p>The moment your number comes back anywhere, we remove it again. The calls keep getting quieter.</p></div>
+    </div>
+    <div class="center" style="margin-top:1.8rem">
+      <p class="muted" id="conf"></p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="narrow center">
+    <span class="overline">One more thing</span>
+    <h2 class="h2" style="margin:.5rem 0 .8rem">Know someone who needs this?</h2>
+    <p class="lead muted" style="max-width:46ch;margin:0 auto 1.6rem">Most of our members also protect a parent or spouse. If someone you love gets too many scam calls, protecting them takes one minute.</p>
+    <a class="btn btn--accent btn--lg" href="index.html">Protect someone else &rarr;</a>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="foot">
+      <div style="max-width:300px">
+        <a href="index.html" class="word2">Spam<span class="cr">Call</span>Stop<span class="cg">.com</span></a>
+        <p>We get your phone number off the lists and keep it off, so the scam calls stop.</p>
+        <p style="margin-top:.8rem">Questions? Email support@spamcallstop.com and we will help.</p>
+      </div>
+      <div><h4>SpamCallStop</h4><a href="index.html">Home</a><a href="offer.html">Your plan</a></div>
+      <div><h4>Trust</h4><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Service</a></div>
+    </div>
+    <p class="disclaimer">&copy; 2026 SpamCallStop. This page is a prototype for demonstration. Confirm your start times and guarantees against your real service before going live.</p>
+  </div>
+</footer>
+
+<script>
+  try {
+    var name = sessionStorage.getItem('scstop_name') || '';
+    var plan = sessionStorage.getItem('scstop_plan') || 'Solo';
+    var email = sessionStorage.getItem('scstop_email') || '';
+    if(name){ document.getElementById('welcome').innerHTML = 'We have got it from here, ' + name.split(' ')[0] + '. Your number is on its way off the lists, and we will keep it that way.'; }
+    var conf = 'Plan: ' + plan + (email ? '. We sent a confirmation to ' + email : '');
+    document.getElementById('conf').textContent = conf;
+  } catch(e){}
+</script>
+</body>
+</html>

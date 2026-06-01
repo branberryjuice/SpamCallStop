@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout | SpamCallStop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="bar">
+  <div class="bar-in">
+    <a href="index.html" class="word">Spam<span class="cr">Call</span>Stop<span class="cg">.com</span></a>
+    <span class="secure"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 10V8a6 6 0 0112 0v2" stroke="#6B6B72" stroke-width="2"/><rect x="4" y="10" width="16" height="10" rx="2" stroke="#6B6B72" stroke-width="2"/></svg> Secure checkout</span>
+  </div>
+</header>
+<div class="progress">
+  <div class="progress-in">
+    <span class="pstep done"><span class="pdot">&#10003;</span><span class="plabel">Scan</span></span>
+    <span class="psep"></span>
+    <span class="pstep done"><span class="pdot">&#10003;</span><span class="plabel">Results</span></span>
+    <span class="psep"></span>
+    <span class="pstep done"><span class="pdot">&#10003;</span><span class="plabel">Plan</span></span>
+    <span class="psep"></span>
+    <span class="pstep active"><span class="pdot">4</span><span class="plabel">Checkout</span></span>
+  </div>
+</div>
+
+<section>
+  <div class="container">
+    <div class="center" style="margin-bottom:2rem">
+      <h1 class="h2">You are one step from a quieter phone.</h1>
+      <p class="muted">Enter your details below. You are covered by our 30 day money back guarantee.</p>
+    </div>
+
+    <div class="colayout">
+      <div>
+        <div class="cocard">
+          <h3>1. Your details</h3>
+          <div class="field"><label for="nm">Your name</label><input id="nm" type="text" placeholder="Jane Smith" autocomplete="name"></div>
+          <div class="field"><label for="em">Email (where we send your reports)</label><input id="em" type="email" placeholder="jane@email.com" autocomplete="email"></div>
+          <div class="field"><label for="ph2">Phone number to protect</label><input id="ph2" type="tel" placeholder="(555) 123 4567" autocomplete="tel"></div>
+        </div>
+
+        <label class="bump" for="bump">
+          <input type="checkbox" id="bump" onchange="recalc()">
+          <span><b>Add instant alerts. Just $5 a month.</b> The moment your number comes back on any site, we remove it within hours and send you a text to let you know. Most members add this.</span>
+        </label>
+
+        <div class="cocard" style="margin-top:1.2rem">
+          <h3>2. Payment</h3>
+          <div class="field"><label for="cc">Card number</label><input id="cc" type="text" inputmode="numeric" placeholder="1234 1234 1234 1234" autocomplete="cc-number"></div>
+          <div class="field-row">
+            <div class="field"><label for="exp">Expires</label><input id="exp" type="text" placeholder="MM / YY" autocomplete="cc-exp"></div>
+            <div class="field"><label for="cvc">Security code</label><input id="cvc" type="text" inputmode="numeric" placeholder="3 digits" autocomplete="cc-csc"></div>
+          </div>
+          <button class="btn btn--accent btn--lg btn--block" style="margin-top:.6rem" onclick="finish()">Complete secure checkout &rarr;</button>
+          <p class="fine center" style="margin-top:.9rem"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="vertical-align:-2px"><path d="M6 10V8a6 6 0 0112 0v2" stroke="#6B6B72" stroke-width="2"/><rect x="4" y="10" width="16" height="10" rx="2" stroke="#6B6B72" stroke-width="2"/></svg> Encrypted and secure. Cancel anytime.</p>
+        </div>
+      </div>
+
+      <div>
+        <div class="summary">
+          <h3 style="margin-bottom:1rem">Order summary</h3>
+          <div class="sumrow"><span class="lbl"><span id="planName">Solo</span> plan (<span id="billName">monthly</span>)</span><span id="basePrice">$19/mo</span></div>
+          <div class="sumrow" id="bumpRow" style="display:none"><span class="lbl">Instant alerts</span><span id="bumpPrice">+$5/mo</span></div>
+          <div class="sumrow tot"><span>Total today</span><span id="totalPrice">$19/mo</span></div>
+          <button class="btn btn--accent btn--block" style="margin-top:1rem" onclick="finish()">Complete secure checkout &rarr;</button>
+          <ul class="trustlist">
+            <li><span class="tk"><svg width="15" height="15" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#1F7A4D" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span> 30 day money back guarantee</li>
+            <li><span class="tk"><svg width="15" height="15" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#1F7A4D" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span> Cancel anytime. No contract</li>
+            <li><span class="tk"><svg width="15" height="15" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#1F7A4D" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span> We start within 24 to 48 hours</li>
+            <li><span class="tk"><svg width="15" height="15" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#1F7A4D" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span> 24/7 help whenever you need it</li>
+          </ul>
+        </div>
+        <p class="demo-note">Prototype: no real payment is taken. The button just moves the demo forward.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="foot">
+      <div style="max-width:300px">
+        <a href="index.html" class="word2">Spam<span class="cr">Call</span>Stop<span class="cg">.com</span></a>
+        <p>We get your phone number off the lists and keep it off.</p>
+      </div>
+      <div><h4>Trust</h4><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Service</a></div>
+    </div>
+    <p class="disclaimer">&copy; 2026 SpamCallStop. This page is a prototype for demonstration. No real charges are made. Connect a real payment provider before going live.</p>
+  </div>
+</footer>
+
+<script>
+  var plan='Solo', billing='m', base=19;
+  try {
+    plan = sessionStorage.getItem('scstop_plan') || 'Solo';
+    billing = sessionStorage.getItem('scstop_billing') || 'm';
+    base = parseInt(sessionStorage.getItem('scstop_price') || '19', 10);
+    var ph = sessionStorage.getItem('scstop_phone'); if(ph){ document.getElementById('ph2').value = ph; }
+  } catch(e){}
+  var per = billing==='y' ? '/yr' : '/mo';
+  var bumpAmt = billing==='y' ? 50 : 5;
+  document.getElementById('planName').textContent = plan;
+  document.getElementById('billName').textContent = billing==='y' ? 'yearly' : 'monthly';
+  document.getElementById('basePrice').textContent = '$'+base+per;
+  document.getElementById('bumpPrice').textContent = '+$'+bumpAmt+per;
+  function recalc(){
+    var on = document.getElementById('bump').checked;
+    document.getElementById('bumpRow').style.display = on ? 'flex' : 'none';
+    var total = base + (on ? bumpAmt : 0);
+    document.getElementById('totalPrice').textContent = '$'+total+per;
+  }
+  recalc();
+  function finish(){
+    try {
+      sessionStorage.setItem('scstop_name', document.getElementById('nm').value || '');
+      sessionStorage.setItem('scstop_email', document.getElementById('em').value || '');
+      sessionStorage.setItem('scstop_bump', document.getElementById('bump').checked ? '1' : '0');
+    } catch(e){}
+    location.href = 'thank-you.html';
+  }
+</script>
+</body>
+</html>

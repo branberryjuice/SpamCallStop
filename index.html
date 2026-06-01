@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpamCallStop. Stop the Spam &amp; Scam Calls For Good.</title>
+<meta name="description" content="SpamCallStop finds everywhere your phone number is being sold online, removes it, and keeps watch for you, so the spam and scam calls finally stop. Free scan, no commitment. Made simple.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   SPAMCALLSTOP DESIGN SYSTEM  (DeleteMe structure, own palette)
+   ============================================================ */
+:root{
+  --ink:#111111; --bg:#FFFFFF; --surface:#F7F7F8; --surface-2:#EFEFF1;
+  --text:#1A1A1A; --muted:#6B6B72; --border:#E5E5E8; --border-strong:#D5D5DA;
+  --accent:#B52A2A; --accent-strong:#991F1F; --accent-tint:#F6E9E9;
+  --font:'Libre Franklin',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+  --r-sm:6px; --r:8px; --r-lg:12px;
+  --sh-sm:0 1px 2px rgba(17,17,17,.06),0 1px 3px rgba(17,17,17,.08);
+  --sh-md:0 2px 4px rgba(17,17,17,.05),0 10px 24px -8px rgba(17,17,17,.13);
+  --sh-lg:0 12px 40px -12px rgba(17,17,17,.20);
+  --maxw:1120px; --narrow:760px; --pad:22px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);font-size:18px;line-height:1.6;color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;overflow-x:hidden}
+img{max-width:100%;display:block}
+a{color:var(--accent)}
+h1,h2,h3{color:var(--ink);font-weight:800;line-height:1.1;letter-spacing:-.02em}
+.display{font-size:clamp(2.5rem,8.5vw,4rem);line-height:1.04;letter-spacing:-.028em;font-weight:800}
+.display .accent{color:var(--accent)}
+.h2{font-size:clamp(1.9rem,5vw,2.75rem);letter-spacing:-.022em}
+.lead{font-size:clamp(1.18rem,2.2vw,1.4rem);line-height:1.5;font-weight:400;color:var(--text)}
+.lead .hl{color:var(--accent);font-weight:700}
+.overline{display:block;font-size:.8125rem;font-weight:800;letter-spacing:.11em;text-transform:uppercase;color:var(--accent)}
+.muted{color:var(--muted)}
+.fine{font-size:.9375rem;line-height:1.55;color:var(--muted)}
+.container{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad)}
+.narrow{max-width:var(--narrow);margin:0 auto;padding:0 var(--pad)}
+section{padding:clamp(56px,8vw,96px) 0}
+.surface{background:var(--surface)}
+.dark{background:var(--ink);color:#EDEDEF}
+.center{text-align:center}
+.sec-head{max-width:62ch;margin:0 auto clamp(2rem,4vw,3rem)}
+.sec-head .overline{margin-bottom:.7rem;text-align:center}
+.sec-head h2{text-align:center;margin-bottom:.9rem}
+.sec-head p{text-align:center;color:var(--muted);font-size:1.15rem}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;font-family:var(--font);font-weight:700;font-size:1.0625rem;line-height:1;letter-spacing:-.01em;text-decoration:none;border:1.5px solid transparent;border-radius:var(--r);padding:.95rem 1.6rem;min-height:56px;cursor:pointer;transition:background .15s ease,box-shadow .15s ease,border-color .15s ease;text-align:center}
+.btn:focus-visible{outline:3px solid #F0B9B9;outline-offset:2px}
+.btn--primary{background:var(--ink);color:#fff;box-shadow:var(--sh-sm)}
+.btn--primary:hover{background:#000;box-shadow:var(--sh-md)}
+.btn--accent{background:var(--accent);color:#fff;box-shadow:var(--sh-sm)}
+.btn--accent:hover{background:var(--accent-strong);box-shadow:var(--sh-md)}
+.btn--outline{background:#fff;color:var(--ink);border-color:var(--border-strong)}
+.btn--outline:hover{background:var(--surface);border-color:var(--ink)}
+.btn--lg{font-size:1.16rem;padding:1.1rem 2rem;min-height:62px}
+.btn--block{width:100%}
+header.bar{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid var(--border)}
+.bar-in{display:flex;align-items:center;justify-content:space-between;gap:1rem;max-width:1180px;margin:0 auto;padding:.85rem var(--pad)}
+.logo-img{height:46px;width:auto}
+.nav{display:flex;align-items:center;gap:1.6rem}
+.nav a.link{color:var(--ink);text-decoration:none;font-weight:600;font-size:1rem}
+.nav a.link:hover{color:var(--accent)}
+.bar .btn{min-height:48px;padding:.6rem 1.25rem;font-size:.98rem}
+.hamb{display:none;background:none;border:none;cursor:pointer;flex-direction:column;gap:5px;padding:.4rem}
+.hamb span{display:block;width:28px;height:3px;border-radius:2px;background:var(--ink)}
+.hero{background:var(--surface);padding:clamp(44px,7vw,84px) 0 clamp(48px,7vw,88px)}
+.hero .display{max-width:18ch;margin:0 auto 1.3rem;text-align:center}
+.hero .lead{max-width:40ch;margin:0 auto 2rem;text-align:center}
+.form{max-width:540px;margin:0 auto;text-align:center}
+.form .primary-cta{width:auto;margin-bottom:1.75rem}
+.field-label{display:block;font-weight:700;font-size:1rem;color:var(--muted);margin-bottom:.55rem}
+.form input[type=tel]{width:100%;font-family:var(--font);font-size:1.18rem;color:var(--text);padding:1rem 1.1rem;min-height:60px;background:#fff;border:1.5px solid var(--border-strong);border-radius:var(--r);margin-bottom:1rem}
+.form input[type=tel]::placeholder{color:#9a9aa1}
+.form input[type=tel]:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-tint)}
+.form .submit-cta{width:auto}
+.form .fine{margin:1.2rem auto 0;max-width:44ch}
+.form .fine a{font-weight:700}
+.trustbar{border-bottom:1px solid var(--border);background:#fff}
+.trustbar .row{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:1rem 2.4rem;padding:clamp(20px,3vw,30px) 0}
+.trustbar .item{display:flex;align-items:center;gap:.55rem;font-weight:600;color:var(--muted);font-size:1rem}
+.trustbar .item b{color:var(--ink)}
+.trustbar .stars{color:var(--accent);letter-spacing:.08em;font-size:1.05rem}
+.press{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:1rem 2rem;margin-top:.4rem}
+.press span{font-weight:800;color:#B7B7BD;font-size:1.1rem;letter-spacing:.01em}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--sh-sm)}
+.stat{padding:1.9rem 1.5rem;text-align:center}
+.stat .num{font-size:2.7rem;font-weight:800;color:var(--accent);line-height:1;letter-spacing:-.02em;margin-bottom:.55rem}
+.stat .lbl{color:var(--muted);font-weight:500;font-size:1rem;line-height:1.45}
+.src{text-align:center;color:var(--muted);font-size:.9rem;margin-top:1.5rem}
+.villain p{font-size:1.18rem;color:var(--text);margin-bottom:1.1rem}
+.chips{display:flex;flex-wrap:wrap;gap:.65rem;justify-content:center;margin:1.7rem 0}
+.chip{background:#fff;border:1px solid var(--border-strong);border-radius:var(--r);padding:.6rem 1.1rem;font-weight:600;color:var(--ink)}
+.chip.more{background:var(--ink);color:#fff;border-color:var(--ink)}
+.kicker{text-align:center;font-weight:800;font-size:1.25rem;color:var(--ink);line-height:1.3}
+.kicker .accent{color:var(--accent)}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.step{padding:2rem 1.6rem}
+.step .n{width:46px;height:46px;border-radius:var(--r);background:var(--accent-tint);color:var(--accent);font-weight:800;font-size:1.3rem;display:flex;align-items:center;justify-content:center;margin-bottom:1.1rem}
+.step h3{font-size:1.35rem;margin-bottom:.55rem}
+.step p{color:var(--muted);font-size:1.05rem}
+.stack{max-width:720px;margin:0 auto;border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--sh-md);overflow:hidden;background:#fff}
+.stack-head{background:var(--ink);color:#fff;padding:1.4rem 1.8rem;text-align:center;font-weight:800;font-size:1.4rem;letter-spacing:-.01em}
+.stack-row{display:flex;gap:1rem;padding:1.1rem 1.8rem;border-bottom:1px solid var(--border)}
+.stack-row .ck{flex:0 0 auto;width:26px;height:26px;border-radius:50%;background:var(--accent-tint);display:flex;align-items:center;justify-content:center;margin-top:.15rem}
+.stack-row .t{flex:1}
+.stack-row .t b{display:block;font-size:1.05rem;color:var(--ink)}
+.stack-row .t small{color:var(--muted)}
+.stack-row .v{flex:0 0 auto;font-weight:700;color:var(--muted);font-size:.95rem;white-space:nowrap}
+.stack-total{display:flex;justify-content:space-between;align-items:center;padding:1.15rem 1.8rem;background:var(--surface)}
+.stack-total .l{font-weight:700;font-size:1.1rem;color:var(--ink)}
+.stack-total .r{font-weight:800;font-size:1.4rem;color:var(--muted);text-decoration:line-through}
+.stack-price{padding:1.7rem 1.8rem;text-align:center}
+.stack-price .small{font-weight:800;text-transform:uppercase;letter-spacing:.08em;font-size:.82rem;color:var(--accent)}
+.stack-price .big{font-size:3rem;font-weight:800;color:var(--ink);letter-spacing:-.02em;line-height:1.05;margin:.15rem 0}
+.stack-price .big span{font-size:1.2rem;font-weight:700;color:var(--muted)}
+.gwrap{display:grid;grid-template-columns:128px 1fr;gap:32px;align-items:center;max-width:880px;margin:0 auto}
+.seal{width:128px;height:128px;border-radius:50%;border:3px solid var(--accent);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:rgba(181,42,42,.10)}
+.seal b{color:#fff;font-weight:800;font-size:1rem;line-height:1.1}
+.seal small{color:#E89C9C;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;margin-top:.3rem}
+.dark h2{color:#fff}
+.glist{list-style:none;margin-top:.4rem}
+.glist li{display:flex;gap:.75rem;align-items:flex-start;margin-bottom:.8rem;color:#CFCFD3;font-size:1.08rem}
+.glist b{color:#fff}
+.glist .gck{flex:0 0 auto;width:24px;height:24px;border-radius:50%;background:rgba(181,42,42,.3);display:flex;align-items:center;justify-content:center;margin-top:.2rem}
+.toggle{display:flex;justify-content:center;align-items:center;gap:.75rem;margin-bottom:2.4rem}
+.toggle button{font-family:var(--font);font-weight:700;font-size:1rem;border:1.5px solid var(--border-strong);background:#fff;color:var(--muted);padding:.6rem 1.25rem;border-radius:var(--r);cursor:pointer}
+.toggle button.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.toggle .save{background:var(--accent-tint);color:var(--accent);font-weight:800;font-size:.8rem;padding:.32rem .6rem;border-radius:var(--r-sm)}
+.plans{display:grid;grid-template-columns:repeat(2,1fr);gap:22px;max-width:780px;margin:0 auto;align-items:stretch}
+.plan{padding:2rem 1.8rem;display:flex;flex-direction:column;position:relative}
+.plan.feat{border:2px solid var(--accent);box-shadow:var(--sh-md)}
+.plan .badge{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-weight:800;font-size:.78rem;letter-spacing:.04em;text-transform:uppercase;padding:.38rem 1rem;border-radius:var(--r-sm);white-space:nowrap}
+.plan h3{font-size:1.5rem;margin-bottom:.25rem}
+.plan .who{color:var(--muted);font-weight:500;margin-bottom:1.1rem}
+.plan .price{font-size:3rem;font-weight:800;color:var(--ink);line-height:1;letter-spacing:-.02em}
+.plan .price span{font-size:1.1rem;font-weight:700;color:var(--muted)}
+.plan .billed{color:var(--muted);font-size:.95rem;min-height:1.3em;margin:.4rem 0 1.3rem}
+.plan ul{list-style:none;flex:1;margin-bottom:1.5rem}
+.plan li{display:flex;gap:.6rem;align-items:flex-start;margin-bottom:.7rem;font-size:1.02rem}
+.plan li .pk{flex:0 0 auto;width:22px;height:22px;border-radius:50%;background:var(--accent-tint);display:flex;align-items:center;justify-content:center;margin-top:.18rem}
+.paynote{display:flex;flex-wrap:wrap;justify-content:center;gap:.5rem 1.5rem;margin-top:1.8rem;color:var(--muted);font-weight:600}
+.paynote span{display:inline-flex;align-items:center;gap:.45rem}
+.ctable{max-width:840px;margin:0 auto;border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--sh-sm);background:#fff}
+.ctable table{width:100%;border-collapse:collapse}
+.ctable th,.ctable td{padding:1.05rem 1rem;text-align:center;border-bottom:1px solid var(--border);font-size:1rem}
+.ctable thead th{background:var(--surface);font-weight:800;color:var(--muted)}
+.ctable thead th.us{background:var(--ink);color:#fff;font-size:1.1rem}
+.ctable td:first-child,.ctable th:first-child{text-align:left;font-weight:700;color:var(--ink)}
+.ctable td.us{background:var(--accent-tint);font-weight:700;color:var(--accent)}
+.ctable .no{color:var(--muted)}
+.tcard{padding:1.8rem 1.6rem}
+.tcard .stars{color:var(--accent);letter-spacing:.1em;font-size:1.15rem;margin-bottom:.8rem}
+.tcard p{font-size:1.06rem;color:var(--text);margin-bottom:1.2rem}
+.tperson{display:flex;align-items:center;gap:.75rem}
+.tav{width:44px;height:44px;border-radius:50%;background:var(--accent-tint);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.1rem}
+.tperson b{display:block;font-size:.98rem;color:var(--ink)}
+.tperson small{color:var(--muted)}
+.phnote{max-width:680px;margin:1.6rem auto 0;text-align:center;background:var(--accent-tint);border:1px dashed var(--accent);color:var(--accent-strong);border-radius:var(--r);padding:.85rem 1.2rem;font-weight:700;font-size:.95rem}
+.faq{max-width:760px;margin:0 auto}
+details{background:#fff;border:1px solid var(--border);border-radius:var(--r);margin-bottom:.85rem;overflow:hidden}
+details[open]{box-shadow:var(--sh-sm)}
+summary{list-style:none;cursor:pointer;padding:1.2rem 1.4rem;font-weight:700;font-size:1.12rem;color:var(--ink);display:flex;justify-content:space-between;align-items:center;gap:1rem}
+summary::-webkit-details-marker{display:none}
+summary .pm{flex:0 0 auto;width:28px;height:28px;border-radius:50%;background:var(--accent-tint);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:1.4rem;line-height:1;transition:transform .2s}
+details[open] summary .pm{transform:rotate(45deg)}
+.ans{padding:0 1.4rem 1.3rem;color:var(--muted);font-size:1.05rem}
+.final{text-align:center}
+.final h2{color:#fff;margin-bottom:1rem}
+.final p{color:#B9B9C0;font-size:1.18rem;max-width:52ch;margin:0 auto 2rem}
+.final .mini{margin-top:1.3rem;color:#8C8C94;font-weight:600}
+footer{background:#0C0C0E;color:#8C8C94;padding:48px 0;font-size:.97rem}
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:2rem}
+.foot .word{font-weight:800;font-size:1.35rem;color:#fff;letter-spacing:-.01em;text-decoration:none;display:inline-block;margin-bottom:.6rem}
+.foot .word .cr{color:var(--accent)}
+.foot .word .cg{color:#8C8C94}
+.foot a{color:#C7C7CD;text-decoration:none;display:block;margin-bottom:.5rem}
+.foot a:hover{color:#fff}
+.foot h4{color:#fff;font-weight:800;font-size:.9rem;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.9rem}
+.disclaimer{border-top:1px solid #232327;margin-top:2.2rem;padding-top:1.4rem;font-size:.84rem;line-height:1.6;color:#6A6A72}
+.sticky{position:fixed;left:0;right:0;bottom:0;z-index:60;background:#fff;border-top:1px solid var(--border);padding:.7rem 16px;display:none;box-shadow:0 -8px 24px -14px rgba(0,0,0,.18)}
+.sticky .btn{width:100%;min-height:54px}
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s ease}
+.reveal.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
+@media (max-width:900px){
+  .grid-3,.steps{grid-template-columns:1fr}
+  .plans{grid-template-columns:1fr;max-width:460px}
+  .gwrap{grid-template-columns:1fr;justify-items:center;text-align:center;gap:22px}
+  .nav .link{display:none}.hamb{display:flex}
+  .ctable{overflow-x:auto}
+}
+@media (max-width:520px){
+  body{font-size:17px}
+  .stack-row{padding:1rem 1.2rem}.stack-row .v{display:none}
+}
+</style>
+</head>
+<body>
+<header class="bar">
+  <div class="bar-in">
+    <a href="#top" aria-label="SpamCallStop.com home" style="text-decoration:none"><span class="word" style="font-weight:800;font-size:1.35rem;color:var(--ink);letter-spacing:-.01em">Spam<span style="color:var(--accent)">Call</span>Stop<span style="color:var(--muted)">.com</span></span></a>
+    <nav class="nav">
+      <a class="link" href="#how">How it works</a>
+      <a class="link" href="#pricing">Pricing</a>
+      <a class="link" href="#faq">FAQ</a>
+      <button class="hamb" aria-label="Menu"><span></span><span></span><span></span></button>
+    </nav>
+  </div>
+</header>
+<a id="top"></a>
+<section class="hero">
+  <div class="container">
+    <h1 class="display reveal">End spam calls <span class="accent">for good.</span></h1>
+    <p class="lead reveal">We take your number off every site selling it, without you lifting a finger. <span class="hl">Free scan</span>, no commitment.</p>
+    <div class="form reveal" id="scan">
+      <label class="field-label" for="ph">Your phone number</label>
+      <input id="ph" type="tel" inputmode="tel" placeholder="Enter your phone number" aria-label="Your phone number">
+      <button class="btn btn--accent btn--lg submit-cta" onclick="startScan()">Free Phone Number Scan</button>
+      <p class="fine">By entering your number you agree to our <a href="terms.html">Terms of Service</a> and <a href="privacy.html">Privacy Policy</a>.</p>
+    </div>
+  </div>
+</section>
+<div class="trustbar">
+  <div class="container">
+    <div class="row">
+      <div class="item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#B52A2A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> 30 day money back guarantee</div>
+      <div class="item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z" stroke="#B52A2A" stroke-width="2" stroke-linejoin="round"/><path d="M8.5 12l2.2 2.2L16 9" stroke="#B52A2A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Bank level data security</div>
+      <div class="item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#B52A2A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Cancel anytime</div>
+    </div>
+    <div class="press">
+      <svg height="26" viewBox="0 0 160 30" fill="#B7B7BD" role="img" aria-label="Press logo"><circle cx="14" cy="15" r="10"/><text x="32" y="21" font-family="Libre Franklin,sans-serif" font-weight="800" font-size="16" letter-spacing="1">CLARION</text></svg>
+      <svg height="26" viewBox="0 0 165 30" fill="#B7B7BD" role="img" aria-label="Press logo"><rect x="4" y="5" width="20" height="20" rx="5"/><text x="32" y="21" font-family="Libre Franklin,sans-serif" font-weight="800" font-size="16" letter-spacing="1">BEACON</text></svg>
+      <svg height="26" viewBox="0 0 185 30" fill="#B7B7BD" role="img" aria-label="Press logo"><path d="M14 4l11 21H3z"/><text x="32" y="21" font-family="Libre Franklin,sans-serif" font-weight="800" font-size="16" letter-spacing="1">MERIDIAN</text></svg>
+      <svg height="26" viewBox="0 0 170 30" fill="#B7B7BD" role="img" aria-label="Press logo"><path d="M14 4l10 11-10 11L4 15z"/><text x="32" y="21" font-family="Libre Franklin,sans-serif" font-weight="800" font-size="16" letter-spacing="1">SUMMIT</text></svg>
+    </div>
+  </div>
+</div>
+<section class="surface">
+  <div class="container">
+    <div class="sec-head">
+      <span class="overline">Why won't the calls stop</span>
+      <h2 class="h2">Because your number is for sale.</h2>
+      <p>It is not bad luck, and you did nothing wrong. Companies you have never heard of collect your phone number and sell it to telemarketers and scammers. The more they sell it, the more the phone rings. And it is people your age losing the most.</p>
+    </div>
+    <div class="grid-3">
+      <div class="card stat reveal"><div class="num">$851M</div><div class="lbl">lost to phone fraud in a single year, nearly double what it was in 2020 (FTC)</div></div>
+      <div class="card stat reveal"><div class="num">$405M</div><div class="lbl">of that lost by adults 60 and older, who report the highest losses (FTC)</div></div>
+      <div class="card stat reveal"><div class="num">~13</div><div class="lbl">spam or fraud calls the average person now gets every single month (industry data)</div></div>
+    </div>
+    <p class="src reveal">Sources: U.S. Federal Trade Commission consumer reports; industry robocall research, 2023 to 2025.</p>
+  </div>
+</section>
+<section class="villain">
+  <div class="narrow">
+    <div class="sec-head">
+      <span class="overline">The part nobody tells you</span>
+      <h2 class="h2">Meet the data brokers.</h2>
+    </div>
+    <p class="reveal">These are companies whose entire business is collecting your phone number and selling it to anyone willing to pay. That includes the people behind those endless spam and scam calls.</p>
+    <p class="reveal">You have probably never heard of most of them. But they likely have your number listed right now:</p>
+    <div class="chips reveal">
+      <span class="chip">Whitepages</span><span class="chip">Spokeo</span><span class="chip">MyLife</span>
+      <span class="chip">Radaris</span><span class="chip">BeenVerified</span><span class="chip">Intelius</span>
+      <span class="chip more">and hundreds more</span>
+    </div>
+    <p class="kicker reveal">You can ask them to take your number down. But there are hundreds, and even after you do, they put it right back within weeks.<br><br>That is the trap. <span class="accent">So we close it for you.</span></p>
+  </div>
+</section>
+<section class="surface" id="how">
+  <div class="container">
+    <div class="sec-head">
+      <span class="overline">How SpamCallStop works</span>
+      <h2 class="h2">Three steps. You only do the first one.</h2>
+    </div>
+    <div class="steps">
+      <div class="card step reveal"><div class="n">1</div><h3>Tell us your number</h3><p>Enter your phone number one time. That is the only thing we will ever ask you to do. It takes about a minute.</p></div>
+      <div class="card step reveal"><div class="n">2</div><h3>We remove it everywhere</h3><p>Our team finds every website selling your number and gets you taken off, usually starting within 24 to 48 hours.</p></div>
+      <div class="card step reveal"><div class="n">3</div><h3>We keep it off for good</h3><p>We watch around the clock. The moment your number pops back up, we remove it again. Automatically. You never think about it.</p></div>
+    </div>
+  </div>
+</section>
+<section>
+  <div class="container">
+    <div class="sec-head">
+      <span class="overline">Everything you get</span>
+      <h2 class="h2">The Stop The Calls Plan</h2>
+      <p>Doing all of this yourself would mean visiting 200+ websites, filling out a different form on each, and repeating it forever. Here is everything we handle for you instead.</p>
+    </div>
+    <div class="stack reveal">
+      <div class="stack-head">Included with your membership</div>
+      <div class="stack-row"><span class="ck"><svg width="14" height="14" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#B52A2A" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="t"><b>We scan hundreds of broker sites</b><small>We find every place your number is listed</small></span><span class="v">$199 value</span></div>
+      <div class="stack-row"><span class="ck"><svg width="14" height="14" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#B52A2A" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="t"><b>Done for you removal</b><small>Our team gets you taken off every site, you do nothing</small></span><span class="v">$499/yr value</span></div>
+      <div class="stack-row"><span class="ck"><svg width="14" height="14" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#B52A2A" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="t"><b>Around the clock removal, for good</b><small>It comes back, we take it down again. Continuously, not once a quarter</small></span><span class="v">$399/yr value</span></div>
+      <div class="stack-row"><span class="ck"><svg width="14" height="14" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#B52A2A" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="t"><b>24/7 help, the moment you need it</b><small>Fast answers any time, day or night</small></span><span class="v">$249/yr value</span></div>
+      <div class="stack-row"><span class="ck"><svg width="14" height="14" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#B52A2A" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="t"><b>A plain English report every month</b><small>See exactly what we removed and where, no jargon</small></span><span class="v">$99/yr value</span></div>
+      <div class="stack-row"><span class="ck"><svg width="14" height="14" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#B52A2A" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="t"><b>Spam Call Defense Kit plus Do Not Call signup</b><small>We register you and show you how to handle the calls that slip through</small></span><span class="v">$49 value</span></div>
+      <div class="stack-row"><span class="ck"><svg width="14" height="14" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#B52A2A" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="t"><b>Bonus: Scam Alert texts</b><small>Friendly warnings about brand new scams aimed at people 60+</small></span><span class="v">$79 value</span></div>
+      <div class="stack-total"><span class="l">Total real world value</span><span class="r">$1,573 / yr</span></div>
+      <div class="stack-price"><div class="small">Your price today</div><div class="big">$19<span> / month</span></div><div class="small" style="color:var(--muted);text-transform:none;letter-spacing:0;font-weight:600">or $190/year, that is 2 months free</div></div>
+    </div>
+    <div class="center" style="margin-top:2.2rem"><a class="btn btn--accent btn--lg" href="#scan">Start With a Free Scan</a></div>
+  </div>
+</section>
+<section class="dark">
+  <div class="container">
+    <div class="gwrap">
+      <div class="seal reveal">
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z" stroke="#B52A2A" stroke-width="1.8" stroke-linejoin="round"/><path d="M8.5 12l2.2 2.2L16 9" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <b style="margin-top:.4rem">The Stop<br>Guarantee</b><small>Risk free</small>
+      </div>
+      <div class="reveal">
+        <span class="overline" style="color:#E89C9C">Our promise</span>
+        <h2 class="h2" style="margin:.6rem 0 1rem">If it does not work, you do not pay.</h2>
+        <ul class="glist">
+          <li><span class="gck"><svg width="13" height="13" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span><b>30 days, no risk.</b> Do not love it in your first month? We refund every penny, and you keep your privacy report. No questions, no runaround.</span></li>
+          <li><span class="gck"><svg width="13" height="13" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span><b>The 90 day promise.</b> If we have not removed your number from every site we found within 90 days, we keep working free until we do, and we refund your last payment.</span></li>
+          <li><span class="gck"><svg width="13" height="13" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span><b>For good.</b> Your number reappears? We find it and remove it again, at no extra charge. That is the whole job.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+<section id="pricing">
+  <div class="container">
+    <div class="sec-head">
+      <span class="overline">Simple pricing</span>
+      <h2 class="h2">Pick your plan. Change your mind anytime.</h2>
+      <p>No long contracts. No big upfront charge. Less than the cost of one dinner out a month.</p>
+    </div>
+    <div class="toggle reveal">
+      <button id="tM" class="active" onclick="setBilling('m')">Monthly</button>
+      <button id="tY" onclick="setBilling('y')">Yearly</button>
+      <span class="save">Save 2 months</span>
+    </div>
+    <div class="plans">
+      <div class="card plan feat reveal">
+        <span class="badge">Most popular</span>
+        <h3>Solo</h3><div class="who">Protect one person</div>
+        <div class="price" id="soloP">$19<span>/mo</span></div>
+        <div class="billed" id="soloB">Billed monthly, cancel anytime</div>
+        <ul>
+          <li><span class="pk"><svg width="13" height="13" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#B52A2A" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Everything in The Stop The Calls Plan</li>
+          <li><span class="pk"><svg width="13" height="13" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#B52A2A" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Removal from hundreds of sites</li>
+          <li><span class="pk"><svg width="13" height="13" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#B52A2A" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Continuous removal, for good</li>
+          <li><span class="pk"><svg width="13" height="13" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#B52A2A" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>24/7 help whenever you need it</li>
+        </ul>
+        <a class="btn btn--accent btn--lg btn--block" href="#scan">Get Solo</a>
+      </div>
+      <div class="card plan reveal">
+        <h3>Household</h3><div class="who">Protect two people (couples)</div>
+        <div class="price" id="dualP">$29<span>/mo</span></div>
+        <div class="billed" id="dualB">Billed monthly, cancel anytime</div>
+        <ul>
+          <li><span class="pk"><svg width="13" height="13" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#B52A2A" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Everything in Solo, for two people</li>
+          <li><span class="pk"><svg width="13" height="13" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#B52A2A" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Perfect for you and your spouse</li>
+          <li><span class="pk"><svg width="13" height="13" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#B52A2A" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>One simple bill</li>
+          <li><span class="pk"><svg width="13" height="13" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#B52A2A" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>24/7 help whenever you need it</li>
+        </ul>
+        <a class="btn btn--outline btn--lg btn--block" href="#scan">Get Household</a>
+      </div>
+    </div>
+    <div class="paynote reveal">
+      <span><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="18" height="13" rx="2" stroke="#6B6B72" stroke-width="2"/><path d="M3 10h18" stroke="#6B6B72" stroke-width="2"/></svg> Secure checkout</span>
+      <span><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#B52A2A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> 30 day money back</span>
+      <span><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#B52A2A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Cancel anytime by email</span>
+    </div>
+  </div>
+</section>
+<section class="surface">
+  <div class="container">
+    <div class="sec-head"><span class="overline">Why SpamCallStop</span><h2 class="h2">The difference is simple.</h2></div>
+    <div class="ctable reveal">
+      <table>
+        <thead><tr><th></th><th>Doing it yourself</th><th>Other services</th><th class="us">SpamCallStop</th></tr></thead>
+        <tbody>
+          <tr><td>Removes your number</td><td>One site at a time</td><td>Yes</td><td class="us">Yes, all of it</td></tr>
+          <tr><td>How often it checks</td><td>Never (you forget)</td><td>Every 3 months</td><td class="us">Around the clock</td></tr>
+          <tr><td>Get help when you need it</td><td class="no">No one to ask</td><td>Email, days</td><td class="us">Instant, 24/7</td></tr>
+          <tr><td>Commitment</td><td>Your time, forever</td><td>Pay a year upfront</td><td class="us">$19/mo, cancel anytime</td></tr>
+          <tr><td>Effort from you</td><td>50+ hours a year</td><td>Some setup</td><td class="us">About 1 minute</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="src reveal" style="margin-top:1.2rem">Comparison reflects common practices in the data removal category as of 2026. Competitor terms vary, so check current details before relying on them.</p>
+  </div>
+</section>
+<section>
+  <div class="container">
+    <div class="sec-head"><span class="overline">Why people trust us</span><h2 class="h2">Simple, honest, and always on.</h2></div>
+    <div class="grid-3">
+      <div class="card tcard reveal"><h3 style="font-size:1.2rem;margin-bottom:.5rem">Help any time, day or night</h3><p>Get fast answers whenever you need them, 24/7. No long waits, ever.</p></div>
+      <div class="card tcard reveal"><h3 style="font-size:1.2rem;margin-bottom:.5rem">We never sell your number</h3><p>Taking your number off the market is our whole job. We would never put it back on.</p></div>
+      <div class="card tcard reveal"><h3 style="font-size:1.2rem;margin-bottom:.5rem">No risk to try</h3><p>Cancel anytime, and you are covered by a 30 day money back guarantee.</p></div>
+    </div>
+  </div>
+</section>
+<section class="surface" id="faq">
+  <div class="container">
+    <div class="sec-head"><span class="overline">Your questions</span><h2 class="h2">Honest answers.</h2></div>
+    <div class="faq">
+      <details class="reveal" open><summary>Wait, is this itself a scam? <span class="pm">+</span></summary><div class="ans">A fair question, and we are glad you asked it. No. SpamCallStop is a real service. We never ask for your Social Security number or bank login to do our job, and you can cancel anytime by email. Start with the free scan, and you will see exactly what we find before you pay anything.</div></details>
+      <details class="reveal"><summary>Do I need to be good with computers? <span class="pm">+</span></summary><div class="ans">Not at all. If you can type your phone number, you can use SpamCallStop. After that, there is nothing to install and nothing to manage. We do all the work behind the scenes, and your monthly report comes in plain English.</div></details>
+      <details class="reveal"><summary>How fast will the calls stop? <span class="pm">+</span></summary><div class="ans">We usually begin removing your number within 24 to 48 hours. As your number comes off the lists over the following weeks, the spam and scam calls drop off. Industry research has found that removing your information can cut unwanted calls significantly. It is not instant magic. It is steady, lasting relief.</div></details>
+      <details class="reveal"><summary>What if my number shows up again later? <span class="pm">+</span></summary><div class="ans">It will try to, and that is exactly why a one time cleanup does not work. We keep watching around the clock, and the moment your number reappears anywhere, we remove it again automatically, at no extra cost. That is the heart of what your membership pays for.</div></details>
+      <details class="reveal"><summary>Is my information safe with you? <span class="pm">+</span></summary><div class="ans">Yes. We only use your details to do one thing: get your number off the broker sites. We do not sell your information. Taking it <em>off</em> the market is the entire point of our business. See our <a href="privacy.html">Privacy Policy</a>.</div></details>
+      <details class="reveal"><summary>Can I cancel? <span class="pm">+</span></summary><div class="ans">Anytime. There is no long contract. Just email us to cancel, and if you are within your first 30 days, we will refund you in full.</div></details>
+      <details class="reveal"><summary>Can I protect my spouse or my parents too? <span class="pm">+</span></summary><div class="ans">Yes. The Household plan covers two people on one simple bill, ideal for couples. Many members also sign up to protect an aging parent. Email us and we will help you set it up.</div></details>
+    </div>
+  </div>
+</section>
+<section class="dark final">
+  <div class="narrow">
+    <span class="overline" style="color:#E89C9C">Every day you wait, your number spreads to more lists</span>
+    <h2 class="h2" style="margin-top:.7rem">Let's make your phone quiet again.</h2>
+    <p>See exactly who is selling your number, free, in about 60 seconds. No payment, no catch. Then let us take it from there.</p>
+    <a class="btn btn--accent btn--lg" href="#scan">Scan My Number Free</a>
+    <div class="mini">Cancel anytime. 30 day money back. Help any time, day or night.</div>
+  </div>
+</section>
+<footer>
+  <div class="container">
+    <div class="foot">
+      <div style="max-width:300px">
+        <a href="#top" class="word">Spam<span class="cr">Call</span>Stop<span class="cg">.com</span></a>
+        <p>We get your phone number off the data broker lists and keep it off, so the scam calls stop.</p>
+        <p style="margin-top:1rem;color:#C7C7CD;font-weight:700">spamcallstop.com</p>
+        <p>Questions? Email support@spamcallstop.com and we will help.</p>
+      </div>
+      <div><h4>SpamCallStop</h4><a href="#scan">Free scan</a><a href="#how">How it works</a><a href="#pricing">Pricing</a><a href="#">Contact us</a></div>
+      <div><h4>Trust</h4><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Service</a><a href="terms.html">Refund and Guarantee</a><a href="https://www.donotcall.gov">Do Not Call list</a></div>
+    </div>
+    <p class="disclaimer">&copy; 2026 SpamCallStop. SpamCallStop is a phone number removal service. We are not affiliated with, endorsed by, or sponsored by any data broker or people search website named on this page. Those names are used only to describe the sites we help remove you from. Results vary, and some phone number listings in public records may not be removable. Statistics are from the U.S. Federal Trade Commission and published industry research, 2023 to 2025.</p>
+  </div>
+</footer>
+<script>
+  function setBilling(m){
+    var tM=document.getElementById('tM'),tY=document.getElementById('tY');
+    var sP=document.getElementById('soloP'),sB=document.getElementById('soloB');
+    var dP=document.getElementById('dualP'),dB=document.getElementById('dualB');
+    if(m==='y'){tY.classList.add('active');tM.classList.remove('active');
+      sP.innerHTML='$190<span>/yr</span>';sB.textContent='Just $15.83/mo, 2 months free';
+      dP.innerHTML='$290<span>/yr</span>';dB.textContent='Just $24.17/mo, 2 months free';
+    }else{tM.classList.add('active');tY.classList.remove('active');
+      sP.innerHTML='$19<span>/mo</span>';sB.textContent='Billed monthly, cancel anytime';
+      dP.innerHTML='$29<span>/mo</span>';dB.textContent='Billed monthly, cancel anytime';}
+  }
+  function focusScan(){var el=document.getElementById('ph');el.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(function(){el.focus()},350);}
+  function startScan(){var v=document.getElementById('ph').value.trim();
+    if(v.replace(/\D/g,'').length<10){alert('Please enter your 10 digit phone number so we can scan it.');return;}
+    try{sessionStorage.setItem('scstop_phone', v);}catch(e){}
+    location.href='scan-results.html';}
+  (function(){var els=document.querySelectorAll('.reveal');
+    if(!('IntersectionObserver' in window)){els.forEach(function(e){e.classList.add('in')});return;}
+    var io=new IntersectionObserver(function(en){en.forEach(function(e,i){if(e.isIntersecting){setTimeout(function(){e.target.classList.add('in')},(i%4)*60);io.unobserve(e.target);}});},{threshold:.12});
+    els.forEach(function(e){io.observe(e)});})();
+</script>
+</body>
+</html>
