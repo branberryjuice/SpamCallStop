@@ -72,9 +72,13 @@ header.bar{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px so
 .form{max-width:540px;margin:0 auto;text-align:center}
 .form .primary-cta{width:auto;margin-bottom:1.75rem}
 .field-label{display:block;font-weight:700;font-size:1rem;color:var(--muted);margin-bottom:.55rem}
-.form input[type=tel]{width:100%;font-family:var(--font);font-size:1.18rem;color:var(--text);padding:1rem 1.1rem;min-height:60px;background:#fff;border:1.5px solid var(--border-strong);border-radius:var(--r);margin-bottom:1rem}
+.form input[type=tel]{width:100%;font-family:var(--font);font-size:1.18rem;color:var(--text);padding:1rem 4.6rem 1rem 1.1rem;min-height:64px;background:#fff;border:1.5px solid var(--border-strong);border-radius:var(--r);margin-bottom:0}
 .form input[type=tel]::placeholder{color:#9a9aa1}
 .form input[type=tel]:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-tint)}
+.inputwrap{position:relative;margin-bottom:1rem}
+.scanbtn{position:absolute;top:7px;right:7px;bottom:7px;width:54px;border:none;border-radius:var(--r-sm);background:var(--accent);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s ease}
+.scanbtn:hover{background:var(--accent-strong)}
+.scanbtn:focus-visible{outline:3px solid #F0B9B9;outline-offset:2px}
 .form .submit-cta{width:auto}
 .form .fine{margin:1.2rem auto 0;max-width:44ch}
 .form .fine a{font-weight:700}
@@ -224,8 +228,10 @@ footer{background:#0C0C0E;color:#8C8C94;padding:48px 0;font-size:.97rem}
     <h1 class="display reveal">End <span class="accent">spam calls</span> for good.</h1>
     <p class="lead reveal">We take your number off every site selling it, without you lifting a finger. <span class="hl">Free scan</span>, no commitment.</p>
     <div class="form reveal" id="scan">
-      <input id="ph" type="tel" inputmode="tel" placeholder="Enter Phone Number" aria-label="Phone number" onkeydown="if(event.key==='Enter')startScan()">
-      <p class="fine">Press Enter to start your free scan. By entering your number you agree to our <a href="terms.html">Terms of Service</a> and <a href="privacy.html">Privacy Policy</a>.</p>
+      <div class="inputwrap">
+        <input id="ph" type="tel" inputmode="tel" placeholder="Enter Phone Number" aria-label="Phone number" onkeydown="if(event.key==='Enter')startScan()">
+        <button type="button" class="scanbtn" aria-label="Start my free scan" onclick="startScan()"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
     </div>
   </div>
 </section>
@@ -252,6 +258,9 @@ footer{background:#0C0C0E;color:#8C8C94;padding:48px 0;font-size:.97rem}
     <div class="mini">Cancel anytime. No long contract. Help any time, day or night.</div>
   </div>
 </section>
+<div class="container center" style="padding:1.8rem var(--pad)">
+  <p class="fine" style="max-width:52ch;margin:0 auto">Press the arrow or Enter to start your free scan. By entering your number you agree to our <a href="terms.html">Terms of Service</a> and <a href="privacy.html">Privacy Policy</a>.</p>
+</div>
 <footer>
   <div class="container">
     <div class="foot">
