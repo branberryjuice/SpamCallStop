@@ -1,0 +1,27 @@
+# Render deploy blueprint for SpamCallStop.
+# In Render: New + Blueprint, connect this GitHub repo, and it builds & runs the app.
+# Plans and the database get confirmed during the deploy step.
+services:
+  - type: web
+    name: spamcallstop
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: PUBLIC_BASE_URL
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: STRIPE_PRICE_MONTHLY
+        sync: false
+      - key: STRIPE_PRICE_YEARLY
+        sync: false
+      - key: DATABASE_URL
+        sync: false

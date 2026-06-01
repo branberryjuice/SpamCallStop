@@ -1,0 +1,16 @@
+{
+  "name": "spamcallstop",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SpamCallStop — phone number removal service (marketing funnel + backend).",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
