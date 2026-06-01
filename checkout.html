@@ -51,13 +51,9 @@
 
         <div class="cocard" style="margin-top:1.2rem">
           <h3>2. Payment</h3>
-          <div class="field"><label for="cc">Card number</label><input id="cc" type="text" inputmode="numeric" placeholder="1234 1234 1234 1234" autocomplete="cc-number"></div>
-          <div class="field-row">
-            <div class="field"><label for="exp">Expires</label><input id="exp" type="text" placeholder="MM / YY" autocomplete="cc-exp"></div>
-            <div class="field"><label for="cvc">Security code</label><input id="cvc" type="text" inputmode="numeric" placeholder="3 digits" autocomplete="cc-csc"></div>
-          </div>
-          <button class="btn btn--accent btn--lg btn--block" style="margin-top:.6rem" onclick="finish()">Complete secure checkout &rarr;</button>
-          <p class="fine center" style="margin-top:.9rem"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="vertical-align:-2px"><path d="M6 10V8a6 6 0 0112 0v2" stroke="#6B6B72" stroke-width="2"/><rect x="4" y="10" width="16" height="10" rx="2" stroke="#6B6B72" stroke-width="2"/></svg> Encrypted and secure. Cancel anytime.</p>
+          <p class="muted" style="margin-bottom:1rem">You will enter your card on the next screen, on Stripe's secure, encrypted checkout. We never see or store your card details.</p>
+          <button class="btn btn--accent btn--lg btn--block" id="payBtn" onclick="startCheckout()">Continue to secure payment &rarr;</button>
+          <p class="fine center" style="margin-top:.9rem"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="vertical-align:-2px"><path d="M6 10V8a6 6 0 0112 0v2" stroke="#6B6B72" stroke-width="2"/><rect x="4" y="10" width="16" height="10" rx="2" stroke="#6B6B72" stroke-width="2"/></svg> Payments handled by Stripe. Cancel anytime.</p>
         </div>
       </div>
 
@@ -67,7 +63,7 @@
           <div class="sumrow"><span class="lbl"><span id="planName">Solo</span> plan (<span id="billName">monthly</span>)</span><span id="basePrice">$19/mo</span></div>
           <div class="sumrow" id="bumpRow" style="display:none"><span class="lbl">Instant alerts</span><span id="bumpPrice">+$5/mo</span></div>
           <div class="sumrow tot"><span>Total today</span><span id="totalPrice">$19/mo</span></div>
-          <button class="btn btn--accent btn--block" style="margin-top:1rem" onclick="finish()">Complete secure checkout &rarr;</button>
+          <button class="btn btn--accent btn--block" style="margin-top:1rem" onclick="startCheckout()">Continue to secure payment &rarr;</button>
           <ul class="trustlist">
             <li><span class="tk"><svg width="15" height="15" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#1F7A4D" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span> We never sell your number</li>
             <li><span class="tk"><svg width="15" height="15" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#1F7A4D" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span> Cancel anytime. No contract</li>
@@ -75,7 +71,7 @@
             <li><span class="tk"><svg width="15" height="15" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#1F7A4D" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span> 24/7 help whenever you need it</li>
           </ul>
         </div>
-        <p class="demo-note">Prototype: no real payment is taken. The button just moves the demo forward.</p>
+        <p class="demo-note">Test mode: on Stripe's page use test card 4242 4242 4242 4242, any future date, any CVC. No real money moves until live keys are switched on.</p>
       </div>
     </div>
   </div>
@@ -115,13 +111,36 @@
     document.getElementById('totalPrice').textContent = '$'+total+per;
   }
   recalc();
-  function finish(){
+  function startCheckout(){
+    var name = (document.getElementById('nm').value || '').trim();
+    var email = (document.getElementById('em').value || '').trim();
+    var phone = (document.getElementById('ph2').value || '').trim();
+    var bump = document.getElementById('bump').checked;
+    if(!name || email.indexOf('@') < 1 || phone.replace(/\D/g,'').length < 10){
+      alert('Please enter your name, a valid email, and your phone number so we know what to protect.');
+      return;
+    }
     try {
-      sessionStorage.setItem('scstop_name', document.getElementById('nm').value || '');
-      sessionStorage.setItem('scstop_email', document.getElementById('em').value || '');
-      sessionStorage.setItem('scstop_bump', document.getElementById('bump').checked ? '1' : '0');
+      sessionStorage.setItem('scstop_name', name);
+      sessionStorage.setItem('scstop_email', email);
+      sessionStorage.setItem('scstop_bump', bump ? '1' : '0');
     } catch(e){}
-    location.href = 'thank-you.html';
+    var btn = document.getElementById('payBtn');
+    if(btn){ btn.disabled = true; btn.textContent = 'Starting secure checkout…'; }
+    fetch('/api/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: name, email: email, phone: phone, plan: plan, billing: billing, bump: bump })
+    }).then(function(r){ return r.json().catch(function(){ return null; }); })
+      .then(function(data){
+        if(data && data.ok && data.url){ location.href = data.url; return; }
+        // No backend/Stripe in this environment (e.g. static preview): fall back
+        // to the demo thank-you so the click-through still works. NOTE: remove
+        // this fallback at go-live so production never skips real payment.
+        console.warn('checkout unavailable, using demo fallback');
+        location.href = 'thank-you.html';
+      })
+      .catch(function(){ location.href = 'thank-you.html'; });
   }
 </script>
 </body>
