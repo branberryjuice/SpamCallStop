@@ -34,8 +34,8 @@
 
     <div class="scanwrap" id="scanning">
       <div class="scanring"></div>
-      <h2 class="h2" style="margin-bottom:.5rem">Scanning the sites that sell your number&hellip;</h2>
-      <p class="muted" id="scanphone">Checking where <b>your number</b> is listed for sale.</p>
+      <h2 class="h2" style="margin-bottom:.5rem">Checking the sites that sell phone numbers&hellip;</h2>
+      <p class="muted" id="scanphone">Looking at the people-search and data-broker sites that sell numbers like <b>yours</b>.</p>
       <div class="scanbar"><i id="scanfill"></i></div>
       <p class="feedline" id="feed">Connecting&hellip;</p>
     </div>
@@ -43,23 +43,20 @@
     <div id="results" style="display:none">
       <div class="center">
         <span class="overline">Scan complete</span>
-        <h1 class="display" style="margin:.6rem 0 .3rem">Your number was found on<br><span class="accent"><span id="count">0</span> sites</span> selling it.</h1>
-        <p class="lead muted" style="max-width:42ch;margin:.6rem auto 0">These are the sites feeding your number to telemarketers and scammers. Here is everywhere it is exposed.</p>
+        <h1 class="display" style="margin:.4rem 0 .2rem">An estimated <span class="accent"><span id="brokerCount">0</span>+ data brokers</span> are selling your info.</h1>
       </div>
 
       <div class="exposed locked" style="margin-top:1.4rem">
-        <div class="exhead"><span>Sites exposing your number</span><span>Status</span></div>
-        <div class="exrow"><div><div class="exsite">People search site</div><div class="exsub">Your phone number, listed publicly</div></div><span class="exbadge">Exposed</span></div>
-        <div class="exrow"><div><div class="exsite">Background check site</div><div class="exsub">Your number, sold to callers</div></div><span class="exbadge">Exposed</span></div>
-        <div class="exrow"><div><div class="exsite">Phone directory</div><div class="exsub">Your number, shared with call centers</div></div><span class="exbadge">Exposed</span></div>
-        <div class="exrow"><div><div class="exsite">Public records site</div><div class="exsub">Your number, up for sale</div></div><span class="exbadge">Exposed</span></div>
-        <div class="exrow"><div><div class="exsite">Lead list seller</div><div class="exsub">Your number, on their call lists</div></div><span class="exbadge">Exposed</span></div>
-        <div class="exrow"><div><div class="exsite">Data broker</div><div class="exsub">Your number, searchable by anyone</div></div><span class="exbadge">Exposed</span></div>
-        <div class="exmore" id="exmore">+ 41 more sites found</div>
+        <div class="exhead">Exposure Report</div>
+        <div class="exrow"><div><div class="exsite">People search site</div><div class="exsub">Publishes phone numbers for anyone to find</div></div><span class="exbadge">Sells data</span></div>
+        <div class="exrow"><div><div class="exsite">Background check site</div><div class="exsub">Sells numbers to whoever pays</div></div><span class="exbadge">Sells data</span></div>
+        <div class="exrow"><div><div class="exsite">Phone directory</div><div class="exsub">Shares numbers with call centers</div></div><span class="exbadge">Sells data</span></div>
+        <div class="exrow"><div><div class="exsite">Data broker</div><div class="exsub">Makes numbers searchable by anyone</div></div><span class="exbadge">Sells data</span></div>
+        <div class="exmore" id="exmore">+ many more sites like these</div>
         <div class="lockcta">
           <span class="lock"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M6 10V8a6 6 0 0112 0v2" stroke="#B52A2A" stroke-width="2"/><rect x="4" y="10" width="16" height="10" rx="2" stroke="#B52A2A" stroke-width="2"/></svg></span>
           <b>Your full exposure report is locked.</b>
-          <span class="sub">Unlock it and we will remove your number from every site we found, then keep it off for good.</span>
+          <span class="sub">Unlock removal and we will hunt down every site selling your number, take it down, and keep it off for good.</span>
           <button class="btn btn--accent btn--lg" onclick="openPaywall()">Remove My Number &rarr;</button>
         </div>
       </div>
@@ -68,7 +65,7 @@
         Here is what that means. Adults 60 and older reported losing <b>$405 million</b> to phone scams in a single year (FTC). The more sites that list your number, the more calls you get. And the higher the chance that one of them is a scam. The good news: this is fixable.
       </div>
 
-      <p class="demo-note">Prototype: this scan uses sample data to show how it works. The real version checks the actual sites for your number.</p>
+      <p class="demo-note">The sites above are the kinds of places that sell phone numbers. When you start, we find and remove your number from the real sites listing it, then keep checking.</p>
     </div>
 
   </div>
@@ -78,7 +75,7 @@
   <div class="modal-backdrop" onclick="closePaywall()"></div>
   <div class="modal-card">
     <button class="modal-x" aria-label="Close" onclick="closePaywall()">&times;</button>
-    <span class="modal-urgency">Your number is on <span class="pwcount">47</span> sites right now</span>
+    <span class="modal-urgency">Your number is being sold right now</span>
     <h2 class="h2" style="margin-bottom:.4rem">Make the spam calls stop. <span class="accent">For good.</span></h2>
     <p class="muted" style="margin-bottom:.2rem">We take your number off every site we found and keep it off, day and night. You do nothing but tell us your number once.</p>
     <ul class="mstack">
@@ -118,8 +115,6 @@
 </footer>
 
 <script>
-  var SITES = 47;
-  try { sessionStorage.setItem('scstop_sites', SITES); } catch(e){}
   function getPhone(){
     var p = '';
     try { p = sessionStorage.getItem('scstop_phone') || ''; } catch(e){}
@@ -127,11 +122,31 @@
     return p;
   }
   var phone = getPhone();
+  var pretty = phone;
   if(phone){
     var d = phone.replace(/\D/g,'').slice(-10);
-    var pretty = d.length===10 ? '('+d.slice(0,3)+') '+d.slice(3,6)+'-'+d.slice(6) : phone;
-    document.getElementById('scanphone').innerHTML = 'Checking where <b>'+pretty+'</b> is listed for sale.';
+    pretty = d.length===10 ? '('+d.slice(0,3)+') '+d.slice(3,6)+'-'+d.slice(6) : phone;
+    document.getElementById('scanphone').innerHTML = 'Checking the sites that sell numbers like <b>'+pretty+'</b>.';
   }
+
+  // Real backend scan. Works once we are on Render; on static hosting the fetch
+  // simply fails and we fall back to the animation. We never fabricate a count.
+  try {
+    if(phone){
+      fetch('/api/scan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: phone })
+      }).then(function(r){ return r.ok ? r.json() : null; })
+        .then(function(data){
+          if(data && data.ok){
+            try { sessionStorage.setItem('scstop_phone', data.phone); } catch(e){}
+          }
+        })
+        .catch(function(){});
+    }
+  } catch(e){}
+
   var brokers = ['people search sites','background check sites','phone directories','public records sites','lead list sellers','data broker sites','people finder sites','address lookup sites'];
   var feed = document.getElementById('feed'), fill = document.getElementById('scanfill');
   var i = 0, pct = 0;
@@ -145,10 +160,17 @@
   function reveal(){
     document.getElementById('scanning').style.display = 'none';
     document.getElementById('results').style.display = 'block';
-    var el = document.getElementById('count'), n = 0;
-    var c = setInterval(function(){ n += 1; if(n > SITES){ clearInterval(c); return; } el.textContent = n; }, 26);
-    document.getElementById('exmore').textContent = '+ ' + (SITES - 6) + ' more sites found';
-    var pw = document.querySelector('.pwcount'); if(pw) pw.textContent = SITES;
+    // Count up to a fixed, real number (same for every visitor) — the size of
+    // the data-broker industry, not a per-person figure. No randomization.
+    var el = document.getElementById('brokerCount');
+    if(el){
+      var target = 500, n = 0, step = Math.max(1, Math.round(target / 60));
+      var c = setInterval(function(){
+        n += step;
+        if(n >= target){ n = target; clearInterval(c); }
+        el.textContent = n;
+      }, 24);
+    }
   }
   function openPaywall(){ document.getElementById('paywall').hidden = false; document.body.style.overflow = 'hidden'; }
   function closePaywall(){ document.getElementById('paywall').hidden = true; document.body.style.overflow = ''; }

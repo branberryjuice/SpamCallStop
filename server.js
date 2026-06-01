@@ -31,7 +31,7 @@ app.get('/api/health', (req, res) => {
 //   /api/checkout  -> Stripe Checkout Session
 //   /api/webhook   -> Stripe payment webhook
 //   /api/signup    -> persist the customer record
-// e.g. app.use('/api', require('./routes/scan'));
+app.use('/api', require('./routes/scan'));
 
 // --- Static site -----------------------------------------------------------
 // Never hand out our server code or config as if it were a web page.
