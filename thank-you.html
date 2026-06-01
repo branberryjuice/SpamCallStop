@@ -8,6 +8,23 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
+<style>
+.radar{position:relative;width:150px;height:150px;margin:0 auto 1.4rem;border-radius:50%;background:radial-gradient(circle,rgba(31,122,77,.12) 0%,rgba(31,122,77,.05) 55%,rgba(31,122,77,0) 72%);border:2px solid rgba(31,122,77,.38);overflow:hidden;box-shadow:0 0 0 6px rgba(31,122,77,.06)}
+.radar::before,.radar::after{content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);border-radius:50%;border:1px solid rgba(31,122,77,.22)}
+.radar::before{width:66%;height:66%}
+.radar::after{width:33%;height:33%}
+.radar-grid{position:absolute;inset:0}
+.radar-grid::before,.radar-grid::after{content:"";position:absolute;background:rgba(31,122,77,.18)}
+.radar-grid::before{left:50%;top:0;bottom:0;width:1px;transform:translateX(-50%)}
+.radar-grid::after{top:50%;left:0;right:0;height:1px;transform:translateY(-50%)}
+.radar-sweep{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,rgba(31,122,77,.55),rgba(31,122,77,.12) 45deg,rgba(31,122,77,0) 90deg,rgba(31,122,77,0) 360deg);animation:radarspin 2.8s linear infinite}
+.radar-core{position:absolute;top:50%;left:50%;width:11px;height:11px;margin:-5.5px 0 0 -5.5px;border-radius:50%;background:#1F7A4D;animation:radarpulse 2s ease-out infinite}
+.radar-blip{position:absolute;width:8px;height:8px;margin:-4px 0 0 -4px;border-radius:50%;background:#1F7A4D;box-shadow:0 0 6px rgba(31,122,77,.8);opacity:0;animation:radarblip 2.8s ease-in-out infinite}
+@keyframes radarspin{to{transform:rotate(360deg)}}
+@keyframes radarpulse{0%{box-shadow:0 0 0 0 rgba(31,122,77,.5)}100%{box-shadow:0 0 0 20px rgba(31,122,77,0)}}
+@keyframes radarblip{0%,100%{opacity:0}12%,32%{opacity:1}55%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.radar-sweep,.radar-core,.radar-blip{animation:none}.radar-blip{opacity:.9}}
+</style>
 </head>
 <body>
 <header class="bar">
@@ -34,14 +51,30 @@
       <svg width="44" height="44" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#1F7A4D" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
     </div>
     <span class="overline" style="color:var(--green)">You're in</span>
-    <h1 class="display" style="margin:.5rem 0 .5rem">You're protected. <span class="accent">Welcome.</span></h1>
+    <h1 class="display" style="margin:.5rem 0 .5rem">You're protected. <span style="color:var(--green)">Welcome.</span></h1>
     <p class="lead muted" id="welcome" style="max-width:48ch;margin:0 auto">We have got it from here. Your number is on its way off the lists, and we will keep it that way.</p>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="narrow center">
+    <div class="radar" aria-hidden="true">
+      <span class="radar-grid"></span>
+      <span class="radar-sweep"></span>
+      <span class="radar-core"></span>
+      <span class="radar-blip" style="top:30%;left:64%;animation-delay:.3s"></span>
+      <span class="radar-blip" style="top:60%;left:36%;animation-delay:1.2s"></span>
+      <span class="radar-blip" style="top:44%;left:72%;animation-delay:2s"></span>
+    </div>
+    <span class="overline" style="color:var(--green)">Always watching</span>
+    <h2 class="h2" style="margin:.5rem 0 .7rem">We never stop scanning.</h2>
+    <p class="lead muted" style="max-width:48ch;margin:0 auto">Around the clock, we keep searching for your number across the sites that sell it, including any new or future listings. The moment it shows up again, we remove it again.</p>
   </div>
 </section>
 
 <section class="surface">
   <div class="container">
-    <div class="sec-head"><span class="overline">What happens next</span><h2 class="h2">You do not lift a finger.</h2></div>
+    <div class="sec-head"><span class="overline" style="color:var(--green)">What happens next</span><h2 class="h2">You do not lift a finger.</h2></div>
     <div class="tsteps">
       <div class="tstep"><div class="n">1</div><h3>We start within 24 to 48 hours</h3><p>Our team begins removing your number from every site we found. You do nothing.</p></div>
       <div class="tstep"><div class="n">2</div><h3>Your first report in about a week</h3><p>We will email you a simple report showing what we removed and where. Watch your inbox.</p></div>
