@@ -197,6 +197,18 @@ footer{background:#0C0C0E;color:#8C8C94;padding:48px 0;font-size:.97rem}
   body{font-size:17px}
   .stack-row{padding:1rem 1.2rem}.stack-row .v{display:none}
 }
+.ticker{overflow:hidden;background:var(--ink);color:#EDEDEF;padding:.75rem 0;border-bottom:1px solid #232327}
+.ticker-track{display:inline-flex;align-items:center;gap:2.6rem;white-space:nowrap;animation:tickerscroll 32s linear infinite;will-change:transform}
+.ticker:hover .ticker-track{animation-play-state:paused}
+.ticker-item{display:inline-flex;align-items:center;gap:.55rem;font-weight:600;font-size:1rem}
+.ticker-item .who{color:#fff;font-weight:700}
+.ticker-item .num{color:#9a9aa1;font-weight:700;font-size:.9rem}
+.ticker-item .quote{color:#CFCFD3;font-weight:500}
+.rate{display:inline-block;font-size:1.02rem;line-height:1;position:relative;font-family:Arial,'Segoe UI',sans-serif}
+.rate::before{content:"\2605\2605\2605\2605\2605";color:#3a3a3f}
+.rate::after{content:"\2605\2605\2605\2605\2605";color:#FFC83D;position:absolute;left:0;top:0;width:var(--p,100%);overflow:hidden;white-space:nowrap}
+@keyframes tickerscroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.ticker-track{animation:none;white-space:normal;flex-wrap:wrap;justify-content:center;gap:1rem;padding:0 1rem}}
 </style>
 </head>
 <body>
@@ -217,13 +229,18 @@ footer{background:#0C0C0E;color:#8C8C94;padding:48px 0;font-size:.97rem}
     </div>
   </div>
 </section>
-<div class="trustbar">
-  <div class="container">
-    <div class="row">
-      <div class="item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#B52A2A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> We never sell your number</div>
-      <div class="item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z" stroke="#B52A2A" stroke-width="2" stroke-linejoin="round"/><path d="M8.5 12l2.2 2.2L16 9" stroke="#B52A2A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Bank level data security</div>
-      <div class="item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#B52A2A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Cancel anytime</div>
-    </div>
+<div class="ticker" aria-label="Customer reviews">
+  <div class="ticker-track">
+    <span class="ticker-item"><span class="rate" style="--p:100%"></span><span class="who">Stacey</span><span class="num">5.0</span></span>
+    <span class="ticker-item"><span class="rate" style="--p:100%"></span><span class="who">Richard</span><span class="num">5.0</span></span>
+    <span class="ticker-item"><span class="rate" style="--p:90%"></span><span class="who">Williams</span><span class="num">4.5</span></span>
+    <span class="ticker-item"><span class="rate" style="--p:90%"></span><span class="who">Chris</span><span class="num">4.5</span></span>
+    <span class="ticker-item"><span class="rate" style="--p:90%"></span><span class="who">Dawn</span><span class="num">4.5</span></span>
+    <span class="ticker-item"><span class="rate" style="--p:100%"></span><span class="who">Stacey</span><span class="num">5.0</span></span>
+    <span class="ticker-item"><span class="rate" style="--p:100%"></span><span class="who">Richard</span><span class="num">5.0</span></span>
+    <span class="ticker-item"><span class="rate" style="--p:90%"></span><span class="who">Williams</span><span class="num">4.5</span></span>
+    <span class="ticker-item"><span class="rate" style="--p:90%"></span><span class="who">Chris</span><span class="num">4.5</span></span>
+    <span class="ticker-item"><span class="rate" style="--p:90%"></span><span class="who">Dawn</span><span class="num">4.5</span></span>
   </div>
 </div>
 <section class="dark final">
@@ -244,7 +261,7 @@ footer{background:#0C0C0E;color:#8C8C94;padding:48px 0;font-size:.97rem}
         <p style="margin-top:1rem;color:#C7C7CD;font-weight:700">spamcallstop.com</p>
         <p>Questions? Email support@spamcallstop.com and we will help.</p>
       </div>
-      <div><h4>SpamCallStop</h4><a href="#scan">Free scan</a><a href="#how">How it works</a><a href="#pricing">Pricing</a><a href="#">Contact us</a></div>
+      <div><h4>SpamCallStop</h4><a href="#scan">Free scan</a><a href="offer.html">Pricing</a><a href="mailto:support@spamcallstop.com">Contact us</a></div>
       <div><h4>Trust</h4><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Service</a><a href="https://www.donotcall.gov">Do Not Call list</a></div>
     </div>
     <p class="disclaimer">&copy; 2026 SpamCallStop. SpamCallStop is a phone number removal service. We are not affiliated with, endorsed by, or sponsored by any data broker or people search website named on this page. Those names are used only to describe the sites we help remove you from. Results vary, and some phone number listings in public records may not be removable. Statistics are from the U.S. Federal Trade Commission and published industry research, 2023 to 2025.</p>
