@@ -228,10 +228,16 @@ footer{background:#0C0C0E;color:#8C8C94;padding:48px 0;font-size:.97rem}
     <h1 class="display reveal">End <span class="accent">spam calls</span> for good.</h1>
     <p class="lead reveal">We take your number off every site selling it, without you lifting a finger. <span class="hl">Free scan</span>, no commitment.</p>
     <div class="form reveal" id="scan">
-      <div class="inputwrap">
+      <div class="inputwrap" id="phoneStep">
         <input id="ph" type="tel" inputmode="tel" placeholder="Enter Phone Number" aria-label="Phone number" onkeydown="if(event.key==='Enter')startScan()">
         <button type="button" class="scanbtn" aria-label="Start my free scan" onclick="startScan()"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       </div>
+      <div class="inputwrap" id="codeStep" style="display:none">
+        <input id="code" type="tel" inputmode="numeric" maxlength="6" placeholder="Enter 6 digit code" aria-label="Verification code" onkeydown="if(event.key==='Enter')checkCode()">
+        <button type="button" class="scanbtn" aria-label="Verify code" onclick="checkCode()"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
+      <p class="fine" id="codeHint" style="display:none;margin-top:1rem">We texted a 6 digit code to <b id="codeTo"></b>. <a href="#" onclick="resendCode();return false;">Resend</a> or <a href="#" onclick="changeNumber();return false;">change number</a>.</p>
+      <p class="fine" id="codeMsg" style="display:none;margin-top:.6rem;color:var(--accent);font-weight:700"></p>
     </div>
   </div>
 </section>
@@ -289,10 +295,47 @@ footer{background:#0C0C0E;color:#8C8C94;padding:48px 0;font-size:.97rem}
       dP.innerHTML='$29<span>/mo</span>';dB.textContent='Billed monthly, cancel anytime';}
   }
   function focusScan(){var el=document.getElementById('ph');el.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(function(){el.focus()},350);}
-  function startScan(){var v=document.getElementById('ph').value.trim();
+  var scstopPhone = '';
+  function goResults(){ try{ sessionStorage.setItem('scstop_phone', scstopPhone); }catch(e){} location.href='scan-results.html'; }
+  function showCodeMsg(m){ var el=document.getElementById('codeMsg'); el.textContent=m; el.style.display='block'; }
+  function prettyPhone(v){ var d=v.replace(/\D/g,'').slice(-10); return d.length===10 ? '('+d.slice(0,3)+') '+d.slice(3,6)+'-'+d.slice(6) : v; }
+  function startScan(){
+    var v=document.getElementById('ph').value.trim();
     if(v.replace(/\D/g,'').length<10){alert('Please enter your 10 digit phone number so we can scan it.');return;}
-    try{sessionStorage.setItem('scstop_phone', v);}catch(e){}
-    location.href='scan-results.html';}
+    scstopPhone=v;
+    var btn=document.querySelector('#phoneStep .scanbtn'); if(btn) btn.disabled=true;
+    fetch('/api/verify/start',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:v})})
+      .then(function(r){ return r.json().then(function(d){return {s:r.status,d:d};}).catch(function(){return {s:r.status,d:null};}); })
+      .then(function(res){
+        if(btn) btn.disabled=false;
+        if(res.d && res.d.ok && res.d.sent){
+          document.getElementById('phoneStep').style.display='none';
+          document.getElementById('codeStep').style.display='block';
+          document.getElementById('codeTo').textContent=prettyPhone(v);
+          document.getElementById('codeHint').style.display='block';
+          document.getElementById('code').focus();
+          return;
+        }
+        if(res.s===429){ showCodeMsg('Too many tries right now. Please wait a few minutes.'); return; }
+        goResults(); // verification not available here (e.g. preview) -> continue
+      })
+      .catch(function(){ if(btn) btn.disabled=false; goResults(); });
+  }
+  function checkCode(){
+    var code=(document.getElementById('code').value||'').replace(/\D/g,'');
+    if(code.length<4){ showCodeMsg('Enter the 6 digit code we texted you.'); return; }
+    var btn=document.querySelector('#codeStep .scanbtn'); if(btn) btn.disabled=true;
+    fetch('/api/verify/check',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:scstopPhone,code:code})})
+      .then(function(r){ return r.json().catch(function(){return null;}); })
+      .then(function(d){
+        if(btn) btn.disabled=false;
+        if(d && d.ok && d.verified){ try{ sessionStorage.setItem('scstop_verify_token', d.token); }catch(e){} goResults(); return; }
+        showCodeMsg('That code was not right. Double check it and try again.');
+      })
+      .catch(function(){ if(btn) btn.disabled=false; showCodeMsg('Something went wrong. Please try again.'); });
+  }
+  function resendCode(){ if(!scstopPhone) return; document.getElementById('code').value=''; showCodeMsg('Sending a new code...'); fetch('/api/verify/start',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:scstopPhone})}).then(function(){ showCodeMsg('New code sent.'); }).catch(function(){}); }
+  function changeNumber(){ document.getElementById('codeStep').style.display='none'; document.getElementById('codeHint').style.display='none'; document.getElementById('codeMsg').style.display='none'; document.getElementById('phoneStep').style.display='block'; document.getElementById('ph').focus(); }
   (function(){var els=document.querySelectorAll('.reveal');
     if(!('IntersectionObserver' in window)){els.forEach(function(e){e.classList.add('in')});return;}
     var io=new IntersectionObserver(function(en){en.forEach(function(e,i){if(e.isIntersecting){setTimeout(function(){e.target.classList.add('in')},(i%4)*60);io.unobserve(e.target);}});},{threshold:.12});
