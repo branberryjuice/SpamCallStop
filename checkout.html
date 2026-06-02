@@ -44,11 +44,6 @@
           <div class="field"><label for="ph2">Phone number to protect</label><input id="ph2" type="tel" placeholder="(555) 123 4567" autocomplete="tel"></div>
         </div>
 
-        <label class="bump" for="bump">
-          <input type="checkbox" id="bump" onchange="recalc()">
-          <span><b>Add instant alerts. Just $5 a month.</b> The moment your number comes back on any site, we remove it within hours and send you a text to let you know. Most members add this.</span>
-        </label>
-
         <div class="cocard" style="margin-top:1.2rem">
           <h3>2. Payment</h3>
           <p class="muted" style="margin-bottom:1rem">You will enter your card on the next screen, on Stripe's secure, encrypted checkout. We never see or store your card details.</p>
@@ -61,9 +56,7 @@
         <div class="summary">
           <h3 style="margin-bottom:1rem">Order summary</h3>
           <div class="sumrow"><span class="lbl"><span id="planName">Solo</span> plan (<span id="billName">monthly</span>)</span><span id="basePrice">$19/mo</span></div>
-          <div class="sumrow" id="bumpRow" style="display:none"><span class="lbl">Instant alerts</span><span id="bumpPrice">+$5/mo</span></div>
           <div class="sumrow tot"><span>Total today</span><span id="totalPrice">$19/mo</span></div>
-          <button class="btn btn--accent btn--block" style="margin-top:1rem" onclick="startCheckout()">Continue to secure payment &rarr;</button>
           <ul class="trustlist">
             <li><span class="tk"><svg width="15" height="15" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#1F7A4D" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span> We never sell your number</li>
             <li><span class="tk"><svg width="15" height="15" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#1F7A4D" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span> Cancel anytime. No contract</li>
@@ -99,23 +92,15 @@
     var ph = sessionStorage.getItem('scstop_phone'); if(ph){ document.getElementById('ph2').value = ph; }
   } catch(e){}
   var per = billing==='y' ? '/yr' : '/mo';
-  var bumpAmt = billing==='y' ? 50 : 5;
   document.getElementById('planName').textContent = plan;
   document.getElementById('billName').textContent = billing==='y' ? 'yearly' : 'monthly';
   document.getElementById('basePrice').textContent = '$'+base+per;
-  document.getElementById('bumpPrice').textContent = '+$'+bumpAmt+per;
-  function recalc(){
-    var on = document.getElementById('bump').checked;
-    document.getElementById('bumpRow').style.display = on ? 'flex' : 'none';
-    var total = base + (on ? bumpAmt : 0);
-    document.getElementById('totalPrice').textContent = '$'+total+per;
-  }
-  recalc();
+  document.getElementById('totalPrice').textContent = '$'+base+per;
   function startCheckout(){
     var name = (document.getElementById('nm').value || '').trim();
     var email = (document.getElementById('em').value || '').trim();
     var phone = (document.getElementById('ph2').value || '').trim();
-    var bump = document.getElementById('bump').checked;
+    var bump = false;
     if(!name || email.indexOf('@') < 1 || phone.replace(/\D/g,'').length < 10){
       alert('Please enter your name, a valid email, and your phone number so we know what to protect.');
       return;

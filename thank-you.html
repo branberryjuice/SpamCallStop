@@ -20,7 +20,7 @@
 .radar-sweep{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,rgba(31,122,77,.55),rgba(31,122,77,.12) 45deg,rgba(31,122,77,0) 90deg,rgba(31,122,77,0) 360deg);animation:radarspin 2.8s linear infinite}
 .radar-core{position:absolute;top:50%;left:50%;width:11px;height:11px;margin:-5.5px 0 0 -5.5px;border-radius:50%;background:#1F7A4D;animation:radarpulse 2s ease-out infinite}
 .radar-blip{position:absolute;width:8px;height:8px;margin:-4px 0 0 -4px;border-radius:50%;background:#1F7A4D;box-shadow:0 0 6px rgba(31,122,77,.8);opacity:0;animation:radarblip 2.8s ease-in-out infinite}
-@keyframes radarspin{to{transform:rotate(360deg)}}
+@keyframes radarspin{to{transform:rotate(-360deg)}}
 @keyframes radarpulse{0%{box-shadow:0 0 0 0 rgba(31,122,77,.5)}100%{box-shadow:0 0 0 20px rgba(31,122,77,0)}}
 @keyframes radarblip{0%,100%{opacity:0}12%,32%{opacity:1}55%{opacity:0}}
 @media (prefers-reduced-motion:reduce){.radar-sweep,.radar-core,.radar-blip{animation:none}.radar-blip{opacity:.9}}
