@@ -34,6 +34,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api', require('./routes/scan'));
 app.use('/api', require('./routes/checkout'));
 app.use('/api', require('./routes/webhook'));
+app.use('/api', require('./routes/verify'));
 
 // --- Static site -----------------------------------------------------------
 // Never hand out our server code or config as if it were a web page.
