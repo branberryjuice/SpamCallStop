@@ -17,6 +17,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../lib/customers');
 const { extractRef, classify, statusFor } = require('../lib/replies');
+const resend = require('../lib/resend');
 
 function authed(req) {
   const secret = process.env.INBOUND_SECRET;
@@ -47,6 +48,17 @@ router.post('/inbound', express.json({ limit: '2mb' }), async (req, res) => {
   if (!ok) return res.status(401).json({ ok: false, error: 'unauthorized' });
 
   const msg = normalize(req.body);
+
+  // Resend's inbound webhook delivers metadata only — fetch the body to classify.
+  if (!msg.text && req.body && req.body.type === 'email.received' && req.body.data && req.body.data.email_id) {
+    const full = await resend.getReceived(req.body.data.email_id);
+    if (full) {
+      if (full.text) msg.text = full.text;
+      if (!msg.subject && full.subject) msg.subject = full.subject;
+      if (!msg.from && full.from) msg.from = full.from;
+    }
+  }
+
   const classification = classify(msg.text + ' ' + msg.subject);
   const ref = extractRef(msg.subject) || extractRef(msg.text);
 
