@@ -32,11 +32,13 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
   if (event.type === 'checkout.session.completed') {
     const s = event.data.object;
     const m = s.metadata || {};
+    const phones = [m.phone, m.phone2].map((x) => String(x || '').trim()).filter(Boolean);
     try {
       await saveCustomer({
         email: s.customer_email || m.email || '',
         name: m.name || '',
-        phone: m.phone || '',
+        phone: phones[0] || m.phone || '',
+        phones: phones,
         plan: m.plan || '',
         billing: m.billing || '',
         bump: m.bump === '1',

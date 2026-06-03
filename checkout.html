@@ -42,6 +42,7 @@
           <div class="field"><label for="nm">Your name</label><input id="nm" type="text" placeholder="Jane Smith" autocomplete="name"></div>
           <div class="field"><label for="em">Email (where we send your reports)</label><input id="em" type="email" placeholder="jane@email.com" autocomplete="email"></div>
           <div class="field"><label for="ph2">Phone number to protect</label><input id="ph2" type="tel" placeholder="(555) 123 4567" autocomplete="tel"></div>
+          <div class="field" id="ph2bWrap" hidden><label for="ph2b">Second phone number to protect</label><input id="ph2b" type="tel" placeholder="(555) 123 4567" autocomplete="tel"></div>
         </div>
 
         <div class="cocard" style="margin-top:1.2rem">
@@ -92,17 +93,27 @@
     var ph = sessionStorage.getItem('scstop_phone'); if(ph){ document.getElementById('ph2').value = ph; }
   } catch(e){}
   var per = billing==='y' ? '/yr' : '/mo';
-  document.getElementById('planName').textContent = plan;
+  var isCouple = (plan === 'Dual');
+  document.getElementById('planName').textContent = isCouple ? 'Couple' : 'Individual';
   document.getElementById('billName').textContent = billing==='y' ? 'yearly' : 'monthly';
+  if (isCouple) {
+    document.getElementById('ph2bWrap').hidden = false;
+    var lbl1 = document.querySelector('label[for="ph2"]'); if (lbl1) lbl1.textContent = 'First phone number to protect';
+  }
   document.getElementById('basePrice').textContent = '$'+base+per;
   document.getElementById('totalPrice').textContent = '$'+base+per;
   function startCheckout(){
     var name = (document.getElementById('nm').value || '').trim();
     var email = (document.getElementById('em').value || '').trim();
     var phone = (document.getElementById('ph2').value || '').trim();
+    var phone2 = (document.getElementById('ph2b').value || '').trim();
     var bump = false;
     if(!name || email.indexOf('@') < 1 || phone.replace(/\D/g,'').length < 10){
       alert('Please enter your name, a valid email, and your phone number so we know what to protect.');
+      return;
+    }
+    if(isCouple && phone2.replace(/\D/g,'').length < 10){
+      alert('The Couple plan covers two numbers. Please enter the second phone number too.');
       return;
     }
     try {
@@ -115,7 +126,7 @@
     fetch('/api/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: name, email: email, phone: phone, plan: plan, billing: billing, bump: bump })
+      body: JSON.stringify({ name: name, email: email, phone: phone, phone2: isCouple ? phone2 : '', plan: plan, billing: billing, bump: bump })
     }).then(function(r){ return r.json().catch(function(){ return null; }); })
       .then(function(data){
         if(data && data.ok && data.url){ location.href = data.url; return; }

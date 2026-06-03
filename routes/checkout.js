@@ -24,6 +24,7 @@ router.post('/checkout', express.json(), async (req, res) => {
     const name = String(b.name || '').trim().slice(0, 120);
     const email = String(b.email || '').trim().slice(0, 200);
     const phone = String(b.phone || '').trim().slice(0, 40);
+    const phone2 = String(b.phone2 || '').trim().slice(0, 40); // Couple plan: 2nd number
     const plan = b.plan === 'Dual' ? 'Dual' : 'Solo';
     const billing = b.billing === 'y' ? 'y' : 'm';
     const bump = b.bump === true || b.bump === '1' || b.bump === 1;
@@ -35,8 +36,8 @@ router.post('/checkout', express.json(), async (req, res) => {
       line_items: buildLineItems({ plan, billing, bump }),
       customer_email: email || undefined,
       allow_promotion_codes: true,
-      metadata: { name, phone, plan, billing, bump: bump ? '1' : '0' },
-      subscription_data: { metadata: { name, phone, plan, billing } },
+      metadata: { name, phone, phone2, plan, billing, bump: bump ? '1' : '0' },
+      subscription_data: { metadata: { name, phone, phone2, plan, billing } },
       success_url: base + '/thank-you.html?session_id={CHECKOUT_SESSION_ID}',
       cancel_url: base + '/checkout.html',
     });
