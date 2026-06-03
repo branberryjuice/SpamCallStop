@@ -52,7 +52,7 @@ router.post('/dashboard-link', express.json(), async (req, res) => {
       if (c) {
         const link = baseUrl() + '/account.html?token=' + encodeURIComponent(token.signCustomer(c.id));
         const msg = loginLinkEmail(c, link);
-        await resend.send({ to: c.email, from: process.env.EMAIL_FROM, subject: msg.subject, text: msg.text, html: msg.html });
+        await resend.send({ to: c.email, from: process.env.EMAIL_FROM, replyTo: 'company@spamcallstop.com', subject: msg.subject, text: msg.text, html: msg.html });
       }
     } catch (e) {
       console.error('[account] dashboard-link error:', e && e.message);

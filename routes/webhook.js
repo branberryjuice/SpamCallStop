@@ -60,7 +60,7 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
           const base = process.env.PUBLIC_BASE_URL || 'https://spamcallstop.com';
           const link = base + '/account.html?token=' + encodeURIComponent(require('../lib/token').signCustomer(saved.id));
           const msg = require('../lib/emails').welcomeEmail(saved, link);
-          await require('../lib/resend').send({ to: saved.email, from: process.env.EMAIL_FROM, subject: msg.subject, text: msg.text, html: msg.html });
+          await require('../lib/resend').send({ to: saved.email, from: process.env.EMAIL_FROM, replyTo: 'company@spamcallstop.com', subject: msg.subject, text: msg.text, html: msg.html });
           console.log('[welcome] sent to', saved.email);
         }
       } catch (we) {
