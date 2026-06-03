@@ -13,18 +13,24 @@
 
 const path = require('path');
 const express = require('express');
+const { securityHeaders, apiRateLimit, bootSecurityCheck } = require('./lib/security');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const STATIC_DIR = __dirname;
 
 app.disable('x-powered-by');
+app.use(securityHeaders);
 
 // --- API ------------------------------------------------------------------
 // Health check (Render pings this to confirm the app is up; handy for us too).
 app.get('/api/health', (req, res) => {
   res.json({ ok: true, service: 'spamcallstop', time: new Date().toISOString() });
 });
+
+// Backstop rate limit across the API (per IP). Stripe webhook + Resend inbound
+// + health are exempt inside the limiter so those callers aren't throttled.
+app.use('/api', apiRateLimit());
 
 // Future API routes mount here as we build them:
 //   /api/scan      -> real phone-number exposure checker
@@ -66,6 +72,16 @@ app.use(express.static(STATIC_DIR, { extensions: ['html'] }));
 app.use((req, res) => {
   res.status(404).sendFile(path.join(STATIC_DIR, 'index.html'));
 });
+
+// Generic error handler — never leak stack traces or internals to clients.
+app.use((err, req, res, next) => {
+  console.error('[error]', err && err.message ? err.message : err);
+  if (res.headersSent) return next(err);
+  res.status(500).json({ ok: false, error: 'server_error' });
+});
+
+// Boot-time security self-check (warns about missing critical secrets).
+bootSecurityCheck();
 
 // Make sure the customer table exists before we start taking traffic.
 require('./lib/customers').init().catch((e) => console.error('[db] init failed:', e.message));

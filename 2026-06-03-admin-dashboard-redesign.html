@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin &middot; SpamCallStop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0B0D; --panel:#141417; --panel2:#17171B; --line:#26262B;
+    --ink:#FFFFFF; --muted:#8A8A93; --muted2:#B6B6BE;
+    --accent:#B52A2A; --accent-tint:rgba(181,42,42,.16);
+    --green:#33C08D; --green-tint:rgba(51,192,141,.14);
+    --amber:#E3A53C; --amber-tint:rgba(227,165,60,.15);
+    --blue:#5B8DEF;
+    --font:'Libre Franklin',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+    --r:14px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:var(--font);-webkit-font-smoothing:antialiased;font-size:15px;line-height:1.5}
+  .wrap{max-width:1140px;margin:0 auto;padding:1.5rem 1.6rem 4rem}
+
+  /* top bar */
+  .top{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:1.6rem}
+  .brand{font-weight:800;font-size:1.4rem;letter-spacing:-.01em}
+  .brand .cr{color:var(--accent)}.brand .cg{color:var(--muted)}
+  .brand .tag{font-size:.66rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted2);border:1px solid var(--line);padding:.28rem .55rem;border-radius:999px;vertical-align:3px;margin-left:.55rem}
+  .keybar{display:flex;gap:.5rem;align-items:center}
+  .keybar input{font-family:var(--font);font-size:.9rem;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:.5rem .75rem;min-height:40px;width:190px}
+  .keybar input::placeholder{color:var(--muted)}
+  .keybar button{font-family:var(--font);font-weight:700;font-size:.9rem;color:#fff;background:var(--accent);border:none;border-radius:10px;padding:.5rem 1rem;min-height:40px;cursor:pointer}
+  .keybar button:hover{background:#9c2020}
+
+  .ribbon{font-size:.82rem;color:var(--muted2);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:.55rem .85rem;margin-bottom:1.3rem}
+  .ribbon b{color:#fff}
+
+  /* stat cards */
+  .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:.85rem;margin-bottom:1.1rem}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:1.05rem 1.1rem}
+  .stat .n{font-size:2rem;font-weight:800;letter-spacing:-.02em;line-height:1}
+  .stat .l{color:var(--muted);font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;margin-top:.45rem}
+  .stat.good .n{color:var(--green)} .stat.warn .n{color:var(--amber)} .stat.accent .n{color:var(--accent)}
+
+  /* overall progress */
+  .progresscard{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:1.15rem 1.3rem;margin-bottom:1.6rem}
+  .progresscard .ptop{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:.7rem}
+  .progresscard .ptitle{font-weight:700;font-size:1.02rem}
+  .progresscard .ppct{font-weight:800;font-size:1.05rem;color:var(--green)}
+  .track{height:12px;background:#202026;border-radius:999px;overflow:hidden}
+  .track i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#2FA876,var(--green))}
+  .plegend{display:flex;flex-wrap:wrap;gap:1.2rem;margin-top:.75rem;font-size:.82rem;color:var(--muted2)}
+  .plegend .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:.4rem;vertical-align:1px}
+  .dot.g{background:var(--green)}.dot.a{background:var(--amber)}.dot.p{background:#54545d}
+
+  /* customers table */
+  .sect-h{display:flex;align-items:center;justify-content:space-between;margin:0 .2rem .7rem}
+  .sect-h h2{font-size:1.1rem;font-weight:800;letter-spacing:-.01em}
+  .sect-h .count{color:var(--muted);font-size:.85rem}
+  .table{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+  .thead,.trow{display:grid;grid-template-columns:1.5fr .7fr 2.2fr .9fr;gap:1rem;align-items:center}
+  .thead{padding:.75rem 1.2rem;border-bottom:1px solid var(--line);color:var(--muted);font-size:.72rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;background:var(--panel2)}
+  .trow{padding:1rem 1.2rem;border-bottom:1px solid var(--line)}
+  .trow:last-child{border-bottom:none}
+  .cust b{display:block;font-weight:700;color:#fff;font-size:.98rem}
+  .cust span{color:var(--muted);font-size:.82rem}
+  .badge{display:inline-block;font-weight:800;font-size:.7rem;letter-spacing:.03em;text-transform:uppercase;padding:.3rem .6rem;border-radius:999px;white-space:nowrap}
+  .badge.ind{background:#202026;color:var(--muted2)}
+  .badge.cpl{background:var(--accent-tint);color:#E8A1A1}
+  .num{margin-bottom:.7rem}
+  .num:last-child{margin-bottom:0}
+  .numtop{display:flex;align-items:center;justify-content:space-between;gap:.6rem;margin-bottom:.3rem}
+  .num .ph{font-weight:700;color:#fff;font-variant-numeric:tabular-nums;font-size:.92rem}
+  .num .cl{font-size:.78rem;font-weight:700}
+  .num .cl.done{color:var(--green)} .num .cl.mid{color:var(--amber)} .num .cl.low{color:var(--muted)}
+  .nbar{height:7px;background:#202026;border-radius:999px;overflow:hidden}
+  .nbar i{display:block;height:100%;border-radius:999px;background:var(--green)}
+  .review{display:inline-block;margin-top:.3rem;font-size:.72rem;font-weight:700;color:var(--amber);background:var(--amber-tint);padding:.12rem .45rem;border-radius:999px}
+  .meta{font-size:.84rem;color:var(--muted2)}
+  .meta .st{display:inline-block;margin-top:.25rem;font-size:.72rem;font-weight:700;color:var(--green);background:var(--green-tint);padding:.12rem .45rem;border-radius:999px}
+  @media (max-width:900px){
+    .stats{grid-template-columns:repeat(2,1fr)}
+    .thead{display:none}
+    .trow{grid-template-columns:1fr;gap:.6rem;padding:1.1rem}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand">Spam<span class="cr">Call</span>Stop<span class="cg">.com</span><span class="tag">Admin</span></div>
+    <div class="keybar">
+      <input id="key" type="password" placeholder="Admin key" autocomplete="off">
+      <button onclick="load()">Load live</button>
+    </div>
+  </div>
+
+  <div class="ribbon" id="ribbon">Showing <b>sample data</b> so you can see the layout. Enter your admin key and Load live to pull real customers.</div>
+
+  <div class="stats">
+    <div class="stat"><div class="n" id="sCustomers">0</div><div class="l">Customers</div></div>
+    <div class="stat"><div class="n" id="sNumbers">0</div><div class="l">Numbers protected</div></div>
+    <div class="stat accent"><div class="n" id="sSent">0</div><div class="l">Opt-outs sent</div></div>
+    <div class="stat good"><div class="n" id="sCleared">0</div><div class="l">Removals cleared</div></div>
+    <div class="stat warn"><div class="n" id="sReview">0</div><div class="l">Need review</div></div>
+  </div>
+
+  <div class="progresscard">
+    <div class="ptop"><span class="ptitle">Overall removal progress</span><span class="ppct" id="ovPct">0%</span></div>
+    <div class="track"><i id="ovBar" style="width:0%"></i></div>
+    <div class="plegend">
+      <span><span class="dot g"></span>Cleared (removed or no record)</span>
+      <span><span class="dot a"></span>Needs review</span>
+      <span><span class="dot p"></span>In progress</span>
+    </div>
+  </div>
+
+  <div class="sect-h"><h2>Customers</h2><span class="count" id="custCount"></span></div>
+  <div class="table">
+    <div class="thead"><div>Customer</div><div>Plan</div><div>Numbers &amp; removal progress</div><div>Billing</div></div>
+    <div id="rows"></div>
+  </div>
+</div>
+
+<script>
+  var BROKERS = 6; // email-broker targets per number
+  var SAMPLE = [
+    { name:'Margaret Ellis', email:'margaret.e@email.com', plan:'Solo', planLabel:'Individual', billing:'Yearly', joined:'Jun 1', status:'Active',
+      numbers:[{phone:'(217) 555-0142', sent:6, cleared:4, review:0}] },
+    { name:'Tom & Linda Park', email:'tpark@email.com', plan:'Dual', planLabel:'Couple', billing:'Yearly', joined:'May 28', status:'Active',
+      numbers:[{phone:'(312) 555-0188', sent:6, cleared:6, review:0},{phone:'(312) 555-0177', sent:6, cleared:3, review:1}] },
+    { name:'Robert Chen', email:'rchen@email.com', plan:'Dual', planLabel:'Couple', billing:'Monthly', joined:'Jun 3', status:'Active',
+      numbers:[{phone:'(415) 555-0123', sent:6, cleared:1, review:0},{phone:'(415) 555-0199', sent:0, cleared:0, review:0}] }
+  ];
+
+  function esc(s){var d=document.createElement('div');d.textContent=(s==null?'':String(s));return d.innerHTML;}
+
+  function adaptLive(customers){
+    // Live endpoint returns numbers as {phone,label,status}; map to the progress shape.
+    return customers.map(function(c){
+      return {
+        name:c.name, email:c.email, plan:c.plan, planLabel:c.planLabel||(c.plan==='Dual'?'Couple':'Individual'),
+        billing:(c.billing||'').replace(/^./,function(m){return m.toUpperCase();}),
+        joined:(c.created_at||'').slice(0,10), status:(c.status||'active').replace(/^./,function(m){return m.toUpperCase();}),
+        numbers:(c.numbers||[]).map(function(n){
+          var cleared = (n.status==='removed'||n.status==='no_record')?BROKERS:0;
+          var review = (n.status==='needs_followup')?1:0;
+          var sent = (n.status&&n.status!=='pending')?BROKERS:0;
+          return { phone:n.phone, sent:sent, cleared:cleared, review:review };
+        })
+      };
+    });
+  }
+
+  function render(list){
+    var customers=list.length, numbers=0, sent=0, cleared=0, review=0, capacity=0;
+    list.forEach(function(c){ (c.numbers||[]).forEach(function(n){ numbers++; sent+=(n.sent||0); cleared+=(n.cleared||0); review+=(n.review||0); capacity+=BROKERS; }); });
+    document.getElementById('sCustomers').textContent=customers;
+    document.getElementById('sNumbers').textContent=numbers;
+    document.getElementById('sSent').textContent=sent;
+    document.getElementById('sCleared').textContent=cleared;
+    document.getElementById('sReview').textContent=review;
+    var pct = capacity? Math.round(cleared/capacity*100):0;
+    document.getElementById('ovPct').textContent=pct+'%';
+    document.getElementById('ovBar').style.width=pct+'%';
+    document.getElementById('custCount').textContent=customers+' total';
+
+    document.getElementById('rows').innerHTML = list.map(function(c){
+      var badge = c.plan==='Dual' ? '<span class="badge cpl">Couple</span>' : '<span class="badge ind">Individual</span>';
+      var nums = (c.numbers||[]).map(function(n){
+        var pc = Math.round((n.cleared||0)/BROKERS*100);
+        var cls = pc>=100?'done':(pc>0?'mid':'low');
+        var label = (n.sent||0)===0 ? 'queued' : (n.cleared||0)+'/'+BROKERS+' cleared';
+        return '<div class="num"><div class="numtop"><span class="ph">'+esc(n.phone)+'</span>'+
+               '<span class="cl '+cls+'">'+label+'</span></div>'+
+               '<div class="nbar"><i style="width:'+pc+'%"></i></div>'+
+               ((n.review||0)>0?'<span class="review">'+n.review+' needs review</span>':'')+'</div>';
+      }).join('');
+      return '<div class="trow">'+
+        '<div class="cust"><b>'+esc(c.name||'(no name)')+'</b><span>'+esc(c.email||'')+'</span></div>'+
+        '<div>'+badge+'</div>'+
+        '<div class="cnums">'+nums+'</div>'+
+        '<div class="meta">'+esc(c.billing||'')+'<br><span style="font-size:.78rem;color:var(--muted)">joined '+esc(c.joined||'')+'</span><br><span class="st">'+esc(c.status||'Active')+'</span></div>'+
+      '</div>';
+    }).join('');
+  }
+  function setRibbon(msg, ok){ var r=document.getElementById('ribbon'); r.innerHTML=msg; r.style.color = ok? 'var(--green)':'var(--muted2)'; }
+
+  function load(){
+    var key=(document.getElementById('key').value||'').trim();
+    if(!key){ setRibbon('Enter your admin key first.'); return; }
+    try{ localStorage.setItem('scstop_admin_key', key); }catch(e){}
+    setRibbon('Loading...');
+    fetch('/api/admin/customers?key='+encodeURIComponent(key))
+      .then(function(r){ return r.json().catch(function(){return null;}); })
+      .then(function(d){
+        if(d && d.ok){ render(adaptLive(d.customers||[])); setRibbon('<b>Live data</b> &middot; '+((d.summary&&d.summary.total)||0)+' customer(s).', true); }
+        else { render(SAMPLE); setRibbon((d&&d.error==='unauthorized')?'That key was rejected. Showing sample data.':'Could not load live data. Showing sample.'); }
+      })
+      .catch(function(){ render(SAMPLE); setRibbon('Could not reach the server. Showing sample data.'); });
+  }
+
+  render(SAMPLE);
+  try{ var k=localStorage.getItem('scstop_admin_key'); if(k){ document.getElementById('key').value=k; load(); } }catch(e){}
+</script>
+</body>
+</html>
