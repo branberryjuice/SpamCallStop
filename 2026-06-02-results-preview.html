@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your results | SpamCallStop (preview)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* ---- dark results theme (mirrors Cloaked's drama, our palette) ---- */
+  body{background:#0C0C0E;color:#E7E7EA}
+  .rbar{position:sticky;top:0;z-index:60;background:#0C0C0E;border-bottom:1px solid #232327}
+  .rbar-in{display:flex;align-items:center;justify-content:space-between;gap:1rem;max-width:1180px;margin:0 auto;padding:.7rem var(--pad)}
+  .rbar .word{color:#fff;font-size:1.25rem}
+  .rbar .word .cr{color:var(--accent)}.rbar .word .cg{color:#8C8C94}
+  .rwrap{max-width:760px;margin:0 auto;padding:0 var(--pad)}
+
+  .preview-ribbon{background:#1C1C20;border-bottom:1px solid #2A2A2F;color:#A9A9B2;font-size:.8rem;text-align:center;padding:.45rem 1rem;letter-spacing:.02em}
+  .preview-ribbon b{color:#fff}
+
+  .rsec{padding:clamp(26px,5vw,46px) 0}
+  .rover{display:block;font-size:.8rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:.7rem}
+  .rh1{font-size:clamp(1.8rem,5vw,2.7rem);font-weight:800;line-height:1.08;letter-spacing:-.025em;color:#fff;margin-bottom:.7rem}
+  .rh1 .accent{color:var(--accent)}
+  .rsub{color:#B6B6BE;font-size:1.08rem;max-width:48ch;margin-bottom:1.6rem}
+  .rsub b{color:#fff}
+
+  /* risk level meter */
+  .riskcard{background:#141417;border:1px solid #2A2A2F;border-radius:var(--r-lg);padding:1.3rem 1.4rem 1.5rem;margin:1.4rem 0}
+  .riskcard .rtop{display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem}
+  .riskcard .rlabel{font-weight:800;font-size:1.05rem;color:#fff;letter-spacing:-.01em}
+  .riskpill{font-weight:800;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;padding:.32rem .7rem;border-radius:999px;background:#2A2A2F;color:#9A9AA2;transition:background .3s ease,color .3s ease}
+  .riskpill.high{background:var(--accent);color:#fff}
+  .meter{height:14px;border-radius:999px;background:#222226;overflow:hidden;position:relative}
+  .meter i{display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,#E0A23C,#D2542B 55%,var(--accent));transition:width 1.6s cubic-bezier(.16,.84,.34,1)}
+  .scale{display:flex;justify-content:space-between;margin-top:.5rem;font-size:.72rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#6E6E77}
+  .scale span.on{color:#fff}
+
+  .recs{display:flex;align-items:baseline;gap:.6rem;margin:.2rem 0 .2rem}
+  .recs .n{font-size:clamp(2.4rem,8vw,3.4rem);font-weight:800;color:var(--accent);line-height:1;letter-spacing:-.03em}
+  .recs .t{color:#C7C7CD;font-weight:700;font-size:1.05rem}
+
+  /* data cards */
+  .dcard{background:#141417;border:1px solid #2A2A2F;border-radius:var(--r-lg);overflow:hidden;margin:1.1rem 0}
+  .dhead{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.95rem 1.3rem;border-bottom:1px solid #2A2A2F}
+  .dhead h3{color:#fff;font-size:1.08rem;font-weight:800;letter-spacing:-.01em}
+  .dhead .tag{font-size:.7rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:rgba(181,42,42,.16);border:1px solid rgba(181,42,42,.35);padding:.28rem .55rem;border-radius:var(--r-sm)}
+  .drow{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.85rem 1.3rem;border-bottom:1px solid #232327}
+  .drow:last-child{border-bottom:none}
+  .drow .k{color:#8E8E97;font-weight:700;font-size:.86rem;letter-spacing:.02em;text-transform:uppercase;flex:0 0 auto}
+  .drow .v{color:#fff;font-weight:700;font-size:1.02rem;text-align:right}
+  .drow .v.exposed{color:#F1A9A9}
+  .idrow{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;padding:1.05rem 1.3rem;border-bottom:1px solid #232327}
+  .idname{color:#fff;font-weight:800;font-size:1.35rem;letter-spacing:-.01em}
+  .idage{flex:0 0 auto;color:#fff;font-weight:700;font-size:1rem}
+  .sitesnote{padding:1.05rem 1.3rem;color:#C7C7CD;font-size:1rem;line-height:1.5}
+  .sitesnote b{color:#fff}
+  .notyou-wrap{margin:.5rem 0 0;text-align:right}
+  .notyou{background:none;border:none;color:#6E6E77;font-family:var(--font);font-size:.78rem;text-decoration:underline;cursor:pointer;padding:.2rem .1rem}
+  .notyou:hover{color:#A9A9B2}
+  .notyou-form{background:#141417;border:1px solid #2A2A2F;border-radius:var(--r-lg);padding:1.05rem 1.2rem;margin-top:.5rem;text-align:left}
+  .notyou-form[hidden]{display:none}
+  .nyf-lead{color:#B6B6BE;font-size:.9rem;margin-bottom:.7rem}
+  .notyou-form input{width:100%;font-family:var(--font);font-size:.98rem;color:#fff;background:#0F0F12;border:1.5px solid #2E2E34;border-radius:var(--r);padding:.7rem .85rem;min-height:46px;margin-bottom:.6rem}
+  .notyou-form input::placeholder{color:#6E6E77}
+  .notyou-form input:focus{outline:none;border-color:var(--accent)}
+  .nyf-row{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+  .notyou-form .btn{width:100%;margin-top:.2rem}
+  .blur{filter:blur(6px);-webkit-filter:blur(6px);user-select:none;color:#F1A9A9}
+  .ff{display:flex;flex-wrap:wrap;gap:.5rem;padding:1.05rem 1.3rem}
+  .ff .chip{background:#1C1C20;border:1px solid #2E2E34;border-radius:999px;padding:.4rem .85rem;font-size:.92rem;font-weight:700;color:#E7E7EA}
+  .ff .chip.blur{padding:.4rem 1.4rem}
+
+  .lockedmsg{display:flex;gap:.6rem;align-items:flex-start;padding:1.05rem 1.3rem;background:#101013;color:#A9A9B2;font-size:.92rem;border-top:1px solid #232327}
+  .lockedmsg svg{flex:0 0 auto;margin-top:.1rem}
+
+  /* sticky bottom CTA */
+  .cta-final{margin:1.8rem 0 .4rem}
+  .cta-final .btn{width:100%}
+  .cta-note{text-align:center;color:#7E7E86;font-size:.86rem;margin-top:.7rem}
+
+  /* paywall modal tweaks (on top of styles.css .modal) */
+  .pw .modal-card{max-width:600px;padding:0;overflow:hidden}
+  .pw-head{background:var(--ink);color:#fff;padding:1.3rem 1.6rem}
+  .pw-head h2{color:#fff;font-size:1.35rem;letter-spacing:-.01em;margin-bottom:.2rem}
+  .pw-head p{color:#C7C7CD;font-size:.95rem}
+  .pw-body{padding:1.4rem 1.6rem 1.7rem}
+  .pw-toggle{display:flex;justify-content:center;align-items:center;gap:.6rem;margin:.2rem 0 1.3rem}
+  .pw-toggle button{font-family:var(--font);font-weight:700;font-size:.98rem;border:1.5px solid var(--border-strong);background:#fff;color:var(--muted);padding:.55rem 1.15rem;border-radius:var(--r);cursor:pointer}
+  .pw-toggle button.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .pw-save{background:var(--accent-tint);color:var(--accent);font-weight:800;font-size:.76rem;padding:.3rem .55rem;border-radius:var(--r-sm)}
+  .pw-plans{display:grid;grid-template-columns:1fr 1fr;gap:.9rem;margin-bottom:1.3rem}
+  .pw-plan{position:relative;border:1.5px solid var(--border-strong);border-radius:var(--r-lg);padding:1.1rem 1rem 1.15rem;cursor:pointer;text-align:left;background:#fff}
+  .pw-plan.sel{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-tint)}
+  .pw-plan .pn{font-weight:800;color:var(--ink);font-size:1.05rem;margin-bottom:.15rem}
+  .pw-plan .pw-who{color:var(--muted);font-size:.84rem;font-weight:600;margin-bottom:.6rem}
+  .pw-plan .pp{font-size:1.7rem;font-weight:800;color:var(--ink);letter-spacing:-.02em;line-height:1}
+  .pw-plan .pp span{font-size:.9rem;font-weight:700;color:var(--muted)}
+  .pw-plan .pbill{color:var(--muted);font-size:.82rem;margin-top:.3rem;min-height:1.1em}
+  .pw-was{padding-left:1.7rem;color:var(--muted);font-weight:700;font-size:.95rem;line-height:1;margin-bottom:.18rem}
+  .pw-was s{text-decoration:line-through;text-decoration-color:var(--accent);text-decoration-thickness:2px}
+  .pw-plan .savebadge{position:absolute;top:-11px;right:10px;background:var(--accent);color:#fff;font-weight:800;font-size:.7rem;letter-spacing:.03em;text-transform:uppercase;padding:.26rem .55rem;border-radius:var(--r-sm)}
+  .pw-plan .radio{position:absolute;top:.85rem;left:.9rem;width:18px;height:18px;border-radius:50%;border:2px solid var(--border-strong)}
+  .pw-plan.sel .radio{border-color:var(--accent);background:radial-gradient(circle at center,var(--accent) 0 5px,#fff 6px)}
+  .pw-plan .pn,.pw-plan .pw-who,.pw-plan .pp,.pw-plan .pbill{padding-left:1.7rem}
+
+  .pw-sec-label{font-weight:800;font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:1.1rem 0 .6rem}
+  .pw-field{margin-bottom:.8rem}
+  .pw-field label{display:block;font-weight:700;font-size:.85rem;color:var(--muted);margin-bottom:.35rem}
+  .pw-field input{width:100%;font-family:var(--font);font-size:1rem;color:var(--text);padding:.75rem .9rem;min-height:48px;background:#fff;border:1.5px solid var(--border-strong);border-radius:var(--r)}
+  .pw-field input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-tint)}
+  .pw-row2{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+  .pw-total{display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid var(--border);margin-top:1rem;padding-top:.9rem;font-weight:800;font-size:1.15rem;color:var(--ink)}
+  .pw-total .amt{color:var(--accent)}
+  .pw-cta{margin-top:1.1rem}
+  .pw-cta .btn{width:100%}
+  .pw-trust{display:flex;flex-wrap:wrap;justify-content:center;gap:.4rem 1.1rem;margin-top:.95rem;color:var(--muted);font-weight:600;font-size:.82rem}
+  .pw-trust span{display:inline-flex;align-items:center;gap:.35rem}
+  .pw-fine{text-align:center;color:var(--muted);font-size:.78rem;margin-top:.8rem;line-height:1.5}
+  @media (max-width:520px){.pw-plans{grid-template-columns:1fr}.pw-row2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- header: logo left, Remove-my-data CTA right (Cloaked-style position) -->
+<header class="rbar">
+  <div class="rbar-in">
+    <a href="index.html" class="word">Spam<span class="cr">Call</span>Stop<span class="cg">.com</span></a>
+    <button class="btn btn--accent" style="min-height:46px;padding:.6rem 1.2rem;font-size:.98rem" onclick="openPaywall()">Remove my data &rarr;</button>
+  </div>
+</header>
+
+<div class="preview-ribbon">PREVIEW &middot; <b>sample data shown for layout only</b> &middot; not a real lookup</div>
+
+<section class="rsec">
+  <div class="rwrap">
+    <span class="rover">Scan complete</span>
+    <h1 class="rh1">Your info is <span class="accent">exposed</span>.</h1>
+
+    <!-- RISK LEVEL meter (animates up to High) -->
+    <div class="riskcard">
+      <div class="rtop">
+        <span class="rlabel">Risk Level</span>
+        <span class="riskpill" id="riskPill">Calculating&hellip;</span>
+      </div>
+      <div class="meter"><i id="meterFill"></i></div>
+      <div class="scale"><span>Low</span><span>Medium</span><span id="scaleHigh">High</span><span>Critical</span></div>
+    </div>
+
+    <div class="recs">
+      <span class="n" id="recCount">0</span>
+      <span class="t">exposed records found across data-broker sites</span>
+    </div>
+  </div>
+</section>
+
+<section style="padding:0 0 8px">
+  <div class="rwrap">
+
+    <!-- YOUR PERSONAL DATA -->
+    <div class="dcard">
+      <div class="dhead">
+        <h3>Your Personal Data</h3>
+        <span class="tag">Exposed</span>
+      </div>
+      <div class="idrow">
+        <span class="idname" id="idname">Jordan A. Sample</span>
+        <span class="idage" id="idage">Age 54</span>
+      </div>
+      <div class="drow"><span class="k">Date of birth</span><span class="v" id="dobVal">March 14, 1972</span></div>
+      <div class="drow"><span class="k">Phone</span><span class="v">(217) 555-0142</span></div>
+      <div class="drow"><span class="k">Current address</span><span class="v">1428 Maple Ave, Springfield, IL 62704</span></div>
+    </div>
+
+    <div class="notyou-wrap">
+      <button class="notyou" id="notYouBtn" onclick="toggleNotYou()">Not you?</button>
+      <div class="notyou-form" id="notYouForm" hidden>
+        <p class="nyf-lead">Not the right person? Add your details and we'll re-check for you.</p>
+        <div class="nyf-row">
+          <input id="nyFirst" type="text" placeholder="First name" autocomplete="given-name">
+          <input id="nyLast" type="text" placeholder="Last name" autocomplete="family-name">
+        </div>
+        <input id="nyDob" type="text" placeholder="Date of birth (MM / DD / YYYY)" inputmode="numeric">
+        <button class="btn btn--accent" onclick="updateResults()">Update my results &rarr;</button>
+      </div>
+    </div>
+
+    <!-- FRIENDS & FAMILY -->
+    <div class="dcard">
+      <div class="dhead">
+        <h3>Friends &amp; Family</h3>
+        <span class="tag">Linked</span>
+      </div>
+      <div class="ff">
+        <span class="chip">Chris Sample, 58</span>
+        <span class="chip">Robin Sample, 29</span>
+        <span class="chip">Dana Sample, 52</span>
+        <span class="chip">Morgan Sample, 26</span>
+      </div>
+    </div>
+
+    <!-- WHERE FOUND -->
+    <div class="dcard">
+      <div class="dhead">
+        <h3>Found on these sites</h3>
+        <span class="tag">18+ sources</span>
+      </div>
+      <div class="sitesnote">Your number is being bought and sold across <b>18+</b> data-broker and people-search sites.</div>
+    </div>
+
+    <div class="cta-final">
+      <button class="btn btn--accent btn--lg" onclick="openPaywall()">Remove my data &rarr;</button>
+      <p class="cta-note">Removes your number from every site above, then keeps checking every month.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ PAYWALL MODAL ============ -->
+<div class="modal pw" id="paywall" hidden>
+  <div class="modal-backdrop" onclick="closePaywall()"></div>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-label="Choose your removal plan">
+    <button class="modal-x" onclick="closePaywall()" aria-label="Close">&times;</button>
+
+    <div class="pw-head">
+      <h2>Start removing your data</h2>
+      <p>Pick a plan to begin opt-out requests to every site that has your number.</p>
+    </div>
+
+    <div class="pw-body">
+      <!-- billing toggle -->
+      <div class="pw-toggle">
+        <button id="tgMonthly" class="active" onclick="setBilling('monthly')">Monthly</button>
+        <button id="tgYearly" onclick="setBilling('yearly')">Yearly</button>
+        <span class="pw-save">2 months free</span>
+      </div>
+
+      <!-- plans -->
+      <div class="pw-plans">
+        <div class="pw-plan sel" id="planSolo" onclick="selectPlan('solo')">
+          <span class="savebadge" id="soloSave">Save 34%</span>
+          <span class="radio"></span>
+          <div class="pn">Individual</div>
+          <div class="pw-who">One phone number</div>
+          <div class="pw-was"><s id="soloWas">$29/mo</s></div>
+          <div class="pp"><span>$</span><span id="soloPrice">19</span><span id="soloPer">/mo</span></div>
+          <div class="pbill" id="soloBill">Billed monthly</div>
+        </div>
+        <div class="pw-plan" id="planDual" onclick="selectPlan('dual')">
+          <span class="savebadge" id="dualSave">Save 50%</span>
+          <span class="radio"></span>
+          <div class="pn">Couple</div>
+          <div class="pw-who">Two phone numbers</div>
+          <div class="pw-was"><s id="dualWas">$580/yr</s></div>
+          <div class="pp"><span>$</span><span id="dualPrice">29</span><span id="dualPer">/mo</span></div>
+          <div class="pbill" id="dualBill">Billed monthly</div>
+        </div>
+      </div>
+
+      <!-- account details -->
+      <div class="pw-sec-label">Account details</div>
+      <div class="pw-field">
+        <label for="pwEmail">Email address</label>
+        <input id="pwEmail" type="email" placeholder="you@email.com" autocomplete="email">
+      </div>
+      <div class="pw-field">
+        <label for="pwPhone">Phone number to protect</label>
+        <input id="pwPhone" type="tel" placeholder="(555) 555-5542" autocomplete="tel">
+      </div>
+
+      <!-- payment details (visual only in preview) -->
+      <div class="pw-sec-label">Payment details</div>
+      <div class="pw-field">
+        <label for="pwCard">Card number</label>
+        <input id="pwCard" type="text" inputmode="numeric" placeholder="1234 1234 1234 1234">
+      </div>
+      <div class="pw-row2">
+        <div class="pw-field"><label for="pwExp">Expiry</label><input id="pwExp" type="text" placeholder="MM / YY"></div>
+        <div class="pw-field"><label for="pwCvc">CVC</label><input id="pwCvc" type="text" inputmode="numeric" placeholder="CVC"></div>
+      </div>
+
+      <div class="pw-total"><span>Total due today</span><span class="amt" id="pwTotal">$19.00</span></div>
+
+      <div class="pw-cta">
+        <button class="btn btn--accent btn--lg" onclick="fakePay()">Start my removal &rarr;</button>
+      </div>
+
+      <div class="pw-trust">
+        <span>&#128274; 256-bit encrypted</span>
+        <span>&#10003; Cancel anytime</span>
+        <span>&#10003; US-based support</span>
+      </div>
+      <p class="pw-fine">By starting you authorize SpamCallStop to act as your agent to request removal of your information from data-broker sites. Subscription renews automatically until cancelled. See Terms of Service and Privacy Policy.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* ---- Risk Level meter animates up to High on load ---- */
+  (function(){
+    var fill = document.getElementById('meterFill');
+    var pill = document.getElementById('riskPill');
+    setTimeout(function(){ fill.style.width = '86%'; }, 350);
+    setTimeout(function(){
+      pill.textContent = 'High';
+      pill.classList.add('high');
+      document.getElementById('scaleHigh').classList.add('on');
+    }, 1500);
+  })();
+
+  /* ---- exposed-records count up (sample number, preview only) ---- */
+  (function(){
+    var el = document.getElementById('recCount'); if(!el) return;
+    var target = 47, n = 0;
+    var c = setInterval(function(){ n += 1; if(n >= target){ n = target; clearInterval(c); } el.textContent = n; }, 28);
+  })();
+
+  /* ---- paywall open/close ---- */
+  function openPaywall(){ document.getElementById('paywall').hidden = false; document.body.style.overflow='hidden'; }
+  function closePaywall(){ document.getElementById('paywall').hidden = true; document.body.style.overflow=''; }
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape') closePaywall(); });
+
+  /* ---- plan + billing state ---- */
+  var billing = 'yearly', plan = 'solo';
+  var PRICE = {
+    monthly:{ solo:{n:19, wasN:29, per:'/mo', was:'$29/mo', bill:'Billed monthly', total:'$19.00'}, dual:{n:29, wasN:58, per:'/mo', was:'$58/mo', bill:'Billed monthly', total:'$29.00'} },
+    yearly: { solo:{n:190, wasN:290, per:'/yr', was:'$290/yr', bill:'Billed yearly &middot; $15.83/mo', total:'$190.00'}, dual:{n:290, wasN:580, per:'/yr', was:'$580/yr', bill:'Billed yearly &middot; $24.17/mo', total:'$290.00'} }
+  };
+  function render(){
+    var s = PRICE[billing].solo, d = PRICE[billing].dual;
+    document.getElementById('soloPrice').textContent = s.n;
+    document.getElementById('soloPer').textContent = s.per;
+    document.getElementById('soloBill').innerHTML = s.bill;
+    document.getElementById('soloWas').textContent = s.was;
+    document.getElementById('dualPrice').textContent = d.n;
+    document.getElementById('dualPer').textContent = d.per;
+    document.getElementById('dualBill').innerHTML = d.bill;
+    document.getElementById('dualWas').textContent = d.was;
+    document.getElementById('soloSave').textContent = 'Save ' + Math.round((1 - s.n / s.wasN) * 100) + '%';
+    document.getElementById('dualSave').textContent = 'Save ' + Math.round((1 - d.n / d.wasN) * 100) + '%';
+    document.getElementById('pwTotal').textContent = PRICE[billing][plan].total;
+    document.getElementById('planSolo').classList.toggle('sel', plan==='solo');
+    document.getElementById('planDual').classList.toggle('sel', plan==='dual');
+    document.getElementById('tgMonthly').classList.toggle('active', billing==='monthly');
+    document.getElementById('tgYearly').classList.toggle('active', billing==='yearly');
+  }
+  function setBilling(b){ billing = b; render(); }
+  function selectPlan(p){ plan = p; render(); }
+  function fakePay(){ alert('Preview only — this paywall is not wired to payment yet. Say the word and I will connect it to the existing Stripe checkout.'); }
+
+  /* ---- "Not you?" — correct the identity (rare path) ---- */
+  function toggleNotYou(){
+    var f = document.getElementById('notYouForm');
+    f.hidden = !f.hidden;
+    if(!f.hidden){ try{ document.getElementById('nyFirst').focus(); }catch(e){} }
+  }
+  function ageFrom(s){
+    var m = s.match(/(\d{1,2})\D+(\d{1,2})\D+(\d{4})/);
+    var today = new Date(2026,5,2);
+    if(m){
+      var mm=+m[1], dd=+m[2], yy=+m[3], age=2026-yy;
+      if((today.getMonth()+1)<mm || ((today.getMonth()+1)===mm && today.getDate()<dd)) age--;
+      return (age>=0 && age<120) ? age : null;
+    }
+    var y = s.match(/(\d{4})/); return y ? 2026-parseInt(y[1],10) : null;
+  }
+  function updateResults(){
+    var first=(document.getElementById('nyFirst').value||'').trim();
+    var last=(document.getElementById('nyLast').value||'').trim();
+    var dob=(document.getElementById('nyDob').value||'').trim();
+    if(!first || !last){ alert('Enter a first and last name so we can re-check.'); return; }
+    document.getElementById('idname').textContent = first + ' ' + last;
+    if(dob){
+      document.getElementById('dobVal').textContent = dob;
+      var age = ageFrom(dob);
+      if(age!=null) document.getElementById('idage').textContent = 'Age ' + age;
+    }
+    document.getElementById('notYouForm').hidden = true;
+    document.getElementById('notYouBtn').textContent = 'Updated ✓';
+  }
+  render();
+</script>
+</body>
+</html>

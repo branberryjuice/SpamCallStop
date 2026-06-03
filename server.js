@@ -35,6 +35,7 @@ app.use('/api', require('./routes/scan'));
 app.use('/api', require('./routes/checkout'));
 app.use('/api', require('./routes/webhook'));
 app.use('/api', require('./routes/verify'));
+app.use('/api', require('./routes/lookup'));
 
 // --- Static site -----------------------------------------------------------
 // Never hand out our server code or config as if it were a web page.
