@@ -13,6 +13,7 @@ const express = require('express');
 const router = express.Router();
 const { listCustomersWithNumbers } = require('../lib/customers');
 const { planLabel } = require('../lib/pricing');
+const digest = require('../lib/digest');
 
 function authed(req) {
   const key = process.env.ADMIN_KEY;
@@ -47,6 +48,19 @@ router.get('/admin/customers', async (req, res) => {
   } catch (e) {
     console.error('[admin] list error:', e && e.message);
     res.status(500).json({ ok: false, error: 'list_failed' });
+  }
+});
+
+// Manually trigger the daily digest (also hit by the in-app scheduler / an
+// external cron). Key-gated like the rest of /api/admin.
+router.get('/admin/daily-digest', async (req, res) => {
+  if (!authed(req)) return res.status(401).json({ ok: false, error: 'unauthorized' });
+  try {
+    const r = await digest.sendDigest();
+    res.json(r);
+  } catch (e) {
+    console.error('[admin] digest error:', e && e.message);
+    res.status(500).json({ ok: false, error: 'digest_failed' });
   }
 });
 

@@ -81,6 +81,23 @@ if (process.env.REMOVALS_PAUSED !== '1') {
   }, 60 * 1000);
 }
 
+// Daily digest: email ADMIN_EMAIL a summary of broker replies once a day.
+if (process.env.ADMIN_EMAIL) {
+  const digest = require('./lib/digest');
+  const DIGEST_HOUR = parseInt(process.env.DIGEST_HOUR_UTC || '13', 10);
+  let lastDigestDay = '';
+  setInterval(() => {
+    const now = new Date();
+    const day = now.toISOString().slice(0, 10);
+    if (now.getUTCHours() === DIGEST_HOUR && lastDigestDay !== day) {
+      lastDigestDay = day;
+      digest.sendDigest()
+        .then((r) => console.log('[digest] sent', JSON.stringify(r)))
+        .catch((e) => console.error('[digest] error:', e && e.message));
+    }
+  }, 15 * 60 * 1000);
+}
+
 app.listen(PORT, () => {
   console.log(`SpamCallStop server listening on port ${PORT}`);
 });
