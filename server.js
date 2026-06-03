@@ -44,6 +44,7 @@ app.use('/api', require('./routes/verify'));
 app.use('/api', require('./routes/lookup'));
 app.use('/api', require('./routes/admin'));
 app.use('/api', require('./routes/inbound'));
+app.use('/api', require('./routes/account'));
 
 // --- Static site -----------------------------------------------------------
 // Never hand out our server code or config as if it were a web page.
