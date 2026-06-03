@@ -37,6 +37,7 @@ app.use('/api', require('./routes/webhook'));
 app.use('/api', require('./routes/verify'));
 app.use('/api', require('./routes/lookup'));
 app.use('/api', require('./routes/admin'));
+app.use('/api', require('./routes/inbound'));
 
 // --- Static site -----------------------------------------------------------
 // Never hand out our server code or config as if it were a web page.
@@ -68,6 +69,17 @@ app.use((req, res) => {
 
 // Make sure the customer table exists before we start taking traffic.
 require('./lib/customers').init().catch((e) => console.error('[db] init failed:', e.message));
+
+// Removal engine: process due opt-out jobs on an interval. Dry-run safe — no
+// email is sent unless RESEND_API_KEY is set. Set REMOVALS_PAUSED=1 to disable.
+if (process.env.REMOVALS_PAUSED !== '1') {
+  const removal = require('./lib/removal');
+  setInterval(() => {
+    removal.processDue(20)
+      .then((r) => { if (r.processed) console.log('[removal] processed', JSON.stringify(r)); })
+      .catch((e) => console.error('[removal] loop error:', e && e.message));
+  }, 60 * 1000);
+}
 
 app.listen(PORT, () => {
   console.log(`SpamCallStop server listening on port ${PORT}`);

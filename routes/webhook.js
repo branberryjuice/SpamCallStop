@@ -34,7 +34,7 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
     const m = s.metadata || {};
     const phones = [m.phone, m.phone2].map((x) => String(x || '').trim()).filter(Boolean);
     try {
-      await saveCustomer({
+      const saved = await saveCustomer({
         email: s.customer_email || m.email || '',
         name: m.name || '',
         phone: phones[0] || m.phone || '',
@@ -45,6 +45,15 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
         stripeCustomer: s.customer || '',
         subscription: s.subscription || '',
       });
+      // Kick off the autonomous opt-out engine for this customer's number(s).
+      // Best-effort: a failure here must NOT 500 the webhook (Stripe would retry
+      // and we'd double-process), so we log and move on.
+      try {
+        const q = await require('../lib/removal').enqueueForCustomer(saved.id);
+        console.log('[removal] enqueued for customer', saved.id, JSON.stringify(q));
+      } catch (re) {
+        console.error('[removal] enqueue failed:', re && re.message);
+      }
     } catch (e) {
       console.error('failed to save customer:', e.message);
       return res.status(500).send('database error'); // 500 -> Stripe retries
