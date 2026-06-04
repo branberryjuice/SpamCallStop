@@ -20,6 +20,21 @@
   .word{font-weight:800;font-size:1.35rem;color:#fff;text-decoration:none}
   .word .cr{color:var(--accent)}.word .cg{color:var(--muted)}
   .signout{color:var(--muted);font-weight:600;font-size:.95rem;text-decoration:none;cursor:pointer}
+  .menu{position:relative}
+  .avatar{width:42px;height:42px;border-radius:50%;background:var(--green);color:#06130D;border:none;font-weight:800;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .menudrop{position:absolute;right:0;top:52px;background:var(--panel);border:1px solid var(--line);border-radius:14px;min-width:212px;padding:.4rem;box-shadow:0 12px 40px rgba(0,0,0,.5);z-index:50}
+  .menudrop[hidden]{display:none}
+  .menudrop a,.menudrop button{display:block;width:100%;text-align:left;background:none;border:none;color:var(--ink);font-family:var(--font);font-size:.98rem;font-weight:600;padding:.7rem .85rem;border-radius:9px;cursor:pointer;text-decoration:none}
+  .menudrop a:hover,.menudrop button:hover{background:#1C1C20}
+  .menudrop .signoutbtn{color:var(--accent);border-top:1px solid var(--line);margin-top:.3rem;padding-top:.75rem}
+  .acctmodal{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:1.2rem}
+  .acctmodal[hidden]{display:none}
+  .acctmodal-bg{position:absolute;inset:0;background:rgba(0,0,0,.6)}
+  .acctmodal-card{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:1.6rem 1.7rem;max-width:420px;width:100%}
+  .acctmodal-card h2{font-size:1.25rem;font-weight:800;margin-bottom:.7rem;color:#fff}
+  .acctmodal-card p{color:var(--muted2);font-size:1rem;line-height:1.5}
+  .acctmodal-card a{color:var(--green);font-weight:700}
+  .acctmodal-x{position:absolute;top:.9rem;right:1rem;background:none;border:none;color:var(--muted);font-size:1.6rem;line-height:1;cursor:pointer}
 
   .hero{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:1.6rem 1.7rem}
   .hello{color:var(--green);font-weight:800;font-size:.95rem;margin-bottom:.4rem}
@@ -73,7 +88,16 @@
 <div class="wrap">
   <div class="bar">
     <a href="index.html" class="word">Spam<span class="cr">Call</span>Stop<span class="cg">.com</span></a>
-    <span class="signout" id="signout" style="display:none" onclick="signOut()">Sign out</span>
+    <div class="menu" id="profileMenu" style="display:none">
+      <button class="avatar" id="avatarBtn" onclick="toggleMenu(event)" aria-label="Account menu" aria-haspopup="true">&bull;</button>
+      <div class="menudrop" id="menuDrop" hidden>
+        <button onclick="showPanel('membership')">My membership</button>
+        <button onclick="showPanel('settings')">Account settings</button>
+        <a href="terms.html">Terms of Service</a>
+        <a href="privacy.html">Privacy Policy</a>
+        <button class="signoutbtn" onclick="signOut()">Sign out</button>
+      </div>
+    </div>
   </div>
 
   <div class="loading" id="loading">Loading your dashboard&hellip;</div>
@@ -123,6 +147,15 @@
   </div>
 </div>
 
+<div class="acctmodal" id="acctModal" hidden>
+  <div class="acctmodal-bg" onclick="hidePanel()"></div>
+  <div class="acctmodal-card">
+    <button class="acctmodal-x" onclick="hidePanel()" aria-label="Close">&times;</button>
+    <h2 id="panelTitle"></h2>
+    <div id="panelBody"></div>
+  </div>
+</div>
+
 <script>
   function getToken(){
     var t = new URLSearchParams(location.search).get('token');
@@ -131,6 +164,23 @@
   }
   function show(id){ ['loading','dash','signin'].forEach(function(x){ document.getElementById(x).style.display = (x===id)?'block':'none'; }); }
   function signOut(){ try{ sessionStorage.removeItem('scstop_ctoken'); }catch(e){} location.href='account.html'; }
+
+  var MY_PLAN = '';
+  function toggleMenu(e){ if(e) e.stopPropagation(); var d=document.getElementById('menuDrop'); d.hidden = !d.hidden; }
+  document.addEventListener('click', function(e){ var m=document.getElementById('profileMenu'), d=document.getElementById('menuDrop'); if(d && !d.hidden && m && !m.contains(e.target)){ d.hidden = true; } });
+  function showPanel(which){
+    document.getElementById('menuDrop').hidden = true;
+    var t=document.getElementById('panelTitle'), b=document.getElementById('panelBody');
+    if(which==='membership'){
+      t.textContent = 'Your membership';
+      b.innerHTML = '<p>You\'re on the <b style="color:#fff">'+(MY_PLAN||'active')+'</b> plan, billed automatically until you cancel.</p><p style="margin-top:.7rem">To change or cancel your plan, email <a href="mailto:company@spamcallstop.com">company@spamcallstop.com</a> and we\'ll take care of it.</p>';
+    } else {
+      t.textContent = 'Account settings';
+      b.innerHTML = '<p>Need to update your details, change a number, or cancel? Email <a href="mailto:company@spamcallstop.com">company@spamcallstop.com</a> and we\'ll sort it out for you.</p>';
+    }
+    document.getElementById('acctModal').hidden = false;
+  }
+  function hidePanel(){ document.getElementById('acctModal').hidden = true; }
 
   function showSignin(note){
     show('signin');
@@ -147,7 +197,9 @@
         if(d && d.ok){
           document.getElementById('firstName').textContent = d.firstName ? (', '+d.firstName) : '';
           document.getElementById('cleared').textContent = (typeof d.cleared==='number') ? d.cleared : 0;
-          document.getElementById('signout').style.display = 'inline';
+          document.getElementById('profileMenu').style.display = 'block';
+          document.getElementById('avatarBtn').textContent = (d.firstName || 'Y').charAt(0).toUpperCase();
+          MY_PLAN = (d.plan === 'Dual') ? 'Couple' : (d.plan ? 'Individual' : '');
           show('dash');
         } else { showSignin(''); }
       })

@@ -184,8 +184,7 @@
     <!-- WHERE FOUND -->
     <div class="dcard">
       <div class="dhead">
-        <h3>Found on these sites</h3>
-        <span class="tag">Many sources</span>
+        <h3>Your information is exposed</h3>
       </div>
       <div class="sitesnote">Your number is bought and sold across data-broker and people-search sites. When you start, we find the real sites listing your number, send removal requests, and keep checking every month.</div>
     </div>
@@ -247,6 +246,12 @@
       </div>
 
       <div class="pw-total"><span>Total due today</span><span class="amt" id="pwTotal">$190.00</span></div>
+
+      <div id="pw2wrap" hidden style="margin-top:.9rem">
+        <label for="pwPhone2" style="display:block;font-weight:700;font-size:.85rem;color:var(--muted);margin-bottom:.35rem">Second phone number to protect</label>
+        <input id="pwPhone2" type="tel" placeholder="(555) 555-5542" autocomplete="tel" style="width:100%;font-family:var(--font);font-size:1rem;color:var(--text);padding:.75rem .9rem;min-height:48px;background:#fff;border:1.5px solid var(--border-strong);border-radius:var(--r)">
+      </div>
+      <p id="pwErr" role="alert" style="color:var(--accent);font-size:.85rem;min-height:1em;margin-top:.5rem;text-align:center"></p>
 
       <div class="pw-cta">
         <button class="btn btn--accent btn--lg" onclick="goCheckout()">Continue to secure checkout &rarr;</button>
@@ -361,20 +366,34 @@
     document.getElementById('tgYearly').classList.toggle('active', billing==='yearly');
   }
   function setBilling(b){ billing = b; render(); }
-  function selectPlan(p){ plan = p; render(); }
+  function selectPlan(p){ plan = p; var w=document.getElementById('pw2wrap'); if(w) w.hidden = (p !== 'dual'); render(); }
 
-  /* ---- hand off to the existing checkout step (name + Stripe-hosted payment) ---- */
+  /* ---- straight to Stripe Checkout — Stripe collects name + email + card; we
+         supply the already-verified phone (+ a 2nd number for Couple). ---- */
+  function showPwErr(m){ var el = document.getElementById('pwErr'); if(el) el.textContent = m; }
   function goCheckout(){
     var planKey = (plan === 'dual') ? 'Dual' : 'Solo';
     var bill = (billing === 'yearly') ? 'y' : 'm';
-    var price = PRICE[billing][plan].n;
-    try {
-      sessionStorage.setItem('scstop_plan', planKey);
-      sessionStorage.setItem('scstop_billing', bill);
-      sessionStorage.setItem('scstop_price', String(price));
-      if(PHONE){ sessionStorage.setItem('scstop_phone', PHONE); }
-    } catch(e){}
-    location.href = 'checkout.html';
+    if(!PHONE){ showPwErr('Please start your scan again so we know which number to protect.'); return; }
+    var phone2 = '';
+    if(plan === 'dual'){
+      phone2 = (document.getElementById('pwPhone2').value || '').trim();
+      if(phone2.replace(/\D/g,'').length < 10){ showPwErr('Enter the second phone number to protect.'); return; }
+    }
+    showPwErr('');
+    try { sessionStorage.setItem('scstop_plan', planKey); sessionStorage.setItem('scstop_billing', bill); } catch(e){}
+    var btn = document.querySelector('.pw-cta .btn');
+    if(btn){ btn.disabled = true; btn.textContent = 'Starting secure checkout…'; }
+    fetch('/api/checkout', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ plan: planKey, billing: bill, phone: PHONE, phone2: phone2, visitor_id: (window.scstopVid ? scstopVid() : '') })
+    }).then(function(r){ return r.json().catch(function(){ return null; }); })
+      .then(function(d){
+        if(d && d.ok && d.url){ if(window.scstopTrack) scstopTrack('checkout_started'); location.href = d.url; return; }
+        if(btn){ btn.disabled = false; btn.innerHTML = 'Continue to secure checkout &rarr;'; }
+        showPwErr((d && d.error === 'payments_not_configured') ? 'Secure checkout is not turned on yet. Please try again shortly.' : 'We could not start checkout. Please try again.');
+      })
+      .catch(function(){ if(btn){ btn.disabled = false; btn.innerHTML = 'Continue to secure checkout &rarr;'; } showPwErr('Something went wrong. Please try again.'); });
   }
 
   /* ---- "Not you?" — correct the displayed name and carry it into signup ---- */

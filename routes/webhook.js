@@ -51,6 +51,7 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
     const s = event.data.object;
     const m = s.metadata || {};
     const phones = [m.phone, m.phone2].map((x) => String(x || '').trim()).filter(Boolean);
+    const cd = s.customer_details || {}; // Stripe-collected name/email (we no longer collect them ourselves)
 
     // Only fire outbound effects for real purchases. Test-mode checkouts must
     // not email real brokers or customers. PROCESS_TEST_EVENTS=1 opts in.
@@ -58,8 +59,8 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
 
     try {
       const saved = await saveCustomer({
-        email: s.customer_email || m.email || '',
-        name: m.name || '',
+        email: s.customer_email || cd.email || m.email || '',
+        name: m.name || cd.name || '',
         phone: phones[0] || m.phone || '',
         phones: phones,
         plan: m.plan || '',
@@ -75,7 +76,7 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
         await recordFunnelEvent({
           visitorId: m.visitor_id || '',
           event: 'purchased',
-          email: s.customer_email || m.email || '',
+          email: s.customer_email || cd.email || m.email || '',
           plan: m.plan || '',
           amount: s.amount_total || 0,
           meta: { livemode: event.livemode === true },

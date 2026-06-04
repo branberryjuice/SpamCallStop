@@ -33,7 +33,6 @@ const STAGES = [
   ['verified', 'Verified number'],
   ['results_view', 'Saw results'],
   ['paywall_open', 'Opened paywall'],
-  ['checkout_view', 'Reached checkout'],
   ['checkout_started', 'Went to Stripe'],
   ['purchased', 'Purchased'],
 ];
