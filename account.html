@@ -135,7 +135,7 @@
   function loadMe(){
     var t = getToken();
     if(!t){ show('signin'); return; }
-    fetch('/api/me?token='+encodeURIComponent(t))
+    fetch('/api/me', { headers: { 'x-customer-token': t } })
       .then(function(r){ return r.json().catch(function(){ return null; }); })
       .then(function(d){
         if(d && d.ok){

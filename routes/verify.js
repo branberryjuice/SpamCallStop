@@ -17,9 +17,39 @@ const { normalizePhone, formatPhone } = require('../lib/phone');
 const token = require('../lib/token');
 const ratelimit = require('../lib/ratelimit');
 const { incrementVerifySends, getVerifySendsToday } = require('../lib/customers');
+const resend = require('../lib/resend');
 
 const SERVICE = process.env.TWILIO_VERIFY_SERVICE_SID;
 const DAILY_CAP = parseInt(process.env.VERIFY_DAILY_CAP || '500', 10);
+
+// Alert ADMIN_EMAIL the first time the daily SMS cap locks out new users (once
+// per UTC day). Fire-and-forget — never blocks or fails the request.
+let capAlertedDay = '';
+function maybeAlertCap(count) {
+  const today = new Date().toISOString().slice(0, 10);
+  if (capAlertedDay === today) return;
+  capAlertedDay = today;
+  const to = process.env.ADMIN_EMAIL;
+  if (!to) return;
+  const text =
+    'Heads up: the daily SMS verification cap (' + DAILY_CAP + ') was reached on ' + today + ' (UTC).\n\n' +
+    'New visitors cannot get a verification code for the rest of the day; it resets at UTC midnight. ' +
+    'This is usually heavy traffic or a bot surge hitting the phone-entry box. ' +
+    'Check Twilio Verify usage and the Render logs.';
+  Promise.resolve()
+    .then(function () {
+      return resend.send({
+        to: to,
+        from: process.env.EMAIL_FROM,
+        replyTo: 'company@spamcallstop.com',
+        subject: 'SpamCallStop: daily SMS verification cap reached',
+        text: text,
+        html: '<p>' + text.replace(/\n/g, '<br>') + '</p>',
+      });
+    })
+    .then(function () { console.log('[verify] cap alert emailed to', to); })
+    .catch(function (e) { console.error('[verify] cap alert failed:', e && e.message); });
+}
 
 function ipOf(req) {
   const xff = req.headers['x-forwarded-for'];
@@ -52,6 +82,7 @@ router.post('/verify/start', express.json(), async (req, res) => {
     const sentToday = await getVerifySendsToday();
     if (sentToday >= DAILY_CAP) {
       console.error('[verify] daily cap reached:', sentToday, '/', DAILY_CAP);
+      maybeAlertCap(sentToday);
       return res.status(429).json({ ok: false, error: 'temporarily_unavailable' });
     }
   } catch (e) {

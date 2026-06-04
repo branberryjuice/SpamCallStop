@@ -18,7 +18,13 @@ const digest = require('../lib/digest');
 function authed(req) {
   const key = process.env.ADMIN_KEY;
   if (!key) return false; // no key configured => locked
-  const given = req.query.key || req.headers['x-admin-key'] || '';
+  let given = req.query.key || req.headers['x-admin-key'] || '';
+  if (!given) {
+    // Also accept HTTP Basic Auth (password = ADMIN_KEY), which the browser
+    // auto-sends once it has authenticated for the /dashboard page.
+    const m = /^Basic\s+(.+)$/i.exec(req.headers.authorization || '');
+    if (m) { try { const dec = Buffer.from(m[1], 'base64').toString('utf8'); given = dec.slice(dec.indexOf(':') + 1); } catch (e) {} }
+  }
   return !!given && String(given) === String(key);
 }
 

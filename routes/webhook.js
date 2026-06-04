@@ -22,7 +22,7 @@
 const express = require('express');
 const router = express.Router();
 const stripe = require('../lib/stripe');
-const { saveCustomer, markEventProcessed, unmarkEventProcessed } = require('../lib/customers');
+const { saveCustomer, markEventProcessed, unmarkEventProcessed, maskEmail } = require('../lib/customers');
 
 router.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
   if (!stripe) return res.status(503).send('payments not configured');
@@ -86,7 +86,7 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
             const link = base + '/account.html?token=' + encodeURIComponent(require('../lib/token').signCustomer(saved.id));
             const msg = require('../lib/emails').welcomeEmail(saved, link);
             await require('../lib/resend').send({ to: saved.email, from: process.env.EMAIL_FROM, replyTo: 'company@spamcallstop.com', subject: msg.subject, text: msg.text, html: msg.html });
-            console.log('[welcome] sent to', saved.email);
+            console.log('[welcome] sent to', maskEmail(saved.email));
           }
         } catch (we) {
           console.error('[welcome] send failed:', we && we.message);

@@ -67,6 +67,22 @@ app.use((req, res, next) => {
   next();
 });
 
+// Gate the admin dashboard page behind the admin key (HTTP Basic Auth, password
+// = ADMIN_KEY) so the page itself won't load without it — not just its data API.
+// If ADMIN_KEY is unset, the page is hidden (404).
+app.get(['/dashboard', '/dashboard.html'], (req, res, next) => {
+  const key = process.env.ADMIN_KEY;
+  if (!key) return res.status(404).type('text/plain').send('Not found');
+  const m = /^Basic\s+(.+)$/i.exec(req.headers.authorization || '');
+  if (m) {
+    let pass = '';
+    try { const dec = Buffer.from(m[1], 'base64').toString('utf8'); pass = dec.slice(dec.indexOf(':') + 1); } catch (e) {}
+    if (pass && pass === key) return next();
+  }
+  res.set('WWW-Authenticate', 'Basic realm="SpamCallStop Admin"');
+  return res.status(401).type('text/plain').send('Authentication required');
+});
+
 // Serve the existing pages. `extensions:['html']` lets /offer load offer.html.
 // `dotfiles:'ignore'` (the default) keeps .env and .git out of reach.
 app.use(express.static(STATIC_DIR, { extensions: ['html'] }));

@@ -27,7 +27,10 @@ function ipOf(req) {
 function baseUrl() { return process.env.PUBLIC_BASE_URL || 'https://spamcallstop.com'; }
 
 router.get('/me', async (req, res) => {
-  const id = token.verifyCustomer(String((req.query && req.query.token) || ''));
+  // Prefer the token in a header so it doesn't land in access logs / referrers;
+  // fall back to the query param for the emailed link's first hop.
+  const tok = String(req.headers['x-customer-token'] || (req.query && req.query.token) || '');
+  const id = token.verifyCustomer(tok);
   if (!id) return res.status(401).json({ ok: false, error: 'not_signed_in' });
   try {
     const c = await db.getCustomerById(id);

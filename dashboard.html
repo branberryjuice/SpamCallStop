@@ -190,20 +190,22 @@
 
   function load(){
     var key=(document.getElementById('key').value||'').trim();
-    if(!key){ setRibbon('Enter your admin key first.'); return; }
-    try{ localStorage.setItem('scstop_admin_key', key); }catch(e){}
+    if(key){ try{ localStorage.setItem('scstop_admin_key', key); }catch(e){} }
     setRibbon('Loading...');
-    fetch('/api/admin/customers?key='+encodeURIComponent(key))
+    var opts = key ? { headers: { 'x-admin-key': key } } : {};
+    fetch('/api/admin/customers', opts)
       .then(function(r){ return r.json().catch(function(){return null;}); })
       .then(function(d){
         if(d && d.ok){ render(adaptLive(d.customers||[])); setRibbon('<b>Live data</b> &middot; '+((d.summary&&d.summary.total)||0)+' customer(s).', true); }
-        else { render(SAMPLE); setRibbon((d&&d.error==='unauthorized')?'That key was rejected. Showing sample data.':'Could not load live data. Showing sample.'); }
+        else { render(SAMPLE); setRibbon((d&&d.error==='unauthorized')?'Enter your admin key and press Load live.':'Could not load live data. Showing sample.'); }
       })
       .catch(function(){ render(SAMPLE); setRibbon('Could not reach the server. Showing sample data.'); });
   }
 
   render(SAMPLE);
-  try{ var k=localStorage.getItem('scstop_admin_key'); if(k){ document.getElementById('key').value=k; load(); } }catch(e){}
+  try{ var k=localStorage.getItem('scstop_admin_key'); if(k){ document.getElementById('key').value=k; } }catch(e){}
+  // The page is behind Basic Auth, so the browser sends the admin key automatically — auto-load.
+  load();
 </script>
 </body>
 </html>
