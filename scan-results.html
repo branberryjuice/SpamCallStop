@@ -51,6 +51,7 @@
   .drow .k{color:#8E8E97;font-weight:700;font-size:.86rem;letter-spacing:.02em;text-transform:uppercase;flex:0 0 auto}
   .drow .v{color:#fff;font-weight:700;font-size:1.02rem;text-align:right}
   .drow .v.exposed{color:#F1A9A9}
+  .nolink{color:inherit;text-decoration:none}
   .idrow{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;padding:1.05rem 1.3rem;border-bottom:1px solid #232327}
   .idname{color:#fff;font-weight:800;font-size:1.35rem;letter-spacing:-.01em}
   .idage{flex:0 0 auto;color:#fff;font-weight:700;font-size:1rem}
@@ -279,8 +280,11 @@
   (function(){
     var pretty = PHONE ? prettyPhone(PHONE) : '';
     if(pretty){
-      document.getElementById('phoneVal').textContent = pretty;
-      document.getElementById('idname').textContent = pretty;
+      // Wrap in a no-href anchor so iOS won't auto-detect the number and put a white
+      // tap-to-call pill behind it (the format-detection meta alone isn't enough).
+      var safe = '<a class="nolink">' + pretty + '</a>';
+      document.getElementById('phoneVal').innerHTML = safe;
+      document.getElementById('idname').innerHTML = safe;
     }
   })();
 
