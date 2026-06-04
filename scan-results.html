@@ -275,7 +275,7 @@
   }
   // The phone number is the exposed item we ALWAYS have (they typed it). Show it
   // right away as the headline of the exposed-data card, no matter what the lookup
-  // returns. Name / age / address get layered on top when the lookup finds them.
+  // returns. Name, carrier, and line type get layered on top when Twilio finds them.
   (function(){
     var pretty = PHONE ? prettyPhone(PHONE) : '';
     if(pretty){
@@ -303,8 +303,8 @@
     var c = setInterval(function(){ n += step; if(n >= target){ n = target; clearInterval(c); } el.textContent = n; }, 24);
   })();
 
-  /* ---- after SMS verification, enrich the card with name / age / address when the
-         lookup finds them. The phone number is already the anchor, so we never blank
+  /* ---- after SMS verification, enrich the card with name / carrier / line type when
+         Twilio returns them. The phone number is already the anchor, so we never blank
          it out — the page always shows exposed data no matter what the lookup returns. ---- */
   (function loadIdentity(){
     if(!PHONE || !TOKEN) return;
