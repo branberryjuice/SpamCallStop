@@ -164,7 +164,8 @@
         <span class="idage" id="idage"></span>
       </div>
       <div class="drow"><span class="k">Phone</span><span class="v exposed" id="phoneVal">&mdash;</span></div>
-      <div class="drow" id="addrRow" hidden><span class="k">Current address</span><span class="v" id="addrVal"></span></div>
+      <div class="drow" id="carrierRow" hidden><span class="k">Carrier</span><span class="v" id="carrierVal"></span></div>
+      <div class="drow" id="lineRow" hidden><span class="k">Line type</span><span class="v" id="lineVal"></span></div>
     </div>
 
     <div class="notyou-wrap">
@@ -313,12 +314,8 @@
         if(!d || !d.ok) return;
         if(d.name){ document.getElementById('idname').textContent = d.name; try{ sessionStorage.setItem('scstop_name', d.name); }catch(e){} }
         if(d.age){ document.getElementById('idage').textContent = 'Age ' + d.age; }
-        var a = d.address || {};
-        var parts = [a.line, a.city, [a.state, a.postal].filter(Boolean).join(' ')].filter(Boolean);
-        if(d.hasAddress && parts.length){
-          document.getElementById('addrVal').textContent = parts.join(', ');
-          document.getElementById('addrRow').hidden = false;
-        }
+        if(d.carrier){ document.getElementById('carrierVal').textContent = d.carrier; document.getElementById('carrierRow').hidden = false; }
+        if(d.lineType){ var lt = String(d.lineType); document.getElementById('lineVal').textContent = lt.charAt(0).toUpperCase() + lt.slice(1); document.getElementById('lineRow').hidden = false; }
       })
       .catch(function(){});
   })();
