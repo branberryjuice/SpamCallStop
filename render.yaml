@@ -1,11 +1,11 @@
 # Render deploy blueprint for SpamCallStop.
 # In Render: New + Blueprint, connect this GitHub repo, and it builds & runs the app.
-# Plans and the database get confirmed during the deploy step.
+# Secret values are entered in the Render dashboard (sync:false = never stored in git).
 services:
   - type: web
     name: spamcallstop
     runtime: node
-    plan: free
+    plan: starter
     buildCommand: npm install
     startCommand: npm start
     healthCheckPath: /api/health
@@ -15,13 +15,39 @@ services:
         value: "22"
       - key: PUBLIC_BASE_URL
         sync: false
+      # Stripe (test keys until launch, then live). Prices are inline in lib/pricing.js.
       - key: STRIPE_SECRET_KEY
         sync: false
       - key: STRIPE_WEBHOOK_SECRET
         sync: false
-      - key: STRIPE_PRICE_MONTHLY
+      # Set to 1 ONLY for a deliberate end-to-end test run (lets test-mode checkouts
+      # send the welcome email + start the removal engine). Leave unset normally.
+      - key: PROCESS_TEST_EVENTS
         sync: false
-      - key: STRIPE_PRICE_YEARLY
-        sync: false
+      # Database — Render Postgres connection string.
       - key: DATABASE_URL
+        sync: false
+      # Twilio Verify (OTP) + Lookup.
+      - key: TWILIO_ACCOUNT_SID
+        sync: false
+      - key: TWILIO_AUTH_TOKEN
+        sync: false
+      - key: TWILIO_VERIFY_SERVICE_SID
+        sync: false
+      # Trestle reverse-phone — owner name + current address.
+      - key: TRESTLE_API_KEY
+        sync: false
+      # Token signing + admin + inbound-email secrets.
+      - key: APP_SECRET
+        sync: false
+      - key: ADMIN_KEY
+        sync: false
+      - key: INBOUND_SECRET
+        sync: false
+      # Resend email (verified domain) + daily reply digest recipient.
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+      - key: ADMIN_EMAIL
         sync: false

@@ -4,7 +4,7 @@
   "private": true,
   "description": "SpamCallStop — phone number removal service (marketing funnel + backend).",
   "engines": {
-    "node": ">=18"
+    "node": ">=22"
   },
   "scripts": {
     "start": "node server.js",

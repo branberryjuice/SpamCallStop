@@ -16,7 +16,7 @@ const twilio = require('../lib/twilio');
 const { normalizePhone, formatPhone } = require('../lib/phone');
 const token = require('../lib/token');
 const ratelimit = require('../lib/ratelimit');
-const { incrementVerifySends } = require('../lib/customers');
+const { incrementVerifySends, getVerifySendsToday } = require('../lib/customers');
 
 const SERVICE = process.env.TWILIO_VERIFY_SERVICE_SID;
 const DAILY_CAP = parseInt(process.env.VERIFY_DAILY_CAP || '500', 10);
@@ -43,20 +43,23 @@ router.post('/verify/start', express.json(), async (req, res) => {
     return res.status(429).json({ ok: false, error: 'too_many_for_number' });
   }
 
-  // Guard 3: app-wide daily ceiling (durable) — the hard cost cap. At ~$0.05
-  // each, the default 500/day caps the worst case near $25/day.
+  // Guard 3: app-wide daily ceiling (durable) — the hard cost cap. Check the
+  // count first and only increment AFTER a successful send, so failed sends
+  // (which cost nothing) don't burn the cap. At ~$0.05 each, 500/day caps the
+  // worst case near $25/day.
   try {
-    const sentToday = await incrementVerifySends();
-    if (sentToday > DAILY_CAP) {
+    const sentToday = await getVerifySendsToday();
+    if (sentToday >= DAILY_CAP) {
       console.error('[verify] daily cap reached:', sentToday, '/', DAILY_CAP);
       return res.status(429).json({ ok: false, error: 'temporarily_unavailable' });
     }
   } catch (e) {
-    console.error('[verify] daily counter error:', e && e.message);
+    console.error('[verify] daily counter read error:', e && e.message);
   }
 
   try {
     await twilio.verify.v2.services(SERVICE).verifications.create({ to: '+1' + digits, channel: 'sms' });
+    try { await incrementVerifySends(); } catch (ce) { console.error('[verify] daily counter inc error:', ce && ce.message); }
     return res.json({ ok: true, sent: true });
   } catch (err) {
     console.error('verify start error:', err && err.message ? err.message : err);
@@ -67,7 +70,7 @@ router.post('/verify/start', express.json(), async (req, res) => {
 router.post('/verify/check', express.json(), async (req, res) => {
   const digits = normalizePhone(req.body && req.body.phone);
   const code = String((req.body && req.body.code) || '').trim();
-  if (!digits || !/^\d{4,8}$/.test(code)) return res.status(400).json({ ok: false, error: 'invalid_input' });
+  if (!digits || !/^\d{6}$/.test(code)) return res.status(400).json({ ok: false, error: 'invalid_input' });
   if (!twilio || !SERVICE) return res.status(503).json({ ok: false, error: 'verify_not_configured' });
 
   // Slow down code brute-forcing (Twilio also locks after a few wrong codes).

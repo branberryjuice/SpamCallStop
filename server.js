@@ -58,6 +58,8 @@ app.use((req, res, next) => {
     p.startsWith('/routes') ||
     p.startsWith('/lib') ||
     p.startsWith('/node_modules') ||
+    /^\/\d{4}-\d{2}-\d{2}-/.test(p) || // internal dated preview/mockup files — never public
+    p.endsWith('.md') ||               // README and notes — never public
     p.includes('.env')
   ) {
     return res.status(404).type('text/plain').send('Not found');

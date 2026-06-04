@@ -4,181 +4,378 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Your Scan Results | SpamCallStop</title>
-<meta name="description" content="See every site exposing and selling your phone number, then remove it.">
+<meta name="description" content="See what data brokers expose about your phone number, then remove it.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
+<style>
+  /* ---- dark results theme (mirrors Cloaked's drama, our palette) ---- */
+  body{background:#0C0C0E;color:#E7E7EA}
+  .rbar{position:sticky;top:0;z-index:60;background:#0C0C0E;border-bottom:1px solid #232327}
+  .rbar-in{display:flex;align-items:center;justify-content:space-between;gap:1rem;max-width:1180px;margin:0 auto;padding:.7rem var(--pad)}
+  .rbar .word{color:#fff;font-size:1.25rem;text-decoration:none;font-weight:800}
+  .rbar .word .cr{color:var(--accent)}.rbar .word .cg{color:#8C8C94}
+  .rwrap{max-width:760px;margin:0 auto;padding:0 var(--pad)}
+
+  .rsec{padding:clamp(26px,5vw,46px) 0}
+  .rover{display:block;font-size:.8rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:.7rem}
+  .rh1{font-size:clamp(1.8rem,5vw,2.7rem);font-weight:800;line-height:1.08;letter-spacing:-.025em;color:#fff;margin-bottom:.7rem}
+  .rh1 .accent{color:var(--accent)}
+  .rsub{color:#B6B6BE;font-size:1.08rem;max-width:48ch;margin-bottom:1.6rem}
+  .rsub b{color:#fff}
+
+  /* risk level meter */
+  .riskcard{background:#141417;border:1px solid #2A2A2F;border-radius:var(--r-lg);padding:1.3rem 1.4rem 1.5rem;margin:1.4rem 0}
+  .riskcard .rtop{display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem}
+  .riskcard .rlabel{font-weight:800;font-size:1.05rem;color:#fff;letter-spacing:-.01em}
+  .riskpill{font-weight:800;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;padding:.32rem .7rem;border-radius:999px;background:#2A2A2F;color:#9A9AA2;transition:background .3s ease,color .3s ease}
+  .riskpill.high{background:var(--accent);color:#fff}
+  .meter{height:14px;border-radius:999px;background:#222226;overflow:hidden;position:relative}
+  .meter i{display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,#E0A23C,#D2542B 55%,var(--accent));transition:width 1.6s cubic-bezier(.16,.84,.34,1)}
+  .scale{display:flex;justify-content:space-between;margin-top:.5rem;font-size:.72rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#6E6E77}
+  .scale span.on{color:#fff}
+
+  .recs{display:flex;align-items:baseline;gap:.6rem;margin:.2rem 0 .2rem}
+  .recs .n{font-size:clamp(2.4rem,8vw,3.4rem);font-weight:800;color:var(--accent);line-height:1;letter-spacing:-.03em}
+  .recs .t{color:#C7C7CD;font-weight:700;font-size:1.05rem}
+
+  /* data cards */
+  .dcard{background:#141417;border:1px solid #2A2A2F;border-radius:var(--r-lg);overflow:hidden;margin:1.1rem 0}
+  .dhead{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.95rem 1.3rem;border-bottom:1px solid #2A2A2F}
+  .dhead h3{color:#fff;font-size:1.08rem;font-weight:800;letter-spacing:-.01em}
+  .dhead .tag{font-size:.7rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:rgba(181,42,42,.16);border:1px solid rgba(181,42,42,.35);padding:.28rem .55rem;border-radius:var(--r-sm)}
+  .drow{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.85rem 1.3rem;border-bottom:1px solid #232327}
+  .drow:last-child{border-bottom:none}
+  .drow .k{color:#8E8E97;font-weight:700;font-size:.86rem;letter-spacing:.02em;text-transform:uppercase;flex:0 0 auto}
+  .drow .v{color:#fff;font-weight:700;font-size:1.02rem;text-align:right}
+  .drow .v.exposed{color:#F1A9A9}
+  .idrow{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;padding:1.05rem 1.3rem;border-bottom:1px solid #232327}
+  .idname{color:#fff;font-weight:800;font-size:1.35rem;letter-spacing:-.01em}
+  .idage{flex:0 0 auto;color:#fff;font-weight:700;font-size:1rem}
+  .sitesnote{padding:1.05rem 1.3rem;color:#C7C7CD;font-size:1rem;line-height:1.5}
+  .sitesnote b{color:#fff}
+  .notyou-wrap{margin:.5rem 0 0;text-align:right}
+  .notyou{background:none;border:none;color:#6E6E77;font-family:var(--font);font-size:.78rem;text-decoration:underline;cursor:pointer;padding:.2rem .1rem}
+  .notyou:hover{color:#A9A9B2}
+  .notyou-form{background:#141417;border:1px solid #2A2A2F;border-radius:var(--r-lg);padding:1.05rem 1.2rem;margin-top:.5rem;text-align:left}
+  .notyou-form[hidden]{display:none}
+  .nyf-lead{color:#B6B6BE;font-size:.9rem;margin-bottom:.7rem}
+  .notyou-form input{width:100%;font-family:var(--font);font-size:.98rem;color:#fff;background:#0F0F12;border:1.5px solid #2E2E34;border-radius:var(--r);padding:.7rem .85rem;min-height:46px;margin-bottom:.6rem}
+  .notyou-form input::placeholder{color:#6E6E77}
+  .notyou-form input:focus{outline:none;border-color:var(--accent)}
+  .nyf-row{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+  .notyou-form .btn{width:100%;margin-top:.2rem}
+
+  .lockedmsg{display:flex;gap:.6rem;align-items:flex-start;padding:1.05rem 1.3rem;background:#101013;color:#A9A9B2;font-size:.92rem;border-top:1px solid #232327}
+  .lockedmsg svg{flex:0 0 auto;margin-top:.1rem}
+
+  /* sticky bottom CTA */
+  .cta-final{margin:1.8rem 0 .4rem}
+  .cta-final .btn{width:100%}
+  .cta-note{text-align:center;color:#7E7E86;font-size:.86rem;margin-top:.7rem}
+
+  .rfoot{max-width:760px;margin:2.2rem auto 0;padding:1.4rem var(--pad) 2.4rem;border-top:1px solid #1E1E22;color:#6E6E77;font-size:.82rem;display:flex;flex-wrap:wrap;gap:.4rem 1.2rem;align-items:center;justify-content:center;text-align:center}
+  .rfoot a{color:#9A9AA2;text-decoration:underline}
+
+  /* paywall modal tweaks (on top of styles.css .modal) */
+  .pw .modal-card{max-width:600px;padding:0;overflow:hidden}
+  .pw-head{background:var(--ink);color:#fff;padding:1.3rem 1.6rem}
+  .pw-head h2{color:#fff;font-size:1.35rem;letter-spacing:-.01em;margin-bottom:.2rem}
+  .pw-head p{color:#C7C7CD;font-size:.95rem}
+  .pw-body{padding:1.4rem 1.6rem 1.7rem}
+  .pw-toggle{display:flex;justify-content:center;align-items:center;gap:.6rem;margin:.2rem 0 1.3rem}
+  .pw-toggle button{font-family:var(--font);font-weight:700;font-size:.98rem;border:1.5px solid var(--border-strong);background:#fff;color:var(--muted);padding:.55rem 1.15rem;border-radius:var(--r);cursor:pointer}
+  .pw-toggle button.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .pw-save{background:var(--accent-tint);color:var(--accent);font-weight:800;font-size:.76rem;padding:.3rem .55rem;border-radius:var(--r-sm)}
+  .pw-plans{display:grid;grid-template-columns:1fr 1fr;gap:.9rem;margin-bottom:1.3rem}
+  .pw-plan{position:relative;border:1.5px solid var(--border-strong);border-radius:var(--r-lg);padding:1.1rem 1rem 1.15rem;cursor:pointer;text-align:left;background:#fff}
+  .pw-plan.sel{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-tint)}
+  .pw-plan .pn{font-weight:800;color:var(--ink);font-size:1.05rem;margin-bottom:.15rem}
+  .pw-plan .pw-who{color:var(--muted);font-size:.84rem;font-weight:600;margin-bottom:.6rem}
+  .pw-plan .pp{font-size:1.7rem;font-weight:800;color:var(--ink);letter-spacing:-.02em;line-height:1}
+  .pw-plan .pp span{font-size:.9rem;font-weight:700;color:var(--muted)}
+  .pw-plan .pbill{color:var(--muted);font-size:.82rem;margin-top:.3rem;min-height:1.1em}
+  .pw-was{padding-left:1.7rem;color:var(--muted);font-weight:700;font-size:.95rem;line-height:1;margin-bottom:.18rem}
+  .pw-was s{text-decoration:line-through;text-decoration-color:var(--accent);text-decoration-thickness:2px}
+  .pw-plan .savebadge{position:absolute;top:-11px;right:10px;background:var(--accent);color:#fff;font-weight:800;font-size:.7rem;letter-spacing:.03em;text-transform:uppercase;padding:.26rem .55rem;border-radius:var(--r-sm)}
+  .pw-plan .radio{position:absolute;top:.85rem;left:.9rem;width:18px;height:18px;border-radius:50%;border:2px solid var(--border-strong)}
+  .pw-plan.sel .radio{border-color:var(--accent);background:radial-gradient(circle at center,var(--accent) 0 5px,#fff 6px)}
+  .pw-plan .pn,.pw-plan .pw-who,.pw-plan .pp,.pw-plan .pbill{padding-left:1.7rem}
+
+  .pw-total{display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid var(--border);margin-top:.4rem;padding-top:.9rem;font-weight:800;font-size:1.15rem;color:var(--ink)}
+  .pw-total .amt{color:var(--accent)}
+  .pw-cta{margin-top:1.1rem}
+  .pw-cta .btn{width:100%}
+  .pw-trust{display:flex;flex-wrap:wrap;justify-content:center;gap:.4rem 1.1rem;margin-top:.95rem;color:var(--muted);font-weight:600;font-size:.82rem}
+  .pw-trust span{display:inline-flex;align-items:center;gap:.35rem}
+  .pw-fine{text-align:center;color:var(--muted);font-size:.78rem;margin-top:.8rem;line-height:1.5}
+  @media (max-width:520px){.pw-plans{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
-<header class="bar">
-  <div class="bar-in">
+
+<!-- header: logo left, Remove-my-data CTA right (Cloaked-style position) -->
+<header class="rbar">
+  <div class="rbar-in">
     <a href="index.html" class="word">Spam<span class="cr">Call</span>Stop<span class="cg">.com</span></a>
-    <span class="secure"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 10V8a6 6 0 0112 0v2" stroke="#6B6B72" stroke-width="2"/><rect x="4" y="10" width="16" height="10" rx="2" stroke="#6B6B72" stroke-width="2"/></svg> Private and secure</span>
+    <button class="btn btn--accent" style="min-height:46px;padding:.6rem 1.2rem;font-size:.98rem" onclick="openPaywall()">Remove my data &rarr;</button>
   </div>
 </header>
-<div class="progress">
-  <div class="progress-in">
-    <span class="pstep done"><span class="pdot">&#10003;</span><span class="plabel">Scan</span></span>
-    <span class="psep"></span>
-    <span class="pstep active"><span class="pdot">2</span><span class="plabel">Results</span></span>
-    <span class="psep"></span>
-    <span class="pstep"><span class="pdot">3</span><span class="plabel">Plan</span></span>
-    <span class="psep"></span>
-    <span class="pstep"><span class="pdot">4</span><span class="plabel">Checkout</span></span>
-  </div>
-</div>
 
-<section style="padding-top:clamp(20px,3vw,32px)">
-  <div class="container">
+<section class="rsec">
+  <div class="rwrap">
+    <span class="rover">Scan complete</span>
+    <h1 class="rh1">Your info is <span class="accent">exposed</span>.</h1>
 
-    <div class="scanwrap" id="scanning">
-      <div class="scanring"></div>
-      <h2 class="h2" style="margin-bottom:.5rem">Checking the sites that sell phone numbers&hellip;</h2>
-      <p class="muted" id="scanphone">Looking at the people-search and data-broker sites that sell numbers like <b>yours</b>.</p>
-      <div class="scanbar"><i id="scanfill"></i></div>
-      <p class="feedline" id="feed">Connecting&hellip;</p>
+    <!-- RISK LEVEL meter (animates up to High) -->
+    <div class="riskcard">
+      <div class="rtop">
+        <span class="rlabel">Risk Level</span>
+        <span class="riskpill" id="riskPill">Calculating&hellip;</span>
+      </div>
+      <div class="meter"><i id="meterFill"></i></div>
+      <div class="scale"><span>Low</span><span>Medium</span><span id="scaleHigh">High</span><span>Critical</span></div>
     </div>
 
-    <div id="results" style="display:none">
-      <div class="center">
-        <span class="overline">Scan complete</span>
-        <h1 class="display" style="margin:.4rem 0 .2rem">An estimated <span class="accent"><span id="brokerCount">0</span>+ data brokers</span> are selling your info.</h1>
-      </div>
+    <div class="recs">
+      <span class="n" id="recCount">0</span>
+      <span class="t">+ data-broker and people-search sites buy and sell numbers like yours</span>
+    </div>
+  </div>
+</section>
 
-      <div class="exposed locked" style="margin-top:1.4rem">
-        <div class="exhead">Exposure Report</div>
-        <div class="exrow"><div><div class="exsite">People search site</div><div class="exsub">Publishes phone numbers for anyone to find</div></div><span class="exbadge">Sells data</span></div>
-        <div class="exrow"><div><div class="exsite">Background check site</div><div class="exsub">Sells numbers to whoever pays</div></div><span class="exbadge">Sells data</span></div>
-        <div class="exrow"><div><div class="exsite">Phone directory</div><div class="exsub">Shares numbers with call centers</div></div><span class="exbadge">Sells data</span></div>
-        <div class="exrow"><div><div class="exsite">Data broker</div><div class="exsub">Makes numbers searchable by anyone</div></div><span class="exbadge">Sells data</span></div>
-        <div class="exmore" id="exmore">+ many more sites like these</div>
-        <div class="lockcta">
-          <span class="lock"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M6 10V8a6 6 0 0112 0v2" stroke="#B52A2A" stroke-width="2"/><rect x="4" y="10" width="16" height="10" rx="2" stroke="#B52A2A" stroke-width="2"/></svg></span>
-          <b>Your full exposure report is locked.</b>
-          <span class="sub">Unlock removal and we will hunt down every site selling your number, take it down, and keep it off for good.</span>
-          <button class="btn btn--accent btn--lg" onclick="openPaywall()">Remove My Number &rarr;</button>
+<section style="padding:0 0 8px">
+  <div class="rwrap">
+
+    <!-- YOUR PERSONAL DATA (filled from the OTP-gated lookup for the verified owner) -->
+    <div class="dcard">
+      <div class="dhead">
+        <h3>Your Personal Data</h3>
+        <span class="tag">Exposed</span>
+      </div>
+      <div class="idrow">
+        <span class="idname" id="idname">Checking&hellip;</span>
+        <span class="idage" id="idage"></span>
+      </div>
+      <div class="drow"><span class="k">Phone</span><span class="v" id="phoneVal">&mdash;</span></div>
+      <div class="drow"><span class="k">Current address</span><span class="v" id="addrVal">Checking&hellip;</span></div>
+    </div>
+
+    <div class="notyou-wrap">
+      <button class="notyou" id="notYouBtn" onclick="toggleNotYou()">Not you?</button>
+      <div class="notyou-form" id="notYouForm" hidden>
+        <p class="nyf-lead">Not the right person? Add your name and we'll make sure we remove the right records.</p>
+        <div class="nyf-row">
+          <input id="nyFirst" type="text" placeholder="First name" autocomplete="given-name">
+          <input id="nyLast" type="text" placeholder="Last name" autocomplete="family-name">
         </div>
+        <button class="btn btn--accent" onclick="updateResults()">Update my results &rarr;</button>
       </div>
+    </div>
 
-      <div class="risk">
-        Here is what that means. People reported losing <b>$12.5 billion</b> to fraud in a single year, and phone calls are one of the top ways scammers reach them (FTC, 2024). The more sites that list your number, the more calls you get. And the higher the chance that one of them is a scam. The good news: this is fixable.
+    <!-- WHERE FOUND -->
+    <div class="dcard">
+      <div class="dhead">
+        <h3>Found on these sites</h3>
+        <span class="tag">Many sources</span>
       </div>
+      <div class="sitesnote">Your number is bought and sold across data-broker and people-search sites. When you start, we find the real sites listing your number, send removal requests, and keep checking every month.</div>
+    </div>
 
-      <p class="demo-note">The sites above are the kinds of places that sell phone numbers. When you start, we find and remove your number from the real sites listing it, then keep checking.</p>
+    <div class="cta-final">
+      <button class="btn btn--accent btn--lg" onclick="openPaywall()">Remove my data &rarr;</button>
+      <p class="cta-note">We request removal from the sites listing your number, then keep checking every month.</p>
     </div>
 
   </div>
 </section>
 
-<div id="paywall" class="modal" hidden>
+<div class="rfoot">
+  <span>&copy; 2026 SpamCallStop</span>
+  <a href="privacy.html">Privacy Policy</a>
+  <a href="terms.html">Terms of Service</a>
+  <a href="mailto:company@spamcallstop.com">company@spamcallstop.com</a>
+</div>
+
+<!-- ============ PAYWALL MODAL ============ -->
+<div class="modal pw" id="paywall" hidden>
   <div class="modal-backdrop" onclick="closePaywall()"></div>
-  <div class="modal-card">
-    <button class="modal-x" aria-label="Close" onclick="closePaywall()">&times;</button>
-    <span class="modal-urgency">Your number is being sold right now</span>
-    <h2 class="h2" style="margin-bottom:.4rem">Make the spam calls stop. <span class="accent">For good.</span></h2>
-    <p class="muted" style="margin-bottom:.2rem">We take your number off every site we found and keep it off, day and night. You do nothing but tell us your number once.</p>
-    <ul class="mstack">
-      <li><span>Scan of hundreds of broker sites</span><span class="v">$199</span></li>
-      <li><span>Done for you removal</span><span class="v">$499 / yr</span></li>
-      <li><span>Around the clock removal, for good</span><span class="v">$399 / yr</span></li>
-      <li><span>Plain English report every month</span><span class="v">$99 / yr</span></li>
-      <li><span>Bonus: Do Not Call signup and scam alerts</span><span class="v">$128</span></li>
-    </ul>
-    <div class="mprice">
-      <div class="was">Total value $1,573 / yr</div>
-      <div class="now">$19<span> / month</span></div>
-      <div class="muted" style="font-size:.9rem">or <span style="text-decoration:line-through">$228</span> $190 a year (2 months free). Cancel anytime.</div>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-label="Choose your removal plan">
+    <button class="modal-x" onclick="closePaywall()" aria-label="Close">&times;</button>
+
+    <div class="pw-head">
+      <h2>Start removing your data</h2>
+      <p>Pick a plan to begin opt-out requests to every site that has your number.</p>
     </div>
-    <button class="btn btn--accent btn--lg btn--block" onclick="goCheckout()">Remove My Number &rarr;</button>
-    <div class="mtrust">
-      <span>&#10003; We never sell your number</span>
-      <span>&#10003; Secure checkout</span>
-      <span>&#10003; Cancel anytime</span>
+
+    <div class="pw-body">
+      <!-- billing toggle -->
+      <div class="pw-toggle">
+        <button id="tgMonthly" onclick="setBilling('monthly')">Monthly</button>
+        <button id="tgYearly" class="active" onclick="setBilling('yearly')">Yearly</button>
+        <span class="pw-save">2 months free</span>
+      </div>
+
+      <!-- plans -->
+      <div class="pw-plans">
+        <div class="pw-plan sel" id="planSolo" onclick="selectPlan('solo')">
+          <span class="savebadge" id="soloSave">Save 34%</span>
+          <span class="radio"></span>
+          <div class="pn">Individual</div>
+          <div class="pw-who">One phone number</div>
+          <div class="pw-was"><s id="soloWas">$290/yr</s></div>
+          <div class="pp"><span>$</span><span id="soloPrice">190</span><span id="soloPer">/yr</span></div>
+          <div class="pbill" id="soloBill">Billed yearly</div>
+        </div>
+        <div class="pw-plan" id="planDual" onclick="selectPlan('dual')">
+          <span class="savebadge" id="dualSave">Save 50%</span>
+          <span class="radio"></span>
+          <div class="pn">Couple</div>
+          <div class="pw-who">Two phone numbers</div>
+          <div class="pw-was"><s id="dualWas">$580/yr</s></div>
+          <div class="pp"><span>$</span><span id="dualPrice">290</span><span id="dualPer">/yr</span></div>
+          <div class="pbill" id="dualBill">Billed yearly</div>
+        </div>
+      </div>
+
+      <div class="pw-total"><span>Total due today</span><span class="amt" id="pwTotal">$190.00</span></div>
+
+      <div class="pw-cta">
+        <button class="btn btn--accent btn--lg" onclick="goCheckout()">Continue to secure checkout &rarr;</button>
+      </div>
+
+      <div class="pw-trust">
+        <span>&#128274; Secure checkout by Stripe</span>
+        <span>&#10003; Cancel anytime</span>
+        <span>&#10003; US-based support</span>
+      </div>
+      <p class="pw-fine">You enter your card on Stripe's secure, encrypted page. By starting you authorize SpamCallStop to act as your agent to request removal of your information from data-broker sites. Subscription renews automatically until cancelled. See <a href="terms.html">Terms of Service</a> and <a href="privacy.html">Privacy Policy</a>.</p>
     </div>
-    <p class="fine center" style="margin-top:.8rem">No long contract. Cancel anytime. We never sell your number.</p>
   </div>
 </div>
 
-<footer>
-  <div class="container">
-    <div class="foot">
-      <div style="max-width:300px">
-        <a href="index.html" class="word2">Spam<span class="cr">Call</span>Stop<span class="cg">.com</span></a>
-        <p>We get your phone number off the lists and keep it off, so the scam calls stop.</p>
-      </div>
-      <div><h4>SpamCallStop</h4><a href="index.html">Home</a><a href="offer.html">Pricing</a></div>
-      <div><h4>Trust</h4><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Service</a></div>
-    </div>
-    <p class="disclaimer">&copy; 2026 SpamCallStop. A phone number removal service. See our <a href="terms.html" style="color:#A6A6AD;text-decoration:underline">Terms of Service</a> for full disclaimers.</p>
-  </div>
-</footer>
-
 <script>
-  function getPhone(){
-    var p = '';
-    try { p = sessionStorage.getItem('scstop_phone') || ''; } catch(e){}
-    if(!p){ var m = location.search.match(/[?&]phone=([^&]+)/); if(m) p = decodeURIComponent(m[1]); }
-    return p;
-  }
-  var phone = getPhone();
-  var pretty = phone;
-  if(phone){
-    var d = phone.replace(/\D/g,'').slice(-10);
-    pretty = d.length===10 ? '('+d.slice(0,3)+') '+d.slice(3,6)+'-'+d.slice(6) : phone;
-    document.getElementById('scanphone').innerHTML = 'Checking the sites that sell numbers like <b>'+pretty+'</b>.';
-  }
+  /* ---- read the verified-owner session (set by index.html + verify.html) ---- */
+  function ss(k){ try{ return sessionStorage.getItem(k) || ''; }catch(e){ return ''; } }
+  var PHONE = ss('scstop_phone');
+  var TOKEN = ss('scstop_verify_token');
 
-  // Real backend scan. Works once we are on Render; on static hosting the fetch
-  // simply fails and we fall back to the animation. We never fabricate a count.
-  try {
-    if(phone){
-      fetch('/api/scan', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: phone })
-      }).then(function(r){ return r.ok ? r.json() : null; })
-        .then(function(data){
-          if(data && data.ok){
-            try { sessionStorage.setItem('scstop_phone', data.phone); } catch(e){}
-          }
-        })
-        .catch(function(){});
-    }
-  } catch(e){}
-
-  var brokers = ['people search sites','background check sites','phone directories','public records sites','lead list sellers','data broker sites','people finder sites','address lookup sites'];
-  var feed = document.getElementById('feed'), fill = document.getElementById('scanfill');
-  var i = 0, pct = 0;
-  var iv = setInterval(function(){
-    pct = Math.min(100, pct + Math.round(8 + Math.random()*10));
-    fill.style.width = pct + '%';
-    var b = brokers[i % brokers.length]; i++;
-    feed.innerHTML = 'Checking <b>'+b+'</b> &hellip;';
-    if(pct >= 100){ clearInterval(iv); setTimeout(reveal, 450); }
-  }, 320);
-  function reveal(){
-    document.getElementById('scanning').style.display = 'none';
-    document.getElementById('results').style.display = 'block';
-    // Count up to a fixed, real number (same for every visitor) — the size of
-    // the data-broker industry, not a per-person figure. No randomization.
-    var el = document.getElementById('brokerCount');
-    if(el){
-      var target = 500, n = 0, step = Math.max(1, Math.round(target / 60));
-      var c = setInterval(function(){
-        n += step;
-        if(n >= target){ n = target; clearInterval(c); }
-        el.textContent = n;
-      }, 24);
-    }
+  function prettyPhone(p){
+    var d = String(p||'').replace(/\D/g,'').slice(-10);
+    return d.length===10 ? '('+d.slice(0,3)+') '+d.slice(3,6)+'-'+d.slice(6) : (p||'');
   }
-  function openPaywall(){ document.getElementById('paywall').hidden = false; document.body.style.overflow = 'hidden'; }
-  function closePaywall(){ document.getElementById('paywall').hidden = true; document.body.style.overflow = ''; }
+  // Their own number is theirs to see — show it immediately, never blurred.
+  (function(){ if(PHONE){ document.getElementById('phoneVal').textContent = prettyPhone(PHONE); } })();
+
+  /* ---- Risk Level meter animates up to High on load ---- */
+  (function(){
+    var fill = document.getElementById('meterFill');
+    var pill = document.getElementById('riskPill');
+    setTimeout(function(){ fill.style.width = '86%'; }, 350);
+    setTimeout(function(){
+      pill.textContent = 'High';
+      pill.classList.add('high');
+      document.getElementById('scaleHigh').classList.add('on');
+    }, 1500);
+  })();
+
+  /* ---- big number counts up to the site-wide industry figure (not per-person) ---- */
+  (function(){
+    var el = document.getElementById('recCount'); if(!el) return;
+    var target = 500, n = 0, step = Math.max(1, Math.round(target / 60));
+    var c = setInterval(function(){ n += step; if(n >= target){ n = target; clearInterval(c); } el.textContent = n; }, 24);
+  })();
+
+  /* ---- after SMS verification, show the owner's real name / age / address in the clear ---- */
+  (function loadIdentity(){
+    var nameEl = document.getElementById('idname');
+    var ageEl  = document.getElementById('idage');
+    var addrEl = document.getElementById('addrVal');
+    if(!PHONE || !TOKEN){
+      // Users reach this page only after verifying by SMS. If there's no token,
+      // prompt to verify rather than show an empty report.
+      nameEl.textContent = 'Verify your number to see your report';
+      addrEl.textContent = '';
+      return;
+    }
+    fetch('/api/lookup', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ phone: PHONE, token: TOKEN }) })
+      .then(function(r){ return r.json().catch(function(){ return null; }); })
+      .then(function(d){
+        if(!d || !d.ok){ nameEl.textContent = 'Not listed'; addrEl.textContent = 'Not listed'; return; }
+        nameEl.textContent = d.name || 'Not listed';
+        if(d.age){ ageEl.textContent = 'Age ' + d.age; }
+        var a = d.address || {};
+        var parts = [a.line, a.city, [a.state, a.postal].filter(Boolean).join(' ')].filter(Boolean);
+        addrEl.textContent = (d.hasAddress && parts.length) ? parts.join(', ') : 'Not listed';
+      })
+      .catch(function(){ nameEl.textContent = 'Not listed'; addrEl.textContent = 'Not listed'; });
+  })();
+
+  /* ---- paywall open/close ---- */
+  function openPaywall(){ document.getElementById('paywall').hidden = false; document.body.style.overflow='hidden'; }
+  function closePaywall(){ document.getElementById('paywall').hidden = true; document.body.style.overflow=''; }
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape') closePaywall(); });
+
+  /* ---- plan + billing state (prices match lib/pricing.js: Solo 19/190, Dual 29/290) ---- */
+  var billing = 'yearly', plan = 'solo';
+  var PRICE = {
+    monthly:{ solo:{n:19, wasN:29, per:'/mo', was:'$29/mo', bill:'Billed monthly', total:'$19.00'}, dual:{n:29, wasN:58, per:'/mo', was:'$58/mo', bill:'Billed monthly', total:'$29.00'} },
+    yearly: { solo:{n:190, wasN:290, per:'/yr', was:'$290/yr', bill:'Billed yearly &middot; $15.83/mo', total:'$190.00'}, dual:{n:290, wasN:580, per:'/yr', was:'$580/yr', bill:'Billed yearly &middot; $24.17/mo', total:'$290.00'} }
+  };
+  function render(){
+    var s = PRICE[billing].solo, d = PRICE[billing].dual;
+    document.getElementById('soloPrice').textContent = s.n;
+    document.getElementById('soloPer').textContent = s.per;
+    document.getElementById('soloBill').innerHTML = s.bill;
+    document.getElementById('soloWas').textContent = s.was;
+    document.getElementById('dualPrice').textContent = d.n;
+    document.getElementById('dualPer').textContent = d.per;
+    document.getElementById('dualBill').innerHTML = d.bill;
+    document.getElementById('dualWas').textContent = d.was;
+    document.getElementById('soloSave').textContent = 'Save ' + Math.round((1 - s.n / s.wasN) * 100) + '%';
+    document.getElementById('dualSave').textContent = 'Save ' + Math.round((1 - d.n / d.wasN) * 100) + '%';
+    document.getElementById('pwTotal').textContent = PRICE[billing][plan].total;
+    document.getElementById('planSolo').classList.toggle('sel', plan==='solo');
+    document.getElementById('planDual').classList.toggle('sel', plan==='dual');
+    document.getElementById('tgMonthly').classList.toggle('active', billing==='monthly');
+    document.getElementById('tgYearly').classList.toggle('active', billing==='yearly');
+  }
+  function setBilling(b){ billing = b; render(); }
+  function selectPlan(p){ plan = p; render(); }
+
+  /* ---- hand off to the existing checkout step (name + Stripe-hosted payment) ---- */
   function goCheckout(){
-    try { sessionStorage.setItem('scstop_plan','Solo'); sessionStorage.setItem('scstop_billing','m'); sessionStorage.setItem('scstop_price','19'); } catch(e){}
+    var planKey = (plan === 'dual') ? 'Dual' : 'Solo';
+    var bill = (billing === 'yearly') ? 'y' : 'm';
+    var price = PRICE[billing][plan].n;
+    try {
+      sessionStorage.setItem('scstop_plan', planKey);
+      sessionStorage.setItem('scstop_billing', bill);
+      sessionStorage.setItem('scstop_price', String(price));
+      if(PHONE){ sessionStorage.setItem('scstop_phone', PHONE); }
+    } catch(e){}
     location.href = 'checkout.html';
   }
-  document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closePaywall(); });
+
+  /* ---- "Not you?" — correct the displayed name and carry it into signup ---- */
+  function toggleNotYou(){
+    var f = document.getElementById('notYouForm');
+    f.hidden = !f.hidden;
+    if(!f.hidden){ try{ document.getElementById('nyFirst').focus(); }catch(e){} }
+  }
+  function updateResults(){
+    var first=(document.getElementById('nyFirst').value||'').trim();
+    var last=(document.getElementById('nyLast').value||'').trim();
+    if(!first || !last){ alert('Enter a first and last name so we remove the right records.'); return; }
+    var full = first + ' ' + last;
+    var nameEl = document.getElementById('idname');
+    nameEl.textContent = full;
+    try { sessionStorage.setItem('scstop_name', full); sessionStorage.setItem('scstop_name_correction', '1'); } catch(e){}
+    document.getElementById('notYouForm').hidden = true;
+    document.getElementById('notYouBtn').textContent = 'Updated ✓';
+  }
+  render();
 </script>
 </body>
 </html>

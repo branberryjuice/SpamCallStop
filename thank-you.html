@@ -53,6 +53,10 @@
     <span class="overline" style="color:var(--green)">You're in</span>
     <h1 class="display" style="margin:.5rem 0 .5rem">You're protected. <span style="color:var(--green)">Welcome.</span></h1>
     <p class="lead muted" id="welcome" style="max-width:48ch;margin:0 auto">We have got it from here. Your number is on its way off the lists, and we will keep it that way.</p>
+    <div style="margin-top:1.6rem">
+      <a class="btn btn--accent btn--lg" href="account.html">Go to your dashboard &rarr;</a>
+      <p class="fine" style="margin-top:.7rem">We also emailed you a private link to your dashboard.</p>
+    </div>
   </div>
 </section>
 
@@ -101,7 +105,7 @@
       <div style="max-width:300px">
         <a href="index.html" class="word2">Spam<span class="cr">Call</span>Stop<span class="cg">.com</span></a>
         <p>We get your phone number off the lists and keep it off, so the scam calls stop.</p>
-        <p style="margin-top:.8rem">Questions? Email support@spamcallstop.com and we will help.</p>
+        <p style="margin-top:.8rem">Questions? Email company@spamcallstop.com and we will help.</p>
       </div>
       <div><h4>SpamCallStop</h4><a href="index.html">Home</a><a href="offer.html">Your plan</a></div>
       <div><h4>Trust</h4><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Service</a></div>
@@ -114,9 +118,10 @@
   try {
     var name = sessionStorage.getItem('scstop_name') || '';
     var plan = sessionStorage.getItem('scstop_plan') || 'Solo';
+    var planLabel = (plan === 'Dual') ? 'Couple' : 'Individual';
     var email = sessionStorage.getItem('scstop_email') || '';
     if(name){ document.getElementById('welcome').innerHTML = 'We have got it from here, ' + name.split(' ')[0] + '. Your number is on its way off the lists, and we will keep it that way.'; }
-    var conf = 'Plan: ' + plan + (email ? '. We sent a confirmation to ' + email : '');
+    var conf = 'Plan: ' + planLabel + (email ? '. We sent a confirmation to ' + email : '');
     document.getElementById('conf').textContent = conf;
   } catch(e){}
 </script>

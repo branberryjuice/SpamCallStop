@@ -203,7 +203,6 @@ footer{background:#0C0C0E;color:#8C8C94;padding:48px 0;font-size:.97rem}
 }
 .ticker{overflow:hidden;background:var(--ink);color:#EDEDEF;padding:.75rem 0;border-bottom:1px solid #232327}
 .ticker-track{display:inline-flex;align-items:center;gap:2.6rem;white-space:nowrap;animation:tickerscroll 32s linear infinite;will-change:transform}
-.ticker:hover .ticker-track{animation-play-state:paused}
 .ticker-item{display:inline-flex;align-items:center;gap:.55rem;font-weight:600;font-size:1rem}
 .ticker-item .who{color:#fff;font-weight:700}
 .ticker-item .num{color:#9a9aa1;font-weight:700;font-size:.9rem}
@@ -268,27 +267,15 @@ footer{background:#0C0C0E;color:#8C8C94;padding:48px 0;font-size:.97rem}
         <a href="#top" class="word">Spam<span class="cr">Call</span>Stop<span class="cg">.com</span></a>
         <p>We get your phone number off the data broker lists and keep it off, so the scam calls stop.</p>
         <p style="margin-top:1rem;color:#C7C7CD;font-weight:700">spamcallstop.com</p>
-        <p>Questions? Email support@spamcallstop.com and we will help.</p>
+        <p>Questions? Email company@spamcallstop.com and we will help.</p>
       </div>
-      <div><h4>SpamCallStop</h4><a href="#scan">Free scan</a><a href="offer.html">Pricing</a><a href="mailto:support@spamcallstop.com">Contact us</a></div>
+      <div><h4>SpamCallStop</h4><a href="#scan">Free scan</a><a href="offer.html">Pricing</a><a href="mailto:company@spamcallstop.com">Contact us</a></div>
       <div><h4>Trust</h4><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Service</a><a href="https://www.donotcall.gov" target="_blank" rel="noopener noreferrer">Do Not Call list</a></div>
     </div>
     <p class="disclaimer">&copy; 2026 SpamCallStop. A phone number removal service. See our <a href="terms.html" style="color:#A6A6AD;text-decoration:underline">Terms of Service</a> for full disclaimers.</p>
   </div>
 </footer>
 <script>
-  function setBilling(m){
-    var tM=document.getElementById('tM'),tY=document.getElementById('tY');
-    var sP=document.getElementById('soloP'),sB=document.getElementById('soloB');
-    var dP=document.getElementById('dualP'),dB=document.getElementById('dualB');
-    if(m==='y'){tY.classList.add('active');tM.classList.remove('active');
-      sP.innerHTML='<span style="text-decoration:line-through;color:var(--muted);font-weight:700;font-size:1.1rem;margin-right:.35rem">$228</span>$190<span>/yr</span>';sB.textContent='Just $15.83/mo. 2 months free';
-      dP.innerHTML='<span style="text-decoration:line-through;color:var(--muted);font-weight:700;font-size:1.1rem;margin-right:.35rem">$348</span>$290<span>/yr</span>';dB.textContent='Just $24.17/mo. 2 months free';
-    }else{tM.classList.add('active');tY.classList.remove('active');
-      sP.innerHTML='$19<span>/mo</span>';sB.textContent='Billed monthly, cancel anytime';
-      dP.innerHTML='$29<span>/mo</span>';dB.textContent='Billed monthly, cancel anytime';}
-  }
-  function focusScan(){var el=document.getElementById('ph');el.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(function(){el.focus()},350);}
   function startScan(){
     var v=document.getElementById('ph').value.trim();
     if(v.replace(/\D/g,'').length<10){alert('Please enter your 10 digit phone number so we can scan it.');return;}

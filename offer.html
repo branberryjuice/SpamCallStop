@@ -78,7 +78,7 @@
     <div class="plans">
       <div class="plan feat">
         <span class="badge">Most popular</span>
-        <h3>Solo</h3><div class="who">Protect one person</div>
+        <h3>Individual</h3><div class="who">Protect one person</div>
         <div class="price" id="soloP">$19<span>/mo</span></div>
         <div class="billed" id="soloB">Billed monthly. Cancel anytime</div>
         <ul>
@@ -87,19 +87,19 @@
           <li><span class="pk"><svg width="13" height="13" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#1F7A4D" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>We keep it off, for good</li>
           <li><span class="pk"><svg width="13" height="13" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#1F7A4D" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>24/7 help whenever you need it</li>
         </ul>
-        <button class="btn btn--accent btn--lg btn--block" onclick="choose('Solo')">Get Solo &rarr;</button>
+        <button class="btn btn--accent btn--lg btn--block" onclick="choose('Solo')">Get Individual &rarr;</button>
       </div>
       <div class="plan">
-        <h3>Household</h3><div class="who">Protect two people</div>
+        <h3>Couple</h3><div class="who">Protect two people</div>
         <div class="price" id="dualP">$29<span>/mo</span></div>
         <div class="billed" id="dualB">Billed monthly. Cancel anytime</div>
         <ul>
-          <li><span class="pk"><svg width="13" height="13" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#1F7A4D" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Everything in Solo, for two people</li>
+          <li><span class="pk"><svg width="13" height="13" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#1F7A4D" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Everything in Individual, for two people</li>
           <li><span class="pk"><svg width="13" height="13" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#1F7A4D" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Great for you and your spouse</li>
           <li><span class="pk"><svg width="13" height="13" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#1F7A4D" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>One simple bill</li>
           <li><span class="pk"><svg width="13" height="13" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#1F7A4D" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>24/7 help whenever you need it</li>
         </ul>
-        <button class="btn btn--outline btn--lg btn--block" onclick="choose('Household')">Get Household &rarr;</button>
+        <button class="btn btn--outline btn--lg btn--block" onclick="choose('Dual')">Get Couple &rarr;</button>
       </div>
     </div>
     <div class="paynote">
@@ -160,7 +160,7 @@
 </footer>
 
 <script>
-  var PRICES = { Solo:{mfull:'19',yfull:'190'}, Household:{mfull:'29',yfull:'290'} };
+  var PRICES = { Solo:{mfull:'19',yfull:'190'}, Dual:{mfull:'29',yfull:'290'} };
   var billing = 'm';
   try { var s = sessionStorage.getItem('scstop_sites'); if(s){ document.getElementById('sitecount').textContent = s; } } catch(e){}
   function setBilling(m){

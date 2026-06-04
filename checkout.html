@@ -50,6 +50,7 @@
           <p class="muted" style="margin-bottom:1rem">You will enter your card on the next screen, on Stripe's secure, encrypted checkout. We never see or store your card details.</p>
           <button class="btn btn--accent btn--lg btn--block" id="payBtn" onclick="startCheckout()">Continue to secure payment &rarr;</button>
           <p class="fine center" style="margin-top:.9rem"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="vertical-align:-2px"><path d="M6 10V8a6 6 0 0112 0v2" stroke="#6B6B72" stroke-width="2"/><rect x="4" y="10" width="16" height="10" rx="2" stroke="#6B6B72" stroke-width="2"/></svg> Payments handled by Stripe. Cancel anytime.</p>
+          <p class="fine center" id="coErr" role="alert" style="color:var(--accent);min-height:1.2em;margin-top:.6rem"></p>
         </div>
       </div>
 
@@ -130,13 +131,17 @@
     }).then(function(r){ return r.json().catch(function(){ return null; }); })
       .then(function(data){
         if(data && data.ok && data.url){ location.href = data.url; return; }
-        // No backend/Stripe in this environment (e.g. static preview): fall back
-        // to the demo thank-you so the click-through still works. NOTE: remove
-        // this fallback at go-live so production never skips real payment.
-        console.warn('checkout unavailable, using demo fallback');
-        location.href = 'thank-you.html';
+        // Never skip real payment. On any problem, surface an error and let them retry.
+        showCoError((data && data.error) === 'payments_not_configured'
+          ? 'Secure checkout is not turned on yet. Please try again shortly, or email company@spamcallstop.com.'
+          : 'We could not start secure checkout. Please try again.');
       })
-      .catch(function(){ location.href = 'thank-you.html'; });
+      .catch(function(){ showCoError('Something went wrong starting checkout. Please check your connection and try again.'); });
+  }
+  function showCoError(m){
+    var btn = document.getElementById('payBtn');
+    if(btn){ btn.disabled = false; btn.innerHTML = 'Continue to secure payment &rarr;'; }
+    var el = document.getElementById('coErr'); if(el){ el.textContent = m; }
   }
 </script>
 </body>
