@@ -276,6 +276,7 @@ footer{background:#0C0C0E;color:#8C8C94;padding:48px 0;font-size:.97rem}
     <p class="disclaimer">&copy; 2026 SpamCallStop. A phone number removal service. See our <a href="terms.html" style="color:#A6A6AD;text-decoration:underline">Terms of Service</a> for full disclaimers.</p>
   </div>
 </footer>
+<script src="track.js"></script>
 <script>
   function startScan(){
     var v=document.getElementById('ph').value.trim();
@@ -286,7 +287,7 @@ footer{background:#0C0C0E;color:#8C8C94;padding:48px 0;font-size:.97rem}
     fetch('/api/verify/start',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:v})})
       .then(function(r){ return r.json().then(function(d){return {s:r.status,d:d};}).catch(function(){return {s:r.status,d:null};}); })
       .then(function(res){
-        if(res.d && res.d.ok && res.d.sent){ location.href='verify.html'; return; }
+        if(res.d && res.d.ok && res.d.sent){ if(window.scstopTrack) scstopTrack('scan_started'); location.href='verify.html'; return; }
         if(btn) btn.disabled=false;
         if(res.s===429){ showScanErr('Too many tries right now. Please wait a few minutes and try again.'); return; }
         // Verification must happen before results — never skip it. Let them retry.
@@ -299,6 +300,7 @@ footer{background:#0C0C0E;color:#8C8C94;padding:48px 0;font-size:.97rem}
     if(!('IntersectionObserver' in window)){els.forEach(function(e){e.classList.add('in')});return;}
     var io=new IntersectionObserver(function(en){en.forEach(function(e,i){if(e.isIntersecting){setTimeout(function(){e.target.classList.add('in')},(i%4)*60);io.unobserve(e.target);}});},{threshold:.12});
     els.forEach(function(e){io.observe(e)});})();
+  if(window.scstopTrack) scstopTrack('landing_view');
 </script>
 </body>
 </html>

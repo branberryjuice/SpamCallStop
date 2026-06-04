@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Funnel analytics &middot; SpamCallStop</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0B0D; --panel:#141417; --panel2:#17171B; --line:#26262B;
+    --ink:#FFFFFF; --muted:#8A8A93; --muted2:#B6B6BE;
+    --accent:#B52A2A; --green:#33C08D; --blue:#2C6FE0; --amber:#E3A53C;
+    --font:'Libre Franklin',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+    --r:14px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:var(--font);-webkit-font-smoothing:antialiased;font-size:15px;line-height:1.5}
+  .wrap{max-width:1140px;margin:0 auto;padding:1.5rem 1.6rem 4rem}
+  a{color:var(--muted2)}
+
+  .top{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:1.3rem}
+  .brand{font-weight:800;font-size:1.4rem;letter-spacing:-.01em}
+  .brand .cr{color:var(--accent)}.brand .cg{color:var(--muted)}
+  .brand .tag{font-size:.66rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted2);border:1px solid var(--line);padding:.28rem .55rem;border-radius:999px;vertical-align:3px;margin-left:.55rem}
+  .controls{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+  .rangebtn{font-family:var(--font);font-weight:700;font-size:.85rem;color:var(--muted2);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:.45rem .8rem;min-height:38px;cursor:pointer}
+  .rangebtn.active{background:var(--ink);color:#fff;border-color:#3a3a40}
+  .controls input{font-family:var(--font);font-size:.85rem;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:.45rem .7rem;min-height:38px;width:150px}
+  .controls .reload{background:var(--accent);color:#fff;border:none;font-weight:700;border-radius:10px;padding:.45rem .9rem;min-height:38px;cursor:pointer}
+
+  .ribbon{font-size:.82rem;color:var(--muted2);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:.55rem .85rem;margin-bottom:1.3rem}
+  .ribbon.ok{color:var(--green)}
+  .ribbon b{color:#fff}
+
+  .stats{display:grid;grid-template-columns:repeat(6,1fr);gap:.8rem;margin-bottom:1.4rem}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:1rem 1.05rem}
+  .stat .n{font-size:1.75rem;font-weight:800;letter-spacing:-.02em;line-height:1}
+  .stat .l{color:var(--muted);font-weight:600;font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;margin-top:.4rem}
+  .stat.good .n{color:var(--green)} .stat.blue .n{color:#5B8DEF} .stat.accent .n{color:var(--accent)}
+
+  .grid2{display:grid;grid-template-columns:1.1fr 1fr;gap:1rem;margin-bottom:1rem}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:1.2rem 1.3rem}
+  .card h2{font-size:1.02rem;font-weight:800;letter-spacing:-.01em;margin-bottom:1rem}
+  .muted{color:var(--muted)}
+
+  /* funnel */
+  .frow{display:grid;grid-template-columns:130px 1fr 150px;gap:.7rem;align-items:center;margin-bottom:.6rem}
+  .flabel{color:var(--muted2);font-size:.86rem;font-weight:600}
+  .fbarwrap{position:relative;background:#1C1C20;border-radius:8px;height:30px;overflow:hidden}
+  .fbar{height:100%;border-radius:8px;background:linear-gradient(90deg,#2C6FE0,#33C08D);min-width:2px;transition:width .5s ease}
+  .fcount{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-weight:800;font-size:.86rem;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+  .fpct{font-size:.82rem;color:var(--muted2);font-weight:700;text-align:right}
+  .fpct .step{color:var(--muted);font-weight:600;font-size:.74rem}
+
+  /* trend */
+  #trend svg{display:block;background:#101013;border-radius:10px}
+  .legend{display:flex;gap:1.2rem;margin-top:.7rem;font-size:.8rem;color:var(--muted2)}
+  .legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:.35rem;vertical-align:-1px}
+
+  /* emails */
+  .ehead,.erow{display:grid;grid-template-columns:1fr 130px 150px;gap:1rem;align-items:center;padding:.6rem .2rem;border-bottom:1px solid var(--line)}
+  .ehead{color:var(--muted);font-size:.72rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase}
+  .erow:last-child{border-bottom:none}
+  .eemail{color:#fff;font-weight:600;font-size:.9rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .estage{font-size:.78rem;font-weight:700;color:var(--green)}
+  .ewhen{font-size:.78rem;color:var(--muted2)}
+
+  @media (max-width:900px){
+    .stats{grid-template-columns:repeat(3,1fr)}
+    .grid2{grid-template-columns:1fr}
+    .frow{grid-template-columns:96px 1fr 92px}
+    .flabel{font-size:.78rem}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand">Spam<span class="cr">Call</span>Stop<span class="cg">.com</span><span class="tag">Analytics</span></div>
+    <div class="controls">
+      <button class="rangebtn" onclick="setDays(7,this)">7d</button>
+      <button class="rangebtn active" onclick="setDays(30,this)">30d</button>
+      <button class="rangebtn" onclick="setDays(90,this)">90d</button>
+      <input id="key" type="password" placeholder="Admin key (if asked)" autocomplete="off">
+      <button class="reload" onclick="load()">Reload</button>
+    </div>
+  </div>
+
+  <div class="ribbon" id="ribbon">Loading&hellip;</div>
+
+  <div class="stats">
+    <div class="stat"><div class="n" id="sVisitors">0</div><div class="l">Visitors</div></div>
+    <div class="stat blue"><div class="n" id="sEmails">0</div><div class="l">Emails captured</div></div>
+    <div class="stat good"><div class="n" id="sPurch">0</div><div class="l">Purchases</div></div>
+    <div class="stat accent"><div class="n" id="sConv">0%</div><div class="l">Visitor &rarr; buy</div></div>
+    <div class="stat good"><div class="n" id="sRev">$0</div><div class="l">Revenue</div></div>
+    <div class="stat"><div class="n" id="sTime">&mdash;</div><div class="l">Avg time to buy</div></div>
+  </div>
+
+  <div class="grid2">
+    <div class="card"><h2>Funnel</h2><div id="funnel"></div></div>
+    <div class="card"><h2>Daily visitors &amp; purchases</h2><div id="trend"></div></div>
+  </div>
+
+  <div class="card"><h2>Emails submitted</h2><div id="emails"></div></div>
+</div>
+
+<script>
+  var DAYS = 30;
+
+  function esc(s){ var d=document.createElement('div'); d.textContent=(s==null?'':String(s)); return d.innerHTML; }
+  function fmtMoney(c){ return '$' + ((c||0)/100).toFixed(2); }
+  function fmtWhen(iso){ try{ var d=new Date(iso); return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}); }catch(e){ return iso; } }
+  function setRibbon(msg, ok){ var r=document.getElementById('ribbon'); r.innerHTML=msg; r.className = 'ribbon' + (ok?' ok':''); }
+
+  function setDays(n, btn){
+    DAYS = n;
+    var bs = document.querySelectorAll('.rangebtn');
+    for (var i=0;i<bs.length;i++) bs[i].classList.remove('active');
+    if (btn) btn.classList.add('active');
+    load();
+  }
+
+  function load(){
+    var key=(document.getElementById('key').value||'').trim();
+    if(key){ try{ localStorage.setItem('scstop_admin_key', key); }catch(e){} }
+    setRibbon('Loading&hellip;');
+    var opts = key ? { headers: { 'x-admin-key': key } } : {};
+    fetch('/api/analytics/funnel?days='+DAYS, opts)
+      .then(function(r){ return r.json().catch(function(){ return null; }); })
+      .then(function(d){
+        if(!d || !d.ok){ setRibbon((d&&d.error==='unauthorized') ? 'Enter your admin key, then Reload.' : 'Could not load analytics.'); return; }
+        render(d);
+        setRibbon('Last <b>'+d.days+' days</b> &middot; updated '+fmtWhen(d.generatedAt), true);
+      })
+      .catch(function(){ setRibbon('Could not reach the server.'); });
+  }
+
+  function render(d){
+    var t = d.totals || {};
+    document.getElementById('sVisitors').textContent = t.visitors||0;
+    document.getElementById('sEmails').textContent = t.emailsCount||0;
+    document.getElementById('sPurch').textContent = t.purchases||0;
+    document.getElementById('sConv').textContent = (t.overallConvPct||0)+'%';
+    document.getElementById('sRev').textContent = fmtMoney(t.revenueCents);
+    document.getElementById('sTime').textContent = (t.avgMinutesToPurchase==null) ? '—' : fmtDuration(t.avgMinutesToPurchase);
+    renderFunnel(d.funnel||[]);
+    renderTrend(d.series||[]);
+    renderEmails(d.emails||[]);
+  }
+
+  function fmtDuration(mins){
+    if(mins < 60) return mins + 'm';
+    var h = Math.floor(mins/60), m = mins%60;
+    if(h < 24) return h + 'h' + (m?(' '+m+'m'):'');
+    var dd = Math.floor(h/24); return dd + 'd ' + (h%24) + 'h';
+  }
+
+  function renderFunnel(funnel){
+    var top = funnel[0] ? funnel[0].count : 0;
+    document.getElementById('funnel').innerHTML = funnel.map(function(s, i){
+      var w = top ? Math.max(2, Math.round(s.count/top*100)) : 0;
+      return '<div class="frow">'+
+        '<div class="flabel">'+esc(s.label)+'</div>'+
+        '<div class="fbarwrap"><div class="fbar" style="width:'+w+'%"></div><span class="fcount">'+s.count+'</span></div>'+
+        '<div class="fpct">'+s.pctOfTop+'%'+(i>0?' <span class="step">('+s.stepPct+'% of prev)</span>':'')+'</div>'+
+      '</div>';
+    }).join('');
+  }
+
+  function renderTrend(series){
+    var el = document.getElementById('trend');
+    if(!series.length){ el.innerHTML = '<div class="muted">No data yet.</div>'; return; }
+    var W = Math.max(series.length*16, 340), H = 170, pad = 26;
+    var maxV = 1;
+    for(var i=0;i<series.length;i++){ if(series[i].visitors>maxV) maxV=series[i].visitors; }
+    var bw = (W-pad*2)/series.length;
+    var parts = '';
+    for(var j=0;j<series.length;j++){
+      var s = series[j], x = pad + j*bw;
+      var vh = Math.round((s.visitors/maxV)*(H-pad*2));
+      var ph = s.purchases>0 ? Math.max(3, Math.round((s.purchases/maxV)*(H-pad*2))) : 0;
+      parts += '<rect x="'+(x+1).toFixed(1)+'" y="'+(H-pad-vh)+'" width="'+Math.max(1,bw-2).toFixed(1)+'" height="'+vh+'" fill="#2C6FE0" opacity="0.55" rx="1"></rect>';
+      if(ph) parts += '<rect x="'+(x+1).toFixed(1)+'" y="'+(H-pad-ph)+'" width="'+Math.max(1,bw-2).toFixed(1)+'" height="'+ph+'" fill="#33C08D" rx="1"></rect>';
+    }
+    function lbl(i){ var s=series[i]; var x=pad + i*bw + bw/2; return '<text x="'+x.toFixed(1)+'" y="'+(H-7)+'" fill="#8A8A93" font-size="9" text-anchor="middle">'+esc(s.date.slice(5))+'</text>'; }
+    var labels = lbl(0) + lbl(Math.floor(series.length/2)) + lbl(series.length-1);
+    el.innerHTML =
+      '<svg viewBox="0 0 '+W+' '+H+'" width="100%" preserveAspectRatio="xMidYMid meet">'+
+      '<text x="'+pad+'" y="13" fill="#8A8A93" font-size="10">peak '+maxV+'/day</text>'+
+      parts + labels + '</svg>'+
+      '<div class="legend"><span><i style="background:#2C6FE0;opacity:.55"></i> Visitors</span><span><i style="background:#33C08D"></i> Purchases</span></div>';
+  }
+
+  function renderEmails(emails){
+    var el = document.getElementById('emails');
+    if(!emails.length){ el.innerHTML = '<div class="muted">No emails submitted yet.</div>'; return; }
+    el.innerHTML = '<div class="ehead"><span>Email</span><span>Furthest step</span><span>First seen</span></div>' +
+      emails.map(function(e){
+        return '<div class="erow"><span class="eemail">'+esc(e.email)+'</span><span class="estage">'+esc(e.stage)+'</span><span class="ewhen">'+fmtWhen(e.when)+'</span></div>';
+      }).join('');
+  }
+
+  try{ var k=localStorage.getItem('scstop_admin_key'); if(k){ document.getElementById('key').value=k; } }catch(e){}
+  // The page is behind Basic Auth, so the browser sends the admin key automatically.
+  load();
+</script>
+</body>
+</html>

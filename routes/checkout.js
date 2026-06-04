@@ -28,6 +28,7 @@ router.post('/checkout', express.json(), async (req, res) => {
     const plan = b.plan === 'Dual' ? 'Dual' : 'Solo';
     const billing = b.billing === 'y' ? 'y' : 'm';
     const bump = b.bump === true || b.bump === '1' || b.bump === 1;
+    const visitorId = String(b.visitor_id || '').slice(0, 64); // ties the sale to the funnel journey
 
     const base = process.env.PUBLIC_BASE_URL || (req.protocol + '://' + req.get('host'));
 
@@ -36,7 +37,7 @@ router.post('/checkout', express.json(), async (req, res) => {
       line_items: buildLineItems({ plan, billing, bump }),
       customer_email: email || undefined,
       allow_promotion_codes: true,
-      metadata: { name, phone, phone2, plan, billing, bump: bump ? '1' : '0' },
+      metadata: { name, phone, phone2, plan, billing, bump: bump ? '1' : '0', visitor_id: visitorId },
       subscription_data: { metadata: { name, phone, phone2, plan, billing } },
       success_url: base + '/thank-you.html?session_id={CHECKOUT_SESSION_ID}',
       cancel_url: base + '/checkout.html',

@@ -41,6 +41,7 @@
     </div>
   </div>
 </section>
+<script src="track.js"></script>
 <script>
   function getPhone(){ try{ return sessionStorage.getItem('scstop_phone') || ''; }catch(e){ return ''; } }
   var phone = getPhone();
@@ -66,7 +67,7 @@
     fetch('/api/verify/check', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ phone: phone, code: code }) })
       .then(function(r){ return r.json().catch(function(){ return null; }); })
       .then(function(d){
-        if(d && d.ok && d.verified){ try{ sessionStorage.setItem('scstop_verify_token', d.token); }catch(e){} location.href = 'scan-results.html'; return; }
+        if(d && d.ok && d.verified){ try{ sessionStorage.setItem('scstop_verify_token', d.token); }catch(e){} if(window.scstopTrack) scstopTrack('verified'); location.href = 'scan-results.html'; return; }
         btn.disabled = false; btn.innerHTML = orig; showMsg('That code was not right. Double check it and try again.', 'err');
       })
       .catch(function(){ btn.disabled = false; btn.innerHTML = orig; showMsg('Something went wrong. Please try again.', 'err'); });

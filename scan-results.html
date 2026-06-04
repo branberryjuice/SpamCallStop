@@ -255,11 +255,13 @@
   </div>
 </div>
 
+<script src="track.js"></script>
 <script>
   /* ---- read the verified-owner session (set by index.html + verify.html) ---- */
   function ss(k){ try{ return sessionStorage.getItem(k) || ''; }catch(e){ return ''; } }
   var PHONE = ss('scstop_phone');
   var TOKEN = ss('scstop_verify_token');
+  if(window.scstopTrack) scstopTrack('results_view');
 
   function prettyPhone(p){
     var d = String(p||'').replace(/\D/g,'').slice(-10);
@@ -317,7 +319,7 @@
   })();
 
   /* ---- paywall open/close ---- */
-  function openPaywall(){ document.getElementById('paywall').hidden = false; document.body.style.overflow='hidden'; }
+  function openPaywall(){ document.getElementById('paywall').hidden = false; document.body.style.overflow='hidden'; if(window.scstopTrack) scstopTrack('paywall_open'); }
   function closePaywall(){ document.getElementById('paywall').hidden = true; document.body.style.overflow=''; }
   document.addEventListener('keydown', function(e){ if(e.key==='Escape') closePaywall(); });
 

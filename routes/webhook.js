@@ -22,7 +22,7 @@
 const express = require('express');
 const router = express.Router();
 const stripe = require('../lib/stripe');
-const { saveCustomer, markEventProcessed, unmarkEventProcessed, maskEmail } = require('../lib/customers');
+const { saveCustomer, markEventProcessed, unmarkEventProcessed, maskEmail, recordFunnelEvent } = require('../lib/customers');
 
 router.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
   if (!stripe) return res.status(503).send('payments not configured');
@@ -68,6 +68,19 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
         stripeCustomer: s.customer || '',
         subscription: s.subscription || '',
       });
+
+      // Authoritative purchase for funnel analytics — tied to the visitor's
+      // journey via metadata.visitor_id. Best-effort; never fails the webhook.
+      try {
+        await recordFunnelEvent({
+          visitorId: m.visitor_id || '',
+          event: 'purchased',
+          email: s.customer_email || m.email || '',
+          plan: m.plan || '',
+          amount: s.amount_total || 0,
+          meta: { livemode: event.livemode === true },
+        });
+      } catch (fe) { console.error('[analytics] purchase record failed:', fe && fe.message); }
 
       if (allowSideEffects) {
         // Kick off the autonomous opt-out engine for this customer's number(s).

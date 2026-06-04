@@ -45,6 +45,8 @@ app.use('/api', require('./routes/lookup'));
 app.use('/api', require('./routes/admin'));
 app.use('/api', require('./routes/inbound'));
 app.use('/api', require('./routes/account'));
+app.use('/api', require('./routes/track'));
+app.use('/api', require('./routes/analytics'));
 
 // --- Static site -----------------------------------------------------------
 // Never hand out our server code or config as if it were a web page.
@@ -70,7 +72,7 @@ app.use((req, res, next) => {
 // Gate the admin dashboard page behind the admin key (HTTP Basic Auth, password
 // = ADMIN_KEY) so the page itself won't load without it — not just its data API.
 // If ADMIN_KEY is unset, the page is hidden (404).
-app.get(['/dashboard', '/dashboard.html'], (req, res, next) => {
+app.get(['/dashboard', '/dashboard.html', '/analytics', '/analytics.html'], (req, res, next) => {
   const key = process.env.ADMIN_KEY;
   if (!key) return res.status(404).type('text/plain').send('Not found');
   const m = /^Basic\s+(.+)$/i.exec(req.headers.authorization || '');
@@ -109,10 +111,14 @@ require('./lib/customers').init().catch((e) => console.error('[db] init failed:'
 // email is sent unless RESEND_API_KEY is set. Set REMOVALS_PAUSED=1 to disable.
 if (process.env.REMOVALS_PAUSED !== '1') {
   const removal = require('./lib/removal');
+  let removalBusy = false; // never overlap a slow run — overlap could double-send opt-outs
   setInterval(() => {
+    if (removalBusy) return;
+    removalBusy = true;
     removal.processDue(20)
       .then((r) => { if (r.processed) console.log('[removal] processed', JSON.stringify(r)); })
-      .catch((e) => console.error('[removal] loop error:', e && e.message));
+      .catch((e) => console.error('[removal] loop error:', e && e.message))
+      .finally(() => { removalBusy = false; });
   }, 60 * 1000);
 }
 

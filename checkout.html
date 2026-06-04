@@ -74,6 +74,7 @@
   </div>
 </footer>
 
+<script src="track.js"></script>
 <script>
   var plan='Solo', billing='m', base=19;
   try {
@@ -94,6 +95,7 @@
   }
   document.getElementById('basePrice').textContent = '$'+base+per;
   document.getElementById('totalPrice').textContent = '$'+base+per;
+  if(window.scstopTrack) scstopTrack('checkout_view');
   function startCheckout(){
     var name = (document.getElementById('nm').value || '').trim();
     var email = (document.getElementById('em').value || '').trim();
@@ -117,10 +119,10 @@
     fetch('/api/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: name, email: email, phone: phone, phone2: isCouple ? phone2 : '', plan: plan, billing: billing, bump: bump })
+      body: JSON.stringify({ name: name, email: email, phone: phone, phone2: isCouple ? phone2 : '', plan: plan, billing: billing, bump: bump, visitor_id: (window.scstopVid ? scstopVid() : '') })
     }).then(function(r){ return r.json().catch(function(){ return null; }); })
       .then(function(data){
-        if(data && data.ok && data.url){ location.href = data.url; return; }
+        if(data && data.ok && data.url){ if(window.scstopTrack) scstopTrack('checkout_started', { email: email }); location.href = data.url; return; }
         // Never skip real payment. On any problem, surface an error and let them retry.
         showCoError((data && data.error) === 'payments_not_configured'
           ? 'Secure checkout is not turned on yet. Please try again shortly, or email company@spamcallstop.com.'
