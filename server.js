@@ -14,6 +14,21 @@
 const path = require('path');
 const express = require('express');
 const { securityHeaders, apiRateLimit, bootSecurityCheck } = require('./lib/security');
+const { alertAdmin } = require('./lib/alert');
+
+// Last-resort crash visibility: log + email the admin so an outage isn't silent.
+process.on('unhandledRejection', (reason) => {
+  const msg = reason && reason.stack ? reason.stack : String(reason);
+  console.error('[fatal] unhandledRejection:', msg);
+  alertAdmin('unhandled promise rejection', msg.slice(0, 1200), { key: 'unhandledRejection' });
+});
+process.on('uncaughtException', (err) => {
+  const msg = err && err.stack ? err.stack : String(err);
+  console.error('[fatal] uncaughtException:', msg);
+  alertAdmin('uncaught exception — server is restarting', msg.slice(0, 1200), { key: 'uncaughtException' });
+  // The process is in an undefined state; let it exit so Render restarts a clean one.
+  setTimeout(() => process.exit(1), 1500);
+});
 
 const app = express();
 const PORT = process.env.PORT || 3000;
