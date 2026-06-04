@@ -164,7 +164,6 @@
         <span class="idname" id="idname">&mdash;</span>
         <span class="idage" id="idage"></span>
       </div>
-      <div class="drow"><span class="k">Phone</span><span class="v exposed" id="phoneVal">&mdash;</span></div>
       <div class="drow" id="carrierRow" hidden><span class="k">Carrier</span><span class="v" id="carrierVal"></span></div>
       <div class="drow" id="lineRow" hidden><span class="k">Line type</span><span class="v" id="lineVal"></span></div>
     </div>
@@ -291,7 +290,6 @@
       // Wrap in a no-href anchor so iOS won't auto-detect the number and put a white
       // tap-to-call pill behind it (the format-detection meta alone isn't enough).
       var safe = '<a class="nolink">' + pretty + '</a>';
-      document.getElementById('phoneVal').innerHTML = safe;
       document.getElementById('idname').innerHTML = safe;
     }
   })();
