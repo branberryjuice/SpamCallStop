@@ -231,6 +231,7 @@ footer{background:#0C0C0E;color:#8C8C94;padding:48px 0;font-size:.97rem}
         <input id="ph" type="tel" inputmode="tel" placeholder="Enter Phone Number" aria-label="Phone number" onkeydown="if(event.key==='Enter')startScan()">
         <button type="button" class="scanbtn" aria-label="Start my free scan" onclick="startScan()"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       </div>
+      <p class="fine" id="scanErr" role="alert" style="color:var(--accent);min-height:1.2em;margin-top:.7rem"></p>
     </div>
   </div>
 </section>
@@ -278,7 +279,8 @@ footer{background:#0C0C0E;color:#8C8C94;padding:48px 0;font-size:.97rem}
 <script>
   function startScan(){
     var v=document.getElementById('ph').value.trim();
-    if(v.replace(/\D/g,'').length<10){alert('Please enter your 10 digit phone number so we can scan it.');return;}
+    if(v.replace(/\D/g,'').length<10){ showScanErr('Please enter your 10 digit phone number so we can scan it.'); return; }
+    showScanErr('');
     try{ sessionStorage.setItem('scstop_phone', v); }catch(e){}
     var btn=document.querySelector('#phoneStep .scanbtn'); if(btn) btn.disabled=true;
     fetch('/api/verify/start',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:v})})
@@ -286,11 +288,13 @@ footer{background:#0C0C0E;color:#8C8C94;padding:48px 0;font-size:.97rem}
       .then(function(res){
         if(res.d && res.d.ok && res.d.sent){ location.href='verify.html'; return; }
         if(btn) btn.disabled=false;
-        if(res.s===429){ alert('Too many tries right now. Please wait a few minutes and try again.'); return; }
-        location.href='scan-results.html'; // verification unavailable here (e.g. preview) -> continue
+        if(res.s===429){ showScanErr('Too many tries right now. Please wait a few minutes and try again.'); return; }
+        // Verification must happen before results — never skip it. Let them retry.
+        showScanErr('We could not text your code just now. Please double check the number and try again.');
       })
-      .catch(function(){ location.href='scan-results.html'; });
+      .catch(function(){ if(btn) btn.disabled=false; showScanErr('Something went wrong. Please check your connection and try again.'); });
   }
+  function showScanErr(m){ var el=document.getElementById('scanErr'); if(el) el.textContent=m; }
   (function(){var els=document.querySelectorAll('.reveal');
     if(!('IntersectionObserver' in window)){els.forEach(function(e){e.classList.add('in')});return;}
     var io=new IntersectionObserver(function(en){en.forEach(function(e,i){if(e.isIntersecting){setTimeout(function(){e.target.classList.add('in')},(i%4)*60);io.unobserve(e.target);}});},{threshold:.12});

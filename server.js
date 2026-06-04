@@ -37,7 +37,7 @@ app.use('/api', apiRateLimit());
 //   /api/checkout  -> Stripe Checkout Session
 //   /api/webhook   -> Stripe payment webhook
 //   /api/signup    -> persist the customer record
-app.use('/api', require('./routes/scan'));
+// /api/scan retired — the results page now uses /api/lookup. Route file kept on disk.
 app.use('/api', require('./routes/checkout'));
 app.use('/api', require('./routes/webhook'));
 app.use('/api', require('./routes/verify'));

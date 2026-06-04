@@ -304,7 +304,7 @@
       .then(function(r){ return r.json().catch(function(){ return null; }); })
       .then(function(d){
         if(!d || !d.ok) return;
-        if(d.name){ document.getElementById('idname').textContent = d.name; }
+        if(d.name){ document.getElementById('idname').textContent = d.name; try{ sessionStorage.setItem('scstop_name', d.name); }catch(e){} }
         if(d.age){ document.getElementById('idage').textContent = 'Age ' + d.age; }
         var a = d.address || {};
         var parts = [a.line, a.city, [a.state, a.postal].filter(Boolean).join(' ')].filter(Boolean);
@@ -323,6 +323,13 @@
 
   /* ---- plan + billing state (prices match lib/pricing.js: Solo 19/190, Dual 29/290) ---- */
   var billing = 'yearly', plan = 'solo';
+  // Pre-select from a prior choice (e.g. the pricing page) if present.
+  (function(){
+    try {
+      var sp = sessionStorage.getItem('scstop_plan'); if(sp === 'Dual') plan = 'dual'; else if(sp === 'Solo') plan = 'solo';
+      var sb = sessionStorage.getItem('scstop_billing'); if(sb === 'y') billing = 'yearly'; else if(sb === 'm') billing = 'monthly';
+    } catch(e){}
+  })();
   var PRICE = {
     monthly:{ solo:{n:19, wasN:29, per:'/mo', was:'$29/mo', bill:'Billed monthly', total:'$19.00'}, dual:{n:29, wasN:58, per:'/mo', was:'$58/mo', bill:'Billed monthly', total:'$29.00'} },
     yearly: { solo:{n:190, wasN:290, per:'/yr', was:'$290/yr', bill:'Billed yearly &middot; $15.83/mo', total:'$190.00'}, dual:{n:290, wasN:580, per:'/yr', was:'$580/yr', bill:'Billed yearly &middot; $24.17/mo', total:'$290.00'} }
@@ -375,7 +382,7 @@
     var full = first + ' ' + last;
     var nameEl = document.getElementById('idname');
     nameEl.textContent = full;
-    try { sessionStorage.setItem('scstop_name', full); sessionStorage.setItem('scstop_name_correction', '1'); } catch(e){}
+    try { sessionStorage.setItem('scstop_name', full); } catch(e){}
     document.getElementById('notYouForm').hidden = true;
     document.getElementById('notYouBtn').textContent = 'Updated ✓';
   }

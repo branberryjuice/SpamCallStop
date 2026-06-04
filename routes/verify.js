@@ -38,8 +38,9 @@ router.post('/verify/start', express.json(), async (req, res) => {
 
   if (!twilio || !SERVICE) return res.status(503).json({ ok: false, error: 'verify_not_configured' });
 
-  // Guard 2: per-phone — no spamming codes to one number.
-  if (!ratelimit.hit('vstart-ph:' + digits, 3, 60 * 60 * 1000).allowed) {
+  // Guard 2: per-phone — no spamming codes to one number. Cap 5/hour to match the
+  // client's 5-code resend limit (1 initial + up to 4 resends).
+  if (!ratelimit.hit('vstart-ph:' + digits, 5, 60 * 60 * 1000).allowed) {
     return res.status(429).json({ ok: false, error: 'too_many_for_number' });
   }
 

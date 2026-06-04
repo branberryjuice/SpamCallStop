@@ -17,21 +17,10 @@
     <span class="secure"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 10V8a6 6 0 0112 0v2" stroke="#6B6B72" stroke-width="2"/><rect x="4" y="10" width="16" height="10" rx="2" stroke="#6B6B72" stroke-width="2"/></svg> Private and secure</span>
   </div>
 </header>
-<div class="progress">
-  <div class="progress-in">
-    <span class="pstep done"><span class="pdot">&#10003;</span><span class="plabel">Scan</span></span>
-    <span class="psep"></span>
-    <span class="pstep done"><span class="pdot">&#10003;</span><span class="plabel">Results</span></span>
-    <span class="psep"></span>
-    <span class="pstep active"><span class="pdot">3</span><span class="plabel">Plan</span></span>
-    <span class="psep"></span>
-    <span class="pstep"><span class="pdot">4</span><span class="plabel">Checkout</span></span>
-  </div>
-</div>
 
 <section class="surface">
   <div class="container center">
-    <span class="overline">Your number is on <span id="sitecount">47</span> sites</span>
+    <span class="overline">Stop the spam calls for good</span>
     <h1 class="display" style="margin:.6rem auto .4rem;max-width:18ch">Here is how we make the calls <span class="accent">stop. For good.</span></h1>
     <p class="lead muted" style="max-width:46ch;margin:0 auto">We take your number off every site we found. Then we keep watching, day and night, so it never goes back up. You do nothing but enter your number once.</p>
     <div style="margin-top:1.8rem">
@@ -152,7 +141,7 @@
         <a href="index.html" class="word2">Spam<span class="cr">Call</span>Stop<span class="cg">.com</span></a>
         <p>We get your phone number off the lists and keep it off, so the scam calls stop.</p>
       </div>
-      <div><h4>SpamCallStop</h4><a href="index.html">Home</a><a href="#plans">Pricing</a><a href="scan-results.html">Your scan</a></div>
+      <div><h4>SpamCallStop</h4><a href="index.html">Home</a><a href="#plans">Pricing</a><a href="index.html#scan">Free scan</a></div>
       <div><h4>Trust</h4><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Service</a></div>
     </div>
     <p class="disclaimer">&copy; 2026 SpamCallStop. A phone number removal service. See our <a href="terms.html" style="color:#A6A6AD;text-decoration:underline">Terms of Service</a> for full disclaimers.</p>
@@ -162,7 +151,6 @@
 <script>
   var PRICES = { Solo:{mfull:'19',yfull:'190'}, Dual:{mfull:'29',yfull:'290'} };
   var billing = 'm';
-  try { var s = sessionStorage.getItem('scstop_sites'); if(s){ document.getElementById('sitecount').textContent = s; } } catch(e){}
   function setBilling(m){
     billing = m;
     var tM=document.getElementById('tM'),tY=document.getElementById('tY');
@@ -176,12 +164,14 @@
       dP.innerHTML='$29<span>/mo</span>';dB.textContent='Billed monthly. Cancel anytime';}
   }
   function choose(plan){
+    // Remember the chosen plan, then send them through the scan + SMS verify flow.
+    // The results paywall pre-selects this plan; checkout always follows verification.
     try {
       sessionStorage.setItem('scstop_plan', plan);
       sessionStorage.setItem('scstop_billing', billing);
       sessionStorage.setItem('scstop_price', billing==='y' ? PRICES[plan].yfull : PRICES[plan].mfull);
     } catch(e){}
-    location.href = 'checkout.html';
+    location.href = 'index.html#scan';
   }
 </script>
 </body>

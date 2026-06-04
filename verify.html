@@ -61,7 +61,7 @@
 
   function checkCode(){
     var code = (document.getElementById('code').value || '').replace(/\D/g,'');
-    if(code.length < 4){ showMsg('Enter the 6 digit code we texted you.', 'err'); return; }
+    if(code.length !== 6){ showMsg('Enter the 6 digit code we texted you.', 'err'); return; }
     var btn = document.getElementById('vbtn'); var orig = btn.innerHTML; btn.disabled = true; btn.textContent = 'Verifying...';
     fetch('/api/verify/check', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ phone: phone, code: code }) })
       .then(function(r){ return r.json().catch(function(){ return null; }); })
@@ -78,29 +78,44 @@
     if(v.length === 6){ checkCode(); }
   });
 
-  // Resend unlocks after a 30-second countdown (industry standard).
-  var RESEND_SECONDS = 30;
-  function startCountdown(){
-    var left = RESEND_SECONDS, wrap = document.getElementById('resendWrap');
+  // Resend: the first code (sent from the landing page) counts as #1. They can
+  // resend after a 15s wait, then 30s between each, up to 5 codes total, then capped.
+  var MAX_CODES = 5;   // total codes per session
+  var sendsUsed = 1;   // code #1 already sent from the landing page
+  var capped = false;
+
+  function showResendUI(seconds){
+    var wrap = document.getElementById('resendWrap');
+    if(capped || sendsUsed >= MAX_CODES){
+      wrap.innerHTML = 'You have reached the code limit. Email <a href="mailto:company@spamcallstop.com">company@spamcallstop.com</a> and we will help.';
+      return;
+    }
+    var left = seconds;
     wrap.innerHTML = '<span id="resendCountdown"></span>';
     (function tick(){
+      if(capped || sendsUsed >= MAX_CODES){ showResendUI(0); return; }
       if(left <= 0){ wrap.innerHTML = '<a href="#" onclick="resendCode();return false;">Resend code</a>'; return; }
       var s = left % 60;
-      document.getElementById('resendCountdown').textContent = 'Resend code in 0:' + (s < 10 ? '0' : '') + s;
+      var c = document.getElementById('resendCountdown'); if(c){ c.textContent = 'Resend code in 0:' + (s < 10 ? '0' : '') + s; }
       left--; setTimeout(tick, 1000);
     })();
   }
   function resendCode(){
+    if(capped || sendsUsed >= MAX_CODES){ showResendUI(0); return; }
     document.getElementById('code').value = '';
     showMsg('Sending a new code...', 'ok');
+    var wrap = document.getElementById('resendWrap'); wrap.innerHTML = '<span id="resendCountdown">Sending&hellip;</span>';
     fetch('/api/verify/start', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ phone: phone }) })
-      .then(function(r){ return r.json().catch(function(){ return null; }); })
-      .then(function(d){ if(d && d.ok && d.sent){ showMsg('New code sent.', 'ok'); } else { showMsg('Could not resend right now. Please wait a moment.', 'err'); } })
-      .catch(function(){ showMsg('Could not resend right now.', 'err'); });
-    startCountdown();
+      .then(function(r){ return r.json().then(function(d){ return {s:r.status, d:d}; }).catch(function(){ return {s:r.status, d:null}; }); })
+      .then(function(res){
+        if(res.d && res.d.ok && res.d.sent){ sendsUsed++; showMsg('New code sent. Check your phone.', 'ok'); showResendUI(30); }
+        else if(res.s === 429){ capped = true; showMsg('That is the most codes we can send right now.', 'err'); showResendUI(0); }
+        else { showMsg('Could not resend right now. Please wait a moment and try again.', 'err'); showResendUI(30); }
+      })
+      .catch(function(){ showMsg('Could not resend right now.', 'err'); showResendUI(30); });
   }
 
-  startCountdown();
+  showResendUI(15);   // first resend available 15s after landing on this screen
   try{ document.getElementById('code').focus(); }catch(e){}
 </script>
 </body>

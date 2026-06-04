@@ -159,6 +159,8 @@
   }
 
   loadMe();
+  // Smooth the post-checkout hop: prefill the sign-in email if we already know it.
+  try{ var em0 = sessionStorage.getItem('scstop_email'); if(em0){ var e0 = document.getElementById('em'); if(e0) e0.value = em0; } }catch(e){}
 </script>
 </body>
 </html>

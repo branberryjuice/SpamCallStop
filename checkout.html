@@ -16,17 +16,6 @@
     <span class="secure"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 10V8a6 6 0 0112 0v2" stroke="#6B6B72" stroke-width="2"/><rect x="4" y="10" width="16" height="10" rx="2" stroke="#6B6B72" stroke-width="2"/></svg> Secure checkout</span>
   </div>
 </header>
-<div class="progress">
-  <div class="progress-in">
-    <span class="pstep done"><span class="pdot">&#10003;</span><span class="plabel">Scan</span></span>
-    <span class="psep"></span>
-    <span class="pstep done"><span class="pdot">&#10003;</span><span class="plabel">Results</span></span>
-    <span class="psep"></span>
-    <span class="pstep done"><span class="pdot">&#10003;</span><span class="plabel">Plan</span></span>
-    <span class="psep"></span>
-    <span class="pstep active"><span class="pdot">4</span><span class="plabel">Checkout</span></span>
-  </div>
-</div>
 
 <section>
   <div class="container">
@@ -92,6 +81,8 @@
     billing = sessionStorage.getItem('scstop_billing') || 'm';
     base = parseInt(sessionStorage.getItem('scstop_price') || '19', 10);
     var ph = sessionStorage.getItem('scstop_phone'); if(ph){ document.getElementById('ph2').value = ph; }
+    var nm0 = sessionStorage.getItem('scstop_name'); if(nm0){ document.getElementById('nm').value = nm0; }
+    var em0 = sessionStorage.getItem('scstop_email'); if(em0){ document.getElementById('em').value = em0; }
   } catch(e){}
   var per = billing==='y' ? '/yr' : '/mo';
   var isCouple = (plan === 'Dual');
@@ -120,7 +111,6 @@
     try {
       sessionStorage.setItem('scstop_name', name);
       sessionStorage.setItem('scstop_email', email);
-      sessionStorage.setItem('scstop_bump', bump ? '1' : '0');
     } catch(e){}
     var btn = document.getElementById('payBtn');
     if(btn){ btn.disabled = true; btn.textContent = 'Starting secure checkout…'; }
