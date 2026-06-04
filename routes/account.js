@@ -19,6 +19,7 @@ const db = require('../lib/customers');
 const resend = require('../lib/resend');
 const ratelimit = require('../lib/ratelimit');
 const { loginLinkEmail } = require('../lib/emails');
+const stripe = require('../lib/stripe');
 
 function ipOf(req) {
   const xff = req.headers['x-forwarded-for'];
@@ -41,6 +42,35 @@ router.get('/me', async (req, res) => {
   } catch (e) {
     console.error('[account] me error:', e && e.message);
     res.status(500).json({ ok: false, error: 'server_error' });
+  }
+});
+
+// Exchange a paid Stripe checkout session for a dashboard token, so a buyer who
+// just paid lands straight in their dashboard (email pulled from Stripe) instead
+// of an email-link wall. Only works for a paid session mapping to a known customer.
+router.get('/account/session', async (req, res) => {
+  if (!stripe) return res.status(503).json({ ok: false, error: 'not_configured' });
+  const sid = String((req.query && req.query.session_id) || '');
+  if (!/^cs_[A-Za-z0-9_]+$/.test(sid)) return res.status(400).json({ ok: false, error: 'bad_session' });
+  if (!ratelimit.hit('sess-ip:' + ipOf(req), 30, 15 * 60 * 1000).allowed) {
+    return res.status(429).json({ ok: false, error: 'too_many_requests' });
+  }
+  try {
+    const session = await stripe.checkout.sessions.retrieve(sid);
+    const paid = session && (session.payment_status === 'paid' || session.payment_status === 'no_payment_required' || session.status === 'complete');
+    if (!paid) return res.json({ ok: false, error: 'pending' });
+    const email = String(
+      session.customer_email ||
+      (session.customer_details && session.customer_details.email) ||
+      (session.metadata && session.metadata.email) || ''
+    ).trim().toLowerCase();
+    const c = email ? await db.getCustomerByEmail(email) : null;
+    if (!c) return res.json({ ok: false, error: 'pending' }); // webhook may not have created the customer yet
+    const firstName = (c.name || '').trim().split(/\s+/)[0] || '';
+    return res.json({ ok: true, token: token.signCustomer(c.id), firstName: firstName });
+  } catch (e) {
+    console.error('[account] session exchange error:', e && e.message);
+    return res.json({ ok: false, error: 'pending' });
   }
 });
 

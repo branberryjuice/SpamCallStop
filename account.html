@@ -132,9 +132,15 @@
   function show(id){ ['loading','dash','signin'].forEach(function(x){ document.getElementById(x).style.display = (x===id)?'block':'none'; }); }
   function signOut(){ try{ sessionStorage.removeItem('scstop_ctoken'); }catch(e){} location.href='account.html'; }
 
-  function loadMe(){
-    var t = getToken();
-    if(!t){ show('signin'); return; }
+  function showSignin(note){
+    show('signin');
+    try{ var em0 = sessionStorage.getItem('scstop_email'); if(em0){ var e0=document.getElementById('em'); if(e0 && !e0.value) e0.value = em0; } }catch(e){}
+    if(note){ var n=document.getElementById('simsg'); if(n) n.textContent = note; }
+  }
+
+  function loadMe(t){
+    t = t || getToken();
+    if(!t){ showSignin(''); return; }
     fetch('/api/me', { headers: { 'x-customer-token': t } })
       .then(function(r){ return r.json().catch(function(){ return null; }); })
       .then(function(d){
@@ -143,9 +149,30 @@
           document.getElementById('cleared').textContent = (typeof d.cleared==='number') ? d.cleared : 0;
           document.getElementById('signout').style.display = 'inline';
           show('dash');
-        } else { show('signin'); }
+        } else { showSignin(''); }
       })
-      .catch(function(){ show('signin'); });
+      .catch(function(){ showSignin(''); });
+  }
+
+  // After paying, the dashboard opens straight from the Stripe session (email
+  // pulled from Stripe) — no sign-in wall. Falls back softly to the email link.
+  function tryStripeSession(sid, attempt){
+    fetch('/api/account/session?session_id=' + encodeURIComponent(sid))
+      .then(function(r){ return r.json().catch(function(){ return null; }); })
+      .then(function(d){
+        if(d && d.ok && d.token){ try{ sessionStorage.setItem('scstop_ctoken', d.token); }catch(e){} loadMe(d.token); return; }
+        if(d && d.error==='pending' && attempt < 2){ setTimeout(function(){ tryStripeSession(sid, attempt+1); }, 2500); return; }
+        showSignin('Your dashboard is being set up — this can take a moment right after payment. Use the private link we just emailed you, or enter your email below.');
+      })
+      .catch(function(){ showSignin(''); });
+  }
+
+  function start(){
+    var t = getToken();
+    if(t){ loadMe(t); return; }
+    var sid = new URLSearchParams(location.search).get('session_id');
+    if(sid){ show('loading'); tryStripeSession(sid, 0); return; }
+    showSignin('');
   }
 
   function sendLink(){
@@ -158,9 +185,7 @@
       .catch(function(){ b.disabled = false; b.textContent = 'Email me my link'; msg.textContent = 'Something went wrong. Please try again.'; });
   }
 
-  loadMe();
-  // Smooth the post-checkout hop: prefill the sign-in email if we already know it.
-  try{ var em0 = sessionStorage.getItem('scstop_email'); if(em0){ var e0 = document.getElementById('em'); if(e0) e0.value = em0; } }catch(e){}
+  start();
 </script>
 </body>
 </html>

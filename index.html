@@ -72,10 +72,11 @@ header.bar{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px so
 .form{max-width:540px;margin:0 auto;text-align:center}
 .form .primary-cta{width:auto;margin-bottom:1.75rem}
 .field-label{display:block;font-weight:700;font-size:1rem;color:var(--muted);margin-bottom:.55rem}
-.form input[type=tel]{width:100%;font-family:var(--font);font-size:1.18rem;color:var(--text);padding:1rem 4.6rem 1rem 1.1rem;min-height:64px;background:#fff;border:1.5px solid var(--border-strong);border-radius:var(--r);margin-bottom:0}
+.form input[type=tel]{width:100%;font-family:var(--font);font-size:1.18rem;color:var(--text);padding:1rem 4.6rem 1rem 2.9rem;min-height:64px;background:#fff;border:1.5px solid var(--border-strong);border-radius:var(--r);margin-bottom:0}
 .form input[type=tel]::placeholder{color:#9a9aa1}
 .form input[type=tel]:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-tint)}
 .inputwrap{position:relative;margin-bottom:1rem}
+.telprefix{position:absolute;left:1.05rem;top:50%;transform:translateY(-50%);font-size:1.18rem;font-weight:600;color:var(--muted);pointer-events:none}
 .scanbtn{position:absolute;top:7px;right:7px;bottom:7px;width:54px;border:none;border-radius:var(--r-sm);background:var(--accent);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s ease}
 .scanbtn:hover{background:var(--accent-strong)}
 .scanbtn:focus-visible{outline:3px solid #F0B9B9;outline-offset:2px}
@@ -228,7 +229,8 @@ footer{background:#0C0C0E;color:#8C8C94;padding:48px 0;font-size:.97rem}
     <p class="lead reveal">We take your number off every site selling it, without you lifting a finger. <span class="hl">Free scan</span>, no commitment.</p>
     <div class="form reveal" id="scan">
       <div class="inputwrap" id="phoneStep">
-        <input id="ph" type="tel" inputmode="tel" placeholder="Enter Phone Number" aria-label="Phone number" onkeydown="if(event.key==='Enter')startScan()">
+        <span class="telprefix" aria-hidden="true">+1</span>
+        <input id="ph" type="tel" inputmode="tel" placeholder="Enter phone number" aria-label="US phone number" onkeydown="if(event.key==='Enter')startScan()">
         <button type="button" class="scanbtn" aria-label="Start my free scan" onclick="startScan()"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       </div>
       <p class="fine" id="scanErr" role="alert" style="color:var(--accent);min-height:1.2em;margin-top:.7rem"></p>
@@ -296,6 +298,9 @@ footer{background:#0C0C0E;color:#8C8C94;padding:48px 0;font-size:.97rem}
       .catch(function(){ if(btn) btn.disabled=false; showScanErr('Something went wrong. Please check your connection and try again.'); });
   }
   function showScanErr(m){ var el=document.getElementById('scanErr'); if(el) el.textContent=m; }
+  // Re-enable the scan button when returning via Back / bfcache — otherwise it stays
+  // disabled after navigating to verify, and entering a new number won't submit.
+  window.addEventListener('pageshow', function(){ var b=document.querySelector('#phoneStep .scanbtn'); if(b) b.disabled=false; showScanErr(''); });
   (function(){var els=document.querySelectorAll('.reveal');
     if(!('IntersectionObserver' in window)){els.forEach(function(e){e.classList.add('in')});return;}
     var io=new IntersectionObserver(function(en){en.forEach(function(e,i){if(e.isIntersecting){setTimeout(function(){e.target.classList.add('in')},(i%4)*60);io.unobserve(e.target);}});},{threshold:.12});

@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="format-detection" content="telephone=no">
 <title>Your Scan Results | SpamCallStop</title>
 <meta name="description" content="See what data brokers expose about your phone number, then remove it.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -119,7 +120,6 @@
 <header class="rbar">
   <div class="rbar-in">
     <a href="index.html" class="word">Spam<span class="cr">Call</span>Stop<span class="cg">.com</span></a>
-    <button class="btn btn--accent" style="min-height:46px;padding:.6rem 1.2rem;font-size:.98rem" onclick="openPaywall()">Remove my data &rarr;</button>
   </div>
 </header>
 
@@ -141,6 +141,11 @@
     <div class="recs">
       <span class="n" id="recCount">0</span>
       <span class="t">+ data-broker and people-search sites buy and sell numbers like yours</span>
+    </div>
+
+    <div class="cta-final" style="margin:1.5rem 0 .2rem">
+      <button class="btn btn--accent btn--lg" onclick="openPaywall()">Remove my data &rarr;</button>
+      <p class="cta-note">Takes about 2 minutes. We start removing your number right away.</p>
     </div>
   </div>
 </section>

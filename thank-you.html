@@ -54,7 +54,7 @@
     <h1 class="display" style="margin:.5rem 0 .5rem">You're protected. <span style="color:var(--green)">Welcome.</span></h1>
     <p class="lead muted" id="welcome" style="max-width:48ch;margin:0 auto">We have got it from here. Your number is on its way off the lists, and we will keep it that way.</p>
     <div style="margin-top:1.6rem">
-      <a class="btn btn--accent btn--lg" href="account.html">Go to your dashboard &rarr;</a>
+      <a id="dashLink" class="btn btn--lg" style="background:#1F7A4D;color:#fff;border-color:#1F7A4D" href="account.html">Go to your dashboard &rarr;</a>
       <p class="fine" style="margin-top:.7rem">We also emailed you a private link to your dashboard.</p>
     </div>
   </div>
@@ -123,6 +123,10 @@
     if(name){ document.getElementById('welcome').innerHTML = 'We have got it from here, ' + name.split(' ')[0] + '. Your number is on its way off the lists, and we will keep it that way.'; }
     var conf = 'Plan: ' + planLabel + (email ? '. We sent a confirmation to ' + email : '');
     document.getElementById('conf').textContent = conf;
+    // Carry the Stripe session to the dashboard so it can open without re-entering email.
+    var sid = new URLSearchParams(location.search).get('session_id');
+    var dl = document.getElementById('dashLink');
+    if(sid && dl){ dl.href = 'account.html?session_id=' + encodeURIComponent(sid); }
   } catch(e){}
 </script>
 </body>
