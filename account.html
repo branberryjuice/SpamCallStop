@@ -82,6 +82,8 @@
   .reassure p{color:#A9C9B8;font-size:1.02rem}
   .help{text-align:center;color:var(--muted);font-size:.95rem;margin-top:1.6rem}
   .help a{color:var(--green);font-weight:700}
+  .welcomeback{background:var(--gtint);border:1px solid var(--gline);color:#A9C9B8;border-radius:14px;padding:.85rem 1.1rem;margin-bottom:1.1rem;font-weight:700}
+  .welcomeback[hidden]{display:none}
 
   .signin{max-width:460px;margin:2.5rem auto 0;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:2rem 1.8rem;text-align:center}
   .signin h1{font-size:1.55rem;font-weight:800;margin-bottom:.5rem;color:#fff}
@@ -114,6 +116,7 @@
   <div class="loading" id="loading">Loading your dashboard&hellip;</div>
 
   <div id="dash" style="display:none">
+    <div class="welcomeback" id="welcomeBack" hidden>You're already protected. Welcome back to your dashboard.</div>
     <div class="hero">
       <div class="hello">Welcome<span id="firstName"></span></div>
       <h1>We're keeping your number safe.</h1>
@@ -274,6 +277,7 @@
           document.getElementById('avatarBtn').textContent = (d.firstName || 'Y').charAt(0).toUpperCase();
           MY_PLAN = (d.plan === 'Dual') ? 'Couple' : (d.plan ? 'Individual' : '');
           show('dash');
+          try{ if(sessionStorage.getItem('scstop_welcome_back')==='1'){ var wb=document.getElementById('welcomeBack'); if(wb) wb.hidden=false; sessionStorage.removeItem('scstop_welcome_back'); } }catch(e){}
         } else { showSignin(''); }
       })
       .catch(function(){ showSignin(''); });

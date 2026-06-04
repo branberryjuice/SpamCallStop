@@ -68,7 +68,17 @@
     fetch('/api/verify/check', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ phone: phone, code: code }) })
       .then(function(r){ return r.json().catch(function(){ return null; }); })
       .then(function(d){
-        if(d && d.ok && d.verified){ try{ sessionStorage.setItem('scstop_verify_token', d.token); }catch(e){} if(window.scstopTrack) scstopTrack('verified'); location.href = 'scan-results.html'; return; }
+        if(d && d.ok && d.verified){
+          try{ sessionStorage.setItem('scstop_verify_token', d.token); }catch(e){}
+          if(window.scstopTrack) scstopTrack('verified');
+          // Already an active member? Skip the funnel and go straight to their
+          // dashboard. Stash the token in sessionStorage so it stays out of the URL.
+          if(d.customerToken){
+            try{ sessionStorage.setItem('scstop_ctoken', d.customerToken); sessionStorage.setItem('scstop_welcome_back', '1'); }catch(e){}
+            location.href = 'account.html'; return;
+          }
+          location.href = 'scan-results.html'; return;
+        }
         btn.disabled = false; btn.innerHTML = orig; showMsg('That code was not right. Double check it and try again.', 'err');
       })
       .catch(function(){ btn.disabled = false; btn.innerHTML = orig; showMsg('Something went wrong. Please try again.', 'err'); });

@@ -16,7 +16,8 @@ const twilio = require('../lib/twilio');
 const { normalizePhone, formatPhone } = require('../lib/phone');
 const token = require('../lib/token');
 const ratelimit = require('../lib/ratelimit');
-const { incrementVerifySends, getVerifySendsToday } = require('../lib/customers');
+const { incrementVerifySends, getVerifySendsToday, getCustomerByPhoneHash } = require('../lib/customers');
+const { phoneHash } = require('../lib/crypto');
 const resend = require('../lib/resend');
 
 const SERVICE = process.env.TWILIO_VERIFY_SERVICE_SID;
@@ -114,7 +115,16 @@ router.post('/verify/check', express.json(), async (req, res) => {
   try {
     const check = await twilio.verify.v2.services(SERVICE).verificationChecks.create({ to: '+1' + digits, code });
     if (check.status === 'approved') {
-      return res.json({ ok: true, verified: true, token: token.sign(digits), phone: formatPhone(digits) });
+      // If this just-verified number belongs to an active member, hand back a
+      // dashboard token so the browser can drop them straight into their account
+      // instead of the signup funnel. Best-effort: a lookup failure must never
+      // fail the verification itself.
+      let customerToken = '';
+      try {
+        const c = await getCustomerByPhoneHash(phoneHash(digits));
+        if (c) customerToken = token.signCustomer(c.id);
+      } catch (le) { console.error('[verify] member lookup error:', le && le.message); }
+      return res.json({ ok: true, verified: true, token: token.sign(digits), phone: formatPhone(digits), customerToken: customerToken });
     }
     return res.json({ ok: true, verified: false });
   } catch (err) {
