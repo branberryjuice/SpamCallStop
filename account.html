@@ -35,6 +35,17 @@
   .acctmodal-card p{color:var(--muted2);font-size:1rem;line-height:1.5}
   .acctmodal-card a{color:var(--green);font-weight:700}
   .acctmodal-x{position:absolute;top:.9rem;right:1rem;background:none;border:none;color:var(--muted);font-size:1.6rem;line-height:1;cursor:pointer}
+  .acctmodal-card .mopt{background:#0F0F12;border:1px solid var(--line);border-radius:12px;padding:.9rem 1rem;margin-top:.8rem}
+  .acctmodal-card .mopt b{display:block;color:#fff;font-size:1rem;margin-bottom:.15rem}
+  .acctmodal-card .mopt p{color:var(--muted);font-size:.92rem;margin-bottom:.5rem}
+  .acctmodal-card .mlink{color:var(--green);font-weight:700;cursor:pointer;text-decoration:none}
+  .acctmodal-card .mrow{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-top:1.1rem}
+  .acctmodal-card .mback{color:var(--muted2);font-weight:700;cursor:pointer;text-decoration:none}
+  .acctmodal-card .mcancel{color:var(--muted);font-weight:600;font-size:.9rem;cursor:pointer;text-decoration:underline}
+  .acctmodal-card .mkeep{color:var(--green);font-weight:700;cursor:pointer;text-decoration:none}
+  .acctmodal-card .mcancelbtn{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:.7rem 1rem;font-family:var(--font);font-weight:700;font-size:.95rem;cursor:pointer;flex:0 0 auto}
+  .acctmodal-card .mcancelbtn:disabled{opacity:.6;cursor:default}
+  .acctmodal-card .mcancelmsg{color:var(--muted2);font-size:.9rem;margin-top:.8rem;min-height:1.1em}
 
   .hero{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:1.6rem 1.7rem}
   .hello{color:var(--green);font-weight:800;font-size:.95rem;margin-bottom:.4rem}
@@ -168,19 +179,81 @@
   var MY_PLAN = '';
   function toggleMenu(e){ if(e) e.stopPropagation(); var d=document.getElementById('menuDrop'); d.hidden = !d.hidden; }
   document.addEventListener('click', function(e){ var m=document.getElementById('profileMenu'), d=document.getElementById('menuDrop'); if(d && !d.hidden && m && !m.contains(e.target)){ d.hidden = true; } });
-  function showPanel(which){
+  function openModal(title){
     document.getElementById('menuDrop').hidden = true;
-    var t=document.getElementById('panelTitle'), b=document.getElementById('panelBody');
-    if(which==='membership'){
-      t.textContent = 'Your membership';
-      b.innerHTML = '<p>You\'re on the <b style="color:#fff">'+(MY_PLAN||'active')+'</b> plan, billed automatically until you cancel.</p><p style="margin-top:.7rem">To change or cancel your plan, email <a href="mailto:company@spamcallstop.com">company@spamcallstop.com</a> and we\'ll take care of it.</p>';
-    } else {
-      t.textContent = 'Account settings';
-      b.innerHTML = '<p>Need to update your details, change a number, or cancel? Email <a href="mailto:company@spamcallstop.com">company@spamcallstop.com</a> and we\'ll sort it out for you.</p>';
-    }
+    document.getElementById('panelTitle').textContent = title;
     document.getElementById('acctModal').hidden = false;
   }
   function hidePanel(){ document.getElementById('acctModal').hidden = true; }
+
+  function showPanel(which){
+    if(which==='membership'){ membershipView('membership'); return; }
+    openModal('Account settings');
+    document.getElementById('panelBody').innerHTML =
+      '<p>Need to update the email or phone number on your account? Email '
+      + '<a href="mailto:company@spamcallstop.com">company@spamcallstop.com</a> and we\'ll take care of it for you.</p>';
+  }
+
+  // Nested membership flow. Canceling is intentionally a few taps deep:
+  // My membership -> Manage membership -> Cancel membership -> confirm.
+  function membershipView(view){
+    var b = document.getElementById('panelBody');
+    var plan = MY_PLAN || 'Individual';
+    if(view==='manage'){
+      openModal('Manage membership');
+      b.innerHTML =
+        '<p>You\'re on the <b style="color:#fff">'+plan+'</b> plan. Here\'s what else your membership can do.</p>'
+        + '<div class="mopt"><b>Protect a second number</b><p>Add a partner\'s phone or a second number of your own to your protection.</p>'
+        + '<a class="mlink" href="mailto:company@spamcallstop.com?subject=Add%20a%20second%20number">Add a number &rarr;</a></div>'
+        + '<div class="mopt"><b>Switch to yearly billing</b><p>Pay once a year instead of monthly and save.</p>'
+        + '<a class="mlink" href="mailto:company@spamcallstop.com?subject=Switch%20to%20yearly%20billing">Switch to yearly &rarr;</a></div>'
+        + '<div class="mrow"><a class="mback" onclick="membershipView(\'membership\')">&larr; Back</a>'
+        + '<a class="mcancel" onclick="membershipView(\'cancel\')">Cancel membership</a></div>';
+      return;
+    }
+    if(view==='cancel'){
+      openModal('Cancel membership');
+      b.innerHTML =
+        '<p>If you cancel, we stop checking the spam lists for your number and it can start showing up on them again within a few weeks.</p>'
+        + '<p style="margin-top:.6rem">Your protection stays active until the end of the period you\'ve already paid for.</p>'
+        + '<div class="mrow"><a class="mkeep" onclick="membershipView(\'manage\')">Keep my protection</a>'
+        + '<button class="mcancelbtn" id="cancelBtn" onclick="doCancel()">Cancel my membership</button></div>'
+        + '<div class="mcancelmsg" id="cancelMsg"></div>';
+      return;
+    }
+    if(view==='canceled'){
+      openModal('Membership ending');
+      b.innerHTML =
+        '<p>Your membership is set to end and won\'t renew. We\'ll keep protecting your number until the end of your current paid period.</p>'
+        + '<p style="margin-top:.6rem">Changed your mind? Email <a href="mailto:company@spamcallstop.com?subject=Reactivate%20my%20membership">company@spamcallstop.com</a> and we\'ll turn it back on.</p>';
+      return;
+    }
+    openModal('Your membership');
+    b.innerHTML =
+      '<p>You\'re on the <b style="color:#fff">'+plan+'</b> plan, billed automatically so your number stays protected without you having to remember anything.</p>'
+      + '<div class="mrow"><span></span><a class="mlink" onclick="membershipView(\'manage\')">Manage membership &rarr;</a></div>';
+  }
+
+  function doCancel(){
+    var btn = document.getElementById('cancelBtn');
+    var msg = document.getElementById('cancelMsg');
+    var t = getToken();
+    if(!t){ if(msg) msg.textContent = 'Please sign in again to cancel.'; return; }
+    if(btn){ btn.disabled = true; btn.textContent = 'Canceling…'; }
+    fetch('/api/account/cancel', { method:'POST', headers:{ 'Content-Type':'application/json', 'x-customer-token': t }, body:'{}' })
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if(d && d.ok){ membershipView('canceled'); }
+        else {
+          if(btn){ btn.disabled = false; btn.textContent = 'Cancel my membership'; }
+          if(msg) msg.textContent = 'We couldn\'t cancel just now. Please email company@spamcallstop.com and we\'ll sort it out.';
+        }
+      })
+      .catch(function(){
+        if(btn){ btn.disabled = false; btn.textContent = 'Cancel my membership'; }
+        if(msg) msg.textContent = 'Something went wrong. Please email company@spamcallstop.com.';
+      });
+  }
 
   function showSignin(note){
     show('signin');

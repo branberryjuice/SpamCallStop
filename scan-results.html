@@ -277,7 +277,10 @@
 
   function prettyPhone(p){
     var d = String(p||'').replace(/\D/g,'').slice(-10);
-    return d.length===10 ? '('+d.slice(0,3)+') '+d.slice(3,6)+'-'+d.slice(6) : (p||'');
+    if(d.length !== 10) return (p||'');
+    // ⁠ (invisible word joiner) breaks the digit run so iOS can't recognize the
+    // number and slap a white tap-to-call pill behind it. Looks identical to the eye.
+    return '('+d.slice(0,3)+') '+d.slice(3,6)+'-'+d.slice(6,8)+'⁠'+d.slice(8);
   }
   // The phone number is the exposed item we ALWAYS have (they typed it). Show it
   // right away as the headline of the exposed-data card, no matter what the lookup

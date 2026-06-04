@@ -74,6 +74,29 @@ router.get('/account/session', async (req, res) => {
   }
 });
 
+// Cancel the signed-in customer's membership at the end of the paid period.
+router.post('/account/cancel', express.json(), async (req, res) => {
+  const tok = String(req.headers['x-customer-token'] || (req.body && req.body.token) || '');
+  const id = token.verifyCustomer(tok);
+  if (!id) return res.status(401).json({ ok: false, error: 'not_signed_in' });
+  if (!ratelimit.hit('cancel-ip:' + ipOf(req), 10, 60 * 60 * 1000).allowed) {
+    return res.status(429).json({ ok: false, error: 'too_many_requests' });
+  }
+  try {
+    const c = await db.getCustomerById(id);
+    if (!c) return res.status(404).json({ ok: false, error: 'not_found' });
+    if (stripe && c.stripe_subscription) {
+      try { await stripe.subscriptions.update(c.stripe_subscription, { cancel_at_period_end: true }); }
+      catch (se) { console.error('[account] stripe cancel error:', se && se.message); }
+    }
+    await db.updateStatus(id, 'canceling');
+    return res.json({ ok: true });
+  } catch (e) {
+    console.error('[account] cancel error:', e && e.message);
+    return res.status(500).json({ ok: false, error: 'server_error' });
+  }
+});
+
 router.post('/dashboard-link', express.json(), async (req, res) => {
   const email = String((req.body && req.body.email) || '').trim().toLowerCase();
   if (!ratelimit.hit('dlink-ip:' + ipOf(req), 5, 15 * 60 * 1000).allowed) {
