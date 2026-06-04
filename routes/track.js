@@ -40,6 +40,7 @@ router.post('/track', express.json({ limit: '4kb', type: () => true }), async (r
       visitorId: b.visitor_id,
       event: event,
       email: b.email || null,
+      phone: b.phone || null,
       plan: b.plan || null,
       meta: b.meta || null,
     });

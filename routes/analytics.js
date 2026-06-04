@@ -3,18 +3,19 @@
 /**
  * Private funnel analytics API for the owner's dashboard.
  *
- *   GET /api/analytics/funnel?days=30   (admin-gated, same key as /api/admin)
+ *   GET /api/analytics/funnel?range=24h|7d|30d|90d   (admin-gated)
  *
  * Aggregates raw funnel_events into: the funnel (distinct visitors per stage),
- * step + overall conversion, a daily time series, revenue, average time to
- * purchase, and the most recent submitted emails with how far each person got.
+ * step + overall conversion, a time series (hourly for 24h, daily otherwise)
+ * carrying visitors / purchases / revenue, totals (incl. phones + emails
+ * captured, revenue, avg time to purchase), and a per-visitor leads list with
+ * the phone number entered and email submitted.
  */
 
 const express = require('express');
 const router = express.Router();
 const db = require('../lib/customers');
 
-// Same gate as /api/admin: query key, x-admin-key header, or HTTP Basic Auth.
 function authed(req) {
   const key = process.env.ADMIN_KEY;
   if (!key) return false;
@@ -26,7 +27,6 @@ function authed(req) {
   return !!given && String(given) === String(key);
 }
 
-// Funnel stages in order. Every page beacon + the webhook map to one of these.
 const STAGES = [
   ['landing_view', 'Visited site'],
   ['scan_started', 'Entered phone'],
@@ -38,89 +38,98 @@ const STAGES = [
   ['purchased', 'Purchased'],
 ];
 
-function dayKey(ts) { return new Date(ts).toISOString().slice(0, 10); }
+const HOUR = 3600000, DAY = 86400000;
+const RANGES = {
+  '24h': { ms: 24 * HOUR, bucketMs: HOUR, bucket: 'hour' },
+  '7d': { ms: 7 * DAY, bucketMs: DAY, bucket: 'day' },
+  '30d': { ms: 30 * DAY, bucketMs: DAY, bucket: 'day' },
+  '90d': { ms: 90 * DAY, bucketMs: DAY, bucket: 'day' },
+};
 
 router.get('/analytics/funnel', async (req, res) => {
   if (!authed(req)) return res.status(401).json({ ok: false, error: 'unauthorized' });
 
-  const days = Math.min(Math.max(parseInt(req.query.days || '30', 10) || 30, 1), 365);
-  const sinceISO = new Date(Date.now() - days * 86400000).toISOString();
+  const range = RANGES[req.query.range] ? req.query.range : '30d';
+  const cfg = RANGES[range];
+  const now = Date.now();
+  const sinceISO = new Date(now - cfg.ms).toISOString();
 
   try {
     const rows = await db.getFunnelEventsSince(sinceISO);
 
     const stageOrder = {};
     STAGES.forEach(([k], i) => { stageOrder[k] = i; });
-
     const stageVisitors = {};
     STAGES.forEach(([k]) => { stageVisitors[k] = new Set(); });
 
-    const visitors = {};   // visitor_id -> { firstTs, purchasedTs }
-    const emailsMap = {};  // email -> { email, firstTs, maxStage }
-    const daily = {};      // 'YYYY-MM-DD' -> { visitors:Set, purchases:int }
+    const visitors = {};   // vid -> { firstTs, purchasedTs }
+    const people = {};     // vid -> { phone, email, maxStage, firstTs, lastTs }
+    const phoneSet = new Set(), emailSet = new Set();
     let purchases = 0, revenueCents = 0;
+
+    const alignedStart = Math.floor((now - cfg.ms) / cfg.bucketMs) * cfg.bucketMs;
+    const nB = Math.max(1, Math.ceil((now - alignedStart) / cfg.bucketMs));
+    const buckets = [];
+    for (let i = 0; i < nB; i++) buckets.push({ ts: alignedStart + i * cfg.bucketMs, vis: new Set(), purchases: 0, revenueCents: 0 });
 
     for (const r of rows) {
       const ev = r.event;
       const ts = new Date(r.created_at).getTime();
       const vid = r.visitor_id || ('row-' + (r.id || Math.random()));
-      const dk = dayKey(r.created_at);
 
       if (stageVisitors[ev]) stageVisitors[ev].add(vid);
+      if (r.phone) phoneSet.add(r.phone);
+      if (r.email) emailSet.add(r.email);
 
-      daily[dk] = daily[dk] || { visitors: new Set(), purchases: 0 };
-      if (ev === 'landing_view') daily[dk].visitors.add(vid);
-      if (ev === 'purchased') daily[dk].purchases++;
+      const bi = Math.floor((ts - alignedStart) / cfg.bucketMs);
+      if (bi >= 0 && bi < buckets.length) {
+        if (ev === 'landing_view') buckets[bi].vis.add(vid);
+        if (ev === 'purchased') { buckets[bi].purchases++; buckets[bi].revenueCents += (r.amount || 0); }
+      }
 
       if (r.visitor_id) {
         const v = visitors[vid] = visitors[vid] || { firstTs: ts, purchasedTs: null };
         if (ts < v.firstTs) v.firstTs = ts;
         if (ev === 'purchased') v.purchasedTs = ts;
+        const p = people[vid] = people[vid] || { phone: '', email: '', maxStage: -1, firstTs: ts, lastTs: ts };
+        if (ts < p.firstTs) p.firstTs = ts;
+        if (ts > p.lastTs) p.lastTs = ts;
+        if (r.phone && !p.phone) p.phone = r.phone;
+        if (r.email && !p.email) p.email = r.email;
+        if (stageOrder[ev] != null && stageOrder[ev] > p.maxStage) p.maxStage = stageOrder[ev];
       }
-
       if (ev === 'purchased') { purchases++; revenueCents += (r.amount || 0); }
-
-      if (r.email) {
-        const e = emailsMap[r.email] = emailsMap[r.email] || { email: r.email, firstTs: ts, maxStage: -1 };
-        if (ts < e.firstTs) e.firstTs = ts;
-        if (stageOrder[ev] != null && stageOrder[ev] > e.maxStage) e.maxStage = stageOrder[ev];
-      }
     }
 
-    const funnel = STAGES.map(([key, label], i) => ({ key, label, count: stageVisitors[key].size }));
+    const funnel = STAGES.map(([key, label]) => ({ key, label, count: stageVisitors[key].size }));
     const top = funnel[0].count || 0;
     funnel.forEach((s, i) => {
       s.pctOfTop = top ? Math.round((s.count / top) * 1000) / 10 : 0;
       s.stepPct = i === 0 ? 100 : (funnel[i - 1].count ? Math.round((s.count / funnel[i - 1].count) * 1000) / 10 : 0);
     });
 
-    // Daily series across the whole window, zero-filled.
-    const series = [];
-    for (let i = days - 1; i >= 0; i--) {
-      const d = dayKey(Date.now() - i * 86400000);
-      const row = daily[d];
-      series.push({ date: d, visitors: row ? row.visitors.size : 0, purchases: row ? row.purchases : 0 });
-    }
+    const series = buckets.map((b) => ({ ts: b.ts, visitors: b.vis.size, purchases: b.purchases, revenueCents: b.revenueCents }));
 
-    // Average minutes from a visitor's first event to their purchase.
     const convTimes = Object.values(visitors).filter((v) => v.purchasedTs).map((v) => v.purchasedTs - v.firstTs).filter((x) => x >= 0);
     const avgMinutesToPurchase = convTimes.length ? Math.round((convTimes.reduce((a, b) => a + b, 0) / convTimes.length) / 60000) : null;
 
-    const emails = Object.values(emailsMap)
-      .sort((a, b) => b.firstTs - a.firstTs)
+    const leads = Object.values(people)
+      .filter((p) => p.phone || p.email)
+      .sort((a, b) => b.lastTs - a.lastTs)
       .slice(0, 200)
-      .map((e) => ({ email: e.email, when: new Date(e.firstTs).toISOString(), stage: (STAGES[e.maxStage] ? STAGES[e.maxStage][1] : '—') }));
+      .map((p) => ({ phone: p.phone, email: p.email, stage: (STAGES[p.maxStage] ? STAGES[p.maxStage][1] : '—'), when: new Date(p.firstTs).toISOString() }));
 
     const totals = {
       visitors: stageVisitors['landing_view'].size,
+      phonesCount: phoneSet.size,
+      emailsCount: emailSet.size,
       purchases: purchases,
       revenueCents: revenueCents,
       overallConvPct: top ? Math.round((stageVisitors['purchased'].size / top) * 1000) / 10 : 0,
       avgMinutesToPurchase: avgMinutesToPurchase,
-      emailsCount: Object.keys(emailsMap).length,
     };
 
-    res.json({ ok: true, days, generatedAt: new Date().toISOString(), funnel, series, emails, totals });
+    res.json({ ok: true, range, bucket: cfg.bucket, generatedAt: new Date().toISOString(), funnel, series, leads, totals });
   } catch (e) {
     console.error('[analytics] error:', e && e.message);
     res.status(500).json({ ok: false, error: 'analytics_failed' });
