@@ -155,11 +155,11 @@
         <span class="tag">Exposed</span>
       </div>
       <div class="idrow">
-        <span class="idname" id="idname">Checking&hellip;</span>
+        <span class="idname" id="idname">&mdash;</span>
         <span class="idage" id="idage"></span>
       </div>
-      <div class="drow"><span class="k">Phone</span><span class="v" id="phoneVal">&mdash;</span></div>
-      <div class="drow"><span class="k">Current address</span><span class="v" id="addrVal">Checking&hellip;</span></div>
+      <div class="drow"><span class="k">Phone</span><span class="v exposed" id="phoneVal">&mdash;</span></div>
+      <div class="drow" id="addrRow" hidden><span class="k">Current address</span><span class="v" id="addrVal"></span></div>
     </div>
 
     <div class="notyou-wrap">
@@ -265,8 +265,16 @@
     var d = String(p||'').replace(/\D/g,'').slice(-10);
     return d.length===10 ? '('+d.slice(0,3)+') '+d.slice(3,6)+'-'+d.slice(6) : (p||'');
   }
-  // Their own number is theirs to see — show it immediately, never blurred.
-  (function(){ if(PHONE){ document.getElementById('phoneVal').textContent = prettyPhone(PHONE); } })();
+  // The phone number is the exposed item we ALWAYS have (they typed it). Show it
+  // right away as the headline of the exposed-data card, no matter what the lookup
+  // returns. Name / age / address get layered on top when the lookup finds them.
+  (function(){
+    var pretty = PHONE ? prettyPhone(PHONE) : '';
+    if(pretty){
+      document.getElementById('phoneVal').textContent = pretty;
+      document.getElementById('idname').textContent = pretty;
+    }
+  })();
 
   /* ---- Risk Level meter animates up to High on load ---- */
   (function(){
@@ -287,29 +295,25 @@
     var c = setInterval(function(){ n += step; if(n >= target){ n = target; clearInterval(c); } el.textContent = n; }, 24);
   })();
 
-  /* ---- after SMS verification, show the owner's real name / age / address in the clear ---- */
+  /* ---- after SMS verification, enrich the card with name / age / address when the
+         lookup finds them. The phone number is already the anchor, so we never blank
+         it out — the page always shows exposed data no matter what the lookup returns. ---- */
   (function loadIdentity(){
-    var nameEl = document.getElementById('idname');
-    var ageEl  = document.getElementById('idage');
-    var addrEl = document.getElementById('addrVal');
-    if(!PHONE || !TOKEN){
-      // Users reach this page only after verifying by SMS. If there's no token,
-      // prompt to verify rather than show an empty report.
-      nameEl.textContent = 'Verify your number to see your report';
-      addrEl.textContent = '';
-      return;
-    }
+    if(!PHONE || !TOKEN) return;
     fetch('/api/lookup', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ phone: PHONE, token: TOKEN }) })
       .then(function(r){ return r.json().catch(function(){ return null; }); })
       .then(function(d){
-        if(!d || !d.ok){ nameEl.textContent = 'Not listed'; addrEl.textContent = 'Not listed'; return; }
-        nameEl.textContent = d.name || 'Not listed';
-        if(d.age){ ageEl.textContent = 'Age ' + d.age; }
+        if(!d || !d.ok) return;
+        if(d.name){ document.getElementById('idname').textContent = d.name; }
+        if(d.age){ document.getElementById('idage').textContent = 'Age ' + d.age; }
         var a = d.address || {};
         var parts = [a.line, a.city, [a.state, a.postal].filter(Boolean).join(' ')].filter(Boolean);
-        addrEl.textContent = (d.hasAddress && parts.length) ? parts.join(', ') : 'Not listed';
+        if(d.hasAddress && parts.length){
+          document.getElementById('addrVal').textContent = parts.join(', ');
+          document.getElementById('addrRow').hidden = false;
+        }
       })
-      .catch(function(){ nameEl.textContent = 'Not listed'; addrEl.textContent = 'Not listed'; });
+      .catch(function(){});
   })();
 
   /* ---- paywall open/close ---- */
