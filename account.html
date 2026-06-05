@@ -239,10 +239,21 @@
 
   <div class="signin" id="signin" style="display:none">
     <h1>See your removal progress</h1>
-    <p>Enter the email you signed up with and we'll send you a private link to your dashboard.</p>
-    <input id="em" type="email" placeholder="you@email.com" autocomplete="email">
-    <button id="sibtn" onclick="sendLink()">Email me my link</button>
+    <p>Sign in with the phone number you're protecting and we'll text you a code.</p>
+    <div id="siPhoneStep">
+      <input id="siPhone" type="tel" inputmode="tel" placeholder="(555) 555-5555" autocomplete="tel">
+      <button id="siPhoneBtn" onclick="signinSendCode()">Text me a code</button>
+    </div>
+    <div id="siCodeStep" hidden>
+      <input id="siCode" type="text" inputmode="numeric" maxlength="6" placeholder="6 digit code" autocomplete="one-time-code">
+      <button id="siCodeBtn" onclick="signinVerifyCode()">Verify and sign in</button>
+    </div>
     <div class="simsg" id="simsg"></div>
+    <button onclick="toggleEmailSignin()" style="width:auto;background:none;border:none;color:var(--muted2);font-family:var(--font);font-weight:600;font-size:.95rem;text-decoration:underline;cursor:pointer;margin-top:1rem">Or sign in with email</button>
+    <div id="siEmailStep" hidden>
+      <input id="em" type="email" placeholder="you@email.com" autocomplete="email">
+      <button id="sibtn" onclick="sendLink()">Email me my link</button>
+    </div>
   </div>
 </div>
 
@@ -456,6 +467,8 @@
   /* ---- sign in + load ---- */
   function showSignin(note){
     show('signin');
+    var ps=document.getElementById('siPhoneStep'); if(ps) ps.hidden=false;
+    var cs=document.getElementById('siCodeStep'); if(cs) cs.hidden=true;
     try{ var em0 = sessionStorage.getItem('scstop_email'); if(em0){ var e0=document.getElementById('em'); if(e0 && !e0.value) e0.value = em0; } }catch(e){}
     if(note){ var n=document.getElementById('simsg'); if(n) n.textContent = note; }
   }
@@ -500,7 +513,7 @@
       .then(function(d){
         if(d && d.ok && d.token){ try{ sessionStorage.setItem('scstop_ctoken', d.token); }catch(e){} loadMe(d.token); return; }
         if(d && d.error==='pending' && attempt < 2){ setTimeout(function(){ tryStripeSession(sid, attempt+1); }, 2500); return; }
-        showSignin('Your dashboard is being set up — this can take a moment right after payment. Use the private link we just emailed you, or enter your email below.');
+        showSignin('Your dashboard is being set up — this can take a moment right after payment. Sign in with your phone number below, or use the link we emailed you.');
       })
       .catch(function(){ showSignin(''); });
   }
@@ -537,6 +550,50 @@
       else { b.textContent = 'Resend in ' + left + 's'; }
     }, 1000);
   }
+
+  // Phone sign-in: text a code, verify, and (for an active member) land in the
+  // dashboard. No email needed — uses the number they're protecting.
+  var SI_PHONE = '';
+  function signinSendCode(){
+    var p = (document.getElementById('siPhone').value || '').replace(/\D/g,'').slice(-10);
+    var msg = document.getElementById('simsg');
+    if(p.length !== 10){ msg.textContent = 'Enter the 10 digit number you signed up with.'; return; }
+    SI_PHONE = p;
+    var b = document.getElementById('siPhoneBtn'); b.disabled = true; b.textContent = 'Sending...';
+    fetch('/api/verify/start', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ phone: p }) })
+      .then(function(r){ return r.json().catch(function(){ return null; }); })
+      .then(function(d){
+        b.disabled = false; b.textContent = 'Text me a code';
+        if(d && d.ok && d.sent){
+          document.getElementById('siPhoneStep').hidden = true;
+          document.getElementById('siCodeStep').hidden = false;
+          msg.textContent = 'We texted a 6 digit code to that number.';
+          var ci = document.getElementById('siCode'); if(ci) ci.focus();
+        } else {
+          msg.textContent = (d && d.error === 'too_many_requests') ? 'Too many tries. Wait a few minutes and try again.' : 'We could not text that number. Double-check it and try again.';
+        }
+      })
+      .catch(function(){ b.disabled = false; b.textContent = 'Text me a code'; msg.textContent = 'Something went wrong. Please try again.'; });
+  }
+  function signinVerifyCode(){
+    var c = (document.getElementById('siCode').value || '').replace(/\D/g,'');
+    var msg = document.getElementById('simsg');
+    if(c.length !== 6){ msg.textContent = 'Enter the 6 digit code we texted you.'; return; }
+    var b = document.getElementById('siCodeBtn'); b.disabled = true; b.textContent = 'Verifying...';
+    fetch('/api/verify/check', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ phone: SI_PHONE, code: c }) })
+      .then(function(r){ return r.json().catch(function(){ return null; }); })
+      .then(function(d){
+        if(d && d.ok && d.verified && d.customerToken){
+          try{ sessionStorage.setItem('scstop_ctoken', d.customerToken); }catch(e){}
+          show('loading'); loadMe(d.customerToken); return;
+        }
+        b.disabled = false; b.textContent = 'Verify and sign in';
+        if(d && d.ok && d.verified){ msg.textContent = "That number is verified, but we couldn't find an active account for it. Did you sign up with a different number?"; }
+        else { msg.textContent = 'That code was not right. Double-check it and try again.'; }
+      })
+      .catch(function(){ b.disabled = false; b.textContent = 'Verify and sign in'; msg.textContent = 'Something went wrong. Please try again.'; });
+  }
+  function toggleEmailSignin(){ var e = document.getElementById('siEmailStep'); if(e) e.hidden = !e.hidden; }
 
   start();
 </script>
