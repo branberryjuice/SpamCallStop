@@ -163,6 +163,23 @@ if (process.env.REMOVALS_PAUSED !== '1') {
   }, 6 * 60 * 60 * 1000);
 }
 
+// Order reconciliation: every 10 min, scan recent paid Checkout Sessions and
+// provision any the webhook missed (idempotent), so a paying customer is never
+// lost even if the webhook fails and they never return to the dashboard.
+if (process.env.STRIPE_SECRET_KEY) {
+  const stripeCli = require('./lib/stripe');
+  const { reconcileRecentSessions } = require('./lib/reconcile');
+  let reconcileBusy = false;
+  setInterval(() => {
+    if (reconcileBusy) return;
+    reconcileBusy = true;
+    reconcileRecentSessions(stripeCli, 180)
+      .then((r) => { if (r.provisioned) console.log('[reconcile]', JSON.stringify(r)); })
+      .catch((e) => console.error('[reconcile] loop error:', e && e.message))
+      .finally(() => { reconcileBusy = false; });
+  }, 10 * 60 * 1000);
+}
+
 // Daily digest: email ADMIN_EMAIL a summary of broker replies once a day.
 if (process.env.ADMIN_EMAIL) {
   const digest = require('./lib/digest');
