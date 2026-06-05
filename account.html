@@ -513,14 +513,29 @@
     showSignin('');
   }
 
+  var resendTimer = null;
   function sendLink(){
     var em = (document.getElementById('em').value || '').trim();
     var msg = document.getElementById('simsg');
+    var b = document.getElementById('sibtn');
     if(em.indexOf('@') < 1){ msg.textContent = 'Enter the email you signed up with.'; return; }
-    var b = document.getElementById('sibtn'); b.disabled = true; b.textContent = 'Sending...';
+    try{ sessionStorage.setItem('scstop_email', em); }catch(e){}
+    b.disabled = true; b.textContent = 'Sending...';
     fetch('/api/dashboard-link', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email: em }) })
-      .then(function(){ msg.textContent = 'If that email is on file, we just sent your link. Check your inbox.'; b.textContent = 'Sent'; })
+      .then(function(){ msg.textContent = "If that email is on file, we just sent your link. Check your inbox and spam folder. Didn't get it? You can resend below."; startResendCooldown(); })
       .catch(function(){ b.disabled = false; b.textContent = 'Email me my link'; msg.textContent = 'Something went wrong. Please try again.'; });
+  }
+  // Let people resend the link after a short cooldown if it didn't arrive.
+  function startResendCooldown(){
+    var b = document.getElementById('sibtn');
+    var left = 15;
+    b.disabled = true; b.textContent = 'Resend in ' + left + 's';
+    if(resendTimer) clearInterval(resendTimer);
+    resendTimer = setInterval(function(){
+      left--;
+      if(left <= 0){ clearInterval(resendTimer); b.disabled = false; b.textContent = 'Resend my link'; }
+      else { b.textContent = 'Resend in ' + left + 's'; }
+    }, 1000);
   }
 
   start();
