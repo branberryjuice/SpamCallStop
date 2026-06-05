@@ -37,8 +37,13 @@ router.get('/me', async (req, res) => {
     const c = await db.getCustomerById(id);
     if (!c) return res.status(404).json({ ok: false, error: 'not_found' });
     const stats = await db.getRemovalStats(id);
+    let unread = 0;
+    try { unread = await db.countUnreadAlerts(id); } catch (ue) {}
     const firstName = (c.name || '').trim().split(/\s+/)[0] || '';
-    res.json({ ok: true, name: c.name || '', firstName: firstName, plan: c.plan || '', cleared: stats.cleared, inProgress: stats.inProgress });
+    res.json({ ok: true, name: c.name || '', firstName: firstName, plan: c.plan || '',
+      cleared: stats.cleared, inProgress: stats.inProgress,
+      requestsSent: stats.requestsSent, confirmedRemoved: stats.confirmedRemoved, active: stats.active,
+      threatPct: stats.threatPct, unread: unread });
   } catch (e) {
     console.error('[account] me error:', e && e.message);
     res.status(500).json({ ok: false, error: 'server_error' });

@@ -71,6 +71,16 @@ router.post('/inbound', express.json({ limit: '2mb' }), async (req, res) => {
       const newStatus = statusFor(classification);
       if (newStatus) fields.status = newStatus;
       await db.updateRemovalJob(job.id, fields);
+      // Surface meaningful reply outcomes in the customer's in-app alerts feed.
+      if (newStatus) {
+        const ALERTS = {
+          removed: { kind: 'removed', title: 'Confirmed removed', body: 'A data broker confirmed your number was removed from their lists.' },
+          no_record: { kind: 'no_record', title: 'No listing found', body: 'A data broker checked and had no record of your number.' },
+          needs_followup: { kind: 'needs_followup', title: 'Update on a removal', body: 'A data broker needs another step; we are handling it for you.' },
+        };
+        const a = ALERTS[newStatus];
+        if (a) { try { await db.insertAlert({ customerId: job.customer_id, kind: a.kind, title: a.title, body: a.body, brokerKey: job.broker_key }); } catch (ae) { console.error('[inbound] alert insert failed:', ae && ae.message); } }
+      }
     }
     await db.insertReply({
       jobId: job ? job.id : null,

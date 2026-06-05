@@ -46,6 +46,9 @@ app.get('/api/health', (req, res) => {
 // Backstop rate limit across the API (per IP). Stripe webhook + Resend inbound
 // + health are exempt inside the limiter so those callers aren't throttled.
 app.use('/api', apiRateLimit());
+// Never let browsers/proxies cache API responses — several carry the customer's
+// own PII (name, phone, alerts). Static assets get their own cache policy below.
+app.use('/api', (req, res, next) => { res.set('Cache-Control', 'no-store'); next(); });
 
 // Future API routes mount here as we build them:
 //   /api/scan      -> real phone-number exposure checker
@@ -62,6 +65,7 @@ app.use('/api', require('./routes/inbound'));
 app.use('/api', require('./routes/account'));
 app.use('/api', require('./routes/track'));
 app.use('/api', require('./routes/analytics'));
+app.use('/api', require('./routes/alerts'));
 
 // --- Static site -----------------------------------------------------------
 // Never hand out our server code or config as if it were a web page.
@@ -102,7 +106,13 @@ app.get(['/dashboard', '/dashboard.html', '/analytics', '/analytics.html'], (req
 
 // Serve the existing pages. `extensions:['html']` lets /offer load offer.html.
 // `dotfiles:'ignore'` (the default) keeps .env and .git out of reach.
-app.use(express.static(STATIC_DIR, { extensions: ['html'] }));
+app.use(express.static(STATIC_DIR, {
+  extensions: ['html'],
+  setHeaders: (res, p) => {
+    // HTML revalidates so a new deploy shows immediately; other assets cache briefly.
+    res.set('Cache-Control', p.endsWith('.html') ? 'no-cache' : 'public, max-age=3600');
+  },
+}));
 
 // Anything else: send people to the home page.
 app.use((req, res) => {
@@ -135,6 +145,22 @@ if (process.env.REMOVALS_PAUSED !== '1') {
       .catch((e) => console.error('[removal] loop error:', e && e.message))
       .finally(() => { removalBusy = false; });
   }, 60 * 1000);
+}
+
+// Verification sweep: 24h+ after a removal email, re-check the broker site and
+// confirm removals (Phase 2). Inert until real per-broker checkers are wired in
+// lib/checkers.js — until then every check is 'unknown' and this does nothing.
+if (process.env.REMOVALS_PAUSED !== '1') {
+  const checkers = require('./lib/checkers');
+  let sweepBusy = false;
+  setInterval(() => {
+    if (sweepBusy || !checkers.anyCheckersLive()) return;
+    sweepBusy = true;
+    checkers.runVerificationSweep(50)
+      .then((r) => { if (r.checked) console.log('[verify-sweep]', JSON.stringify(r)); })
+      .catch((e) => console.error('[verify-sweep] error:', e && e.message))
+      .finally(() => { sweepBusy = false; });
+  }, 6 * 60 * 60 * 1000);
 }
 
 // Daily digest: email ADMIN_EMAIL a summary of broker replies once a day.

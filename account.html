@@ -15,18 +15,84 @@
   }
   *{margin:0;padding:0;box-sizing:border-box}
   body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased}
-  .wrap{max-width:720px;margin:0 auto;padding:1.5rem 1.3rem 4rem}
+  .wrap{max-width:720px;margin:0 auto;padding:1.2rem 1.3rem 6rem}
   .bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
-  .word{font-weight:800;font-size:1.35rem;color:#fff;text-decoration:none}
+  .word{font-weight:800;font-size:1.2rem;color:#fff;text-decoration:none}
   .word .cr{color:var(--accent)}.word .cg{color:var(--muted)}
-  .signout{color:var(--muted);font-weight:600;font-size:.95rem;text-decoration:none;cursor:pointer}
-  .menu{position:relative}
-  .avatar{width:42px;height:42px;border-radius:50%;background:var(--green);color:#06130D;border:none;font-weight:800;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
-  .menudrop{position:absolute;right:0;top:52px;background:var(--panel);border:1px solid var(--line);border-radius:14px;min-width:212px;padding:.4rem;box-shadow:0 12px 40px rgba(0,0,0,.5);z-index:50}
-  .menudrop[hidden]{display:none}
-  .menudrop a,.menudrop button{display:block;width:100%;text-align:left;background:none;border:none;color:var(--ink);font-family:var(--font);font-size:.98rem;font-weight:600;padding:.7rem .85rem;border-radius:9px;cursor:pointer;text-decoration:none}
-  .menudrop a:hover,.menudrop button:hover{background:#1C1C20}
-  .menudrop .signoutbtn{color:var(--accent);border-top:1px solid var(--line);margin-top:.3rem;padding-top:.75rem}
+
+  /* greeting header */
+  .tophead{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin:.3rem 0 1.2rem}
+  .hi{font-size:1.7rem;font-weight:800;color:#fff;letter-spacing:-.02em}
+  .status{display:inline-flex;align-items:center;gap:.45rem;color:var(--green);font-weight:700;font-size:.98rem;margin-top:.3rem}
+  .status.sub{color:var(--muted2)}
+  .status .dot{flex:0 0 auto;width:19px;height:19px;border-radius:50%;background:var(--green);display:inline-flex;align-items:center;justify-content:center}
+
+  /* radar */
+  .radarwrap{flex:0 0 auto;text-align:center}
+  .radarlabel{margin-top:.4rem;font-size:.72rem;font-weight:800;color:var(--green);letter-spacing:.02em}
+  .radar{position:relative;width:80px;height:80px;border-radius:50%;background:rgba(51,192,141,.10);border:1.5px solid var(--gline);overflow:hidden}
+  .ring{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);border:1px solid rgba(51,192,141,.32);border-radius:50%}
+  .ring.r1{width:72%;height:72%}.ring.r2{width:44%;height:44%}
+  .cross{position:absolute;background:rgba(51,192,141,.22)}
+  .cross.h{top:50%;left:0;right:0;height:1px}.cross.v{left:50%;top:0;bottom:0;width:1px}
+  .sweep{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,rgba(70,210,156,.62),rgba(70,210,156,.12) 45deg,rgba(70,210,156,0) 85deg);animation:spin 5.5s linear infinite}
+  @keyframes spin{to{transform:rotate(-360deg)}}
+  .center{position:absolute;top:50%;left:50%;width:7px;height:7px;border-radius:50%;background:var(--green2);transform:translate(-50%,-50%)}
+  .blip{position:absolute;width:6px;height:6px;border-radius:50%;background:var(--green2);opacity:0;animation:blip 5.5s ease-out infinite}
+  .blip.b1{top:32%;left:36%;animation-delay:1.4s}.blip.b2{top:60%;left:62%;animation-delay:3.6s}
+  @keyframes blip{0%,100%{opacity:0;transform:scale(.6)}10%{opacity:1;transform:scale(1)}40%{opacity:0}}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:1.3rem 1.4rem;margin-top:1.05rem}
+  .card h2{font-size:1.18rem;font-weight:800;color:#fff}
+  .cardhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+  .viewall{color:var(--green);font-weight:700;font-size:.95rem;cursor:pointer;text-decoration:none}
+  .psub{color:var(--muted);font-size:.95rem;margin-top:.9rem}
+
+  /* stat tiles */
+  .tiles{display:flex;gap:.7rem}
+  .tile{flex:1;background:#0F0F12;border:1px solid var(--line);border-radius:14px;padding:1rem .5rem;text-align:center}
+  .tnum{font-size:2rem;font-weight:800;color:var(--green);line-height:1;letter-spacing:-.02em}
+  .tlab{color:var(--muted2);font-size:.82rem;font-weight:600;margin-top:.4rem;line-height:1.25}
+  .ptop{display:flex;align-items:baseline;gap:.6rem;flex-wrap:wrap}
+  .ptop .big{font-size:2.5rem;font-weight:800;color:var(--green);line-height:1;letter-spacing:-.02em}
+  .ptop .lab{color:var(--muted2);font-size:1.02rem;font-weight:600;flex:1;min-width:9rem}
+  .threathead{display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem}
+  .threatword{font-weight:800;font-size:1.05rem;color:#E0533B}
+  .threatbar{height:14px;background:#0F0F12;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+  .threatfill{height:100%;width:100%;border-radius:inherit;background:#E0533B;transition:width 1.2s cubic-bezier(.22,.61,.36,1),background .8s ease}
+  .threatscale{display:flex;justify-content:space-between;color:var(--muted);font-size:.78rem;font-weight:600;margin-top:.45rem}
+
+  /* alerts */
+  .alertrow{display:flex;gap:.8rem;align-items:flex-start;padding:.85rem 0;border-top:1px solid var(--line)}
+  .alertrow:first-child{border-top:none;padding-top:0}
+  .alert-ic{flex:0 0 auto;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1rem}
+  .alert-ic.good{background:var(--gtint);color:var(--green);border:1px solid var(--gline)}
+  .alert-ic.info{background:rgba(106,169,255,.12);color:#6aa9ff;border:1px solid rgba(106,169,255,.3)}
+  .alert-ic.warn{background:rgba(231,184,75,.12);color:#e7b84b;border:1px solid rgba(231,184,75,.3)}
+  .alert-bd{flex:1;min-width:0}
+  .alert-title{font-weight:700;color:#fff;font-size:1rem}
+  .alert-body{color:var(--muted2);font-size:.93rem;margin-top:.12rem}
+  .alert-time{color:var(--muted);font-size:.8rem;margin-top:.25rem}
+  .emptynote{color:var(--muted);text-align:center;padding:1.4rem .5rem;font-size:.97rem}
+
+  .reassure{background:var(--gtint);border:1px solid var(--gline);border-radius:18px;padding:1.2rem 1.4rem;margin-top:1.05rem;display:flex;gap:.9rem;align-items:flex-start}
+  .reassure .ic{flex:0 0 auto;width:40px;height:40px;border-radius:50%;background:rgba(51,192,141,.12);border:1px solid var(--gline);display:flex;align-items:center;justify-content:center;color:var(--green)}
+  .reassure b{display:block;font-size:1.08rem;font-weight:800;margin-bottom:.2rem;color:#fff}
+  .reassure p{color:#A9C9B8;font-size:1rem}
+  .help{text-align:center;color:var(--muted);font-size:.95rem;margin-top:1.5rem}
+  .help a{color:var(--green);font-weight:700}
+  .welcomeback{background:var(--gtint);border:1px solid var(--gline);color:#A9C9B8;border-radius:14px;padding:.85rem 1.1rem;margin-bottom:1rem;font-weight:700}
+  .welcomeback[hidden]{display:none}
+
+  /* account tab list */
+  .acctlist{display:flex;flex-direction:column}
+  .acctlist a,.acctlist button{display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;background:none;border:none;border-top:1px solid var(--line);color:var(--ink);font-family:var(--font);font-size:1.02rem;font-weight:600;padding:1rem .2rem;cursor:pointer;text-decoration:none}
+  .acctlist a:first-child,.acctlist button:first-child{border-top:none}
+  .acctlist .chev{color:var(--muted);font-size:1.3rem;line-height:1}
+  .acctlist .signoutbtn{color:var(--accent)}
+  .markread{background:none;border:1px solid var(--line);color:var(--muted2);font-family:var(--font);font-weight:700;font-size:.85rem;padding:.5rem .8rem;border-radius:9px;cursor:pointer}
+
+  /* membership / settings modal */
   .acctmodal{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:1.2rem}
   .acctmodal[hidden]{display:none}
   .acctmodal-bg{position:absolute;inset:0;background:rgba(0,0,0,.6)}
@@ -47,44 +113,7 @@
   .acctmodal-card .mcancelbtn:disabled{opacity:.6;cursor:default}
   .acctmodal-card .mcancelmsg{color:var(--muted2);font-size:.9rem;margin-top:.8rem;min-height:1.1em}
 
-  .hero{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:1.6rem 1.7rem}
-  .hello{color:var(--green);font-weight:800;font-size:.95rem;margin-bottom:.4rem}
-  .hero h1{font-size:clamp(1.7rem,4.6vw,2rem);font-weight:800;letter-spacing:-.02em;line-height:1.12;margin-bottom:.75rem;color:#fff}
-  .herorow{display:flex;gap:1.4rem;align-items:center}
-  .herorow p{flex:1;color:var(--muted2);font-size:1.06rem}
-  .radarwrap{flex:0 0 auto;text-align:center}
-  .radarlabel{margin-top:.55rem;font-size:.78rem;font-weight:800;color:var(--green)}
-  .radar{position:relative;width:110px;height:110px;border-radius:50%;background:rgba(51,192,141,.10);border:1.5px solid var(--gline);overflow:hidden}
-  .ring{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);border:1px solid rgba(51,192,141,.32);border-radius:50%}
-  .ring.r1{width:72%;height:72%}.ring.r2{width:44%;height:44%}
-  .cross{position:absolute;background:rgba(51,192,141,.22)}
-  .cross.h{top:50%;left:0;right:0;height:1px}.cross.v{left:50%;top:0;bottom:0;width:1px}
-  .sweep{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,rgba(70,210,156,.62),rgba(70,210,156,.12) 45deg,rgba(70,210,156,0) 85deg);animation:spin 5.5s linear infinite}
-  @keyframes spin{to{transform:rotate(-360deg)}}
-  .center{position:absolute;top:50%;left:50%;width:8px;height:8px;border-radius:50%;background:var(--green2);transform:translate(-50%,-50%)}
-  .blip{position:absolute;width:7px;height:7px;border-radius:50%;background:var(--green2);opacity:0;animation:blip 5.5s ease-out infinite}
-  .blip.b1{top:32%;left:36%;animation-delay:1.4s}.blip.b2{top:60%;left:62%;animation-delay:3.6s}
-  @keyframes blip{0%,100%{opacity:0;transform:scale(.6)}10%{opacity:1;transform:scale(1)}40%{opacity:0}}
-
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:1.4rem 1.7rem;margin-top:1.1rem}
-  .card h2{font-size:1.25rem;font-weight:800;margin-bottom:.9rem;color:#fff}
-  .ptop{display:flex;align-items:baseline;gap:.6rem;margin-bottom:.7rem;flex-wrap:wrap}
-  .ptop .big{font-size:2.7rem;font-weight:800;color:var(--green);line-height:1;letter-spacing:-.02em}
-  .ptop .lab{color:var(--muted2);font-size:1.08rem;font-weight:600}
-  .actively{display:inline-flex;align-items:center;gap:.6rem;color:var(--green);font-weight:700;font-size:1.02rem;margin-bottom:.6rem}
-  .lpulse{flex:0 0 auto;width:10px;height:10px;border-radius:50%;background:var(--green2);animation:pulse 1.9s ease-out infinite}
-  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(70,210,156,.5)}70%{box-shadow:0 0 0 9px rgba(70,210,156,0)}100%{box-shadow:0 0 0 0 rgba(70,210,156,0)}}
-  .psub{color:var(--muted);font-size:1rem}
-
-  .reassure{background:var(--gtint);border:1px solid var(--gline);border-radius:18px;padding:1.3rem 1.5rem;margin-top:1.1rem;display:flex;gap:.9rem;align-items:flex-start}
-  .reassure .ic{flex:0 0 auto;width:40px;height:40px;border-radius:50%;background:rgba(51,192,141,.12);border:1px solid var(--gline);display:flex;align-items:center;justify-content:center;color:var(--green)}
-  .reassure b{display:block;font-size:1.1rem;font-weight:800;margin-bottom:.2rem;color:#fff}
-  .reassure p{color:#A9C9B8;font-size:1.02rem}
-  .help{text-align:center;color:var(--muted);font-size:.95rem;margin-top:1.6rem}
-  .help a{color:var(--green);font-weight:700}
-  .welcomeback{background:var(--gtint);border:1px solid var(--gline);color:#A9C9B8;border-radius:14px;padding:.85rem 1.1rem;margin-bottom:1.1rem;font-weight:700}
-  .welcomeback[hidden]{display:none}
-
+  /* sign in */
   .signin{max-width:460px;margin:2.5rem auto 0;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:2rem 1.8rem;text-align:center}
   .signin h1{font-size:1.55rem;font-weight:800;margin-bottom:.5rem;color:#fff}
   .signin p{color:var(--muted2);font-size:1.02rem;max-width:34ch;margin:0 auto}
@@ -93,35 +122,51 @@
   .signin button{width:100%;background:var(--green);color:#06130D;border:none;border-radius:10px;padding:.95rem;font-weight:800;font-size:1.06rem;cursor:pointer}
   .signin button:hover{background:var(--green2)}
   .simsg{color:var(--muted2);font-size:.95rem;margin-top:.9rem;min-height:1.2em}
-  .loading{text-align:center;color:var(--muted);padding:3rem 1rem}
-  @media (max-width:560px){ .herorow{flex-direction:column-reverse;align-items:flex-start} }
+  .loading{padding:1.2rem 0 0}
+  .skel{background:#16161a;background-image:linear-gradient(90deg,rgba(255,255,255,0) 0,rgba(255,255,255,.05) 50%,rgba(255,255,255,0) 100%);background-size:200% 100%;background-repeat:no-repeat;border-radius:12px;animation:skelsh 1.3s ease-in-out infinite}
+  @keyframes skelsh{0%{background-position:-120% 0}100%{background-position:120% 0}}
+  .skelhead{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:1.2rem}
+  .skelrow{display:flex;gap:.8rem;align-items:center;padding:.6rem 0}
+
+  /* bottom nav */
+  .botnav{position:fixed;left:0;right:0;bottom:0;background:rgba(11,11,13,.96);border-top:1px solid var(--line);display:flex;z-index:60;backdrop-filter:blur(8px)}
+  .botnav[hidden]{display:none}
+  .navbtn{flex:1;background:none;border:none;color:var(--muted);font-family:var(--font);font-weight:700;font-size:.72rem;padding:.55rem 0 .7rem;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:.18rem;position:relative}
+  .navbtn svg{width:23px;height:23px;display:block}
+  .navbtn.active{color:var(--green)}
+  .badge{position:absolute;top:.2rem;left:calc(50% + .55rem);background:var(--accent);color:#fff;font-size:.62rem;font-weight:800;min-width:16px;height:16px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 .25rem}
+  .badge[hidden]{display:none}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="bar">
     <a href="index.html" class="word">Spam<span class="cr">Call</span>Stop<span class="cg">.com</span></a>
-    <div class="menu" id="profileMenu" style="display:none">
-      <button class="avatar" id="avatarBtn" onclick="toggleMenu(event)" aria-label="Account menu" aria-haspopup="true">&bull;</button>
-      <div class="menudrop" id="menuDrop" hidden>
-        <button onclick="showPanel('membership')">My membership</button>
-        <button onclick="showPanel('settings')">Account settings</button>
-        <a href="terms.html">Terms of Service</a>
-        <a href="privacy.html">Privacy Policy</a>
-        <button class="signoutbtn" onclick="signOut()">Sign out</button>
-      </div>
-    </div>
   </div>
 
-  <div class="loading" id="loading">Loading your dashboard&hellip;</div>
+  <div class="loading" id="loading">
+    <div class="skelhead">
+      <div>
+        <div class="skel" style="width:150px;height:26px"></div>
+        <div class="skel" style="width:115px;height:14px;margin-top:9px"></div>
+      </div>
+      <div class="skel" style="width:58px;height:58px;border-radius:50%"></div>
+    </div>
+    <div class="skel" style="height:128px;margin-bottom:11px"></div>
+    <div class="skel" style="height:128px;margin-bottom:11px"></div>
+    <div class="skel" style="height:96px"></div>
+  </div>
 
   <div id="dash" style="display:none">
     <div class="welcomeback" id="welcomeBack" hidden>You're already protected. Welcome back to your dashboard.</div>
-    <div class="hero">
-      <div class="hello">Welcome<span id="firstName"></span></div>
-      <h1>We're keeping your number safe.</h1>
-      <div class="herorow">
-        <p>We're taking your phone number off the lists that spammers and scammers buy. We check every day and remove any new ones. You don't have to do anything.</p>
+
+    <!-- HOME -->
+    <div id="viewHome">
+      <div class="tophead">
+        <div>
+          <div class="hi">Hi, <span id="firstName">there</span></div>
+          <div class="status"><span class="dot"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="#06130D" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span> Monitoring active</div>
+        </div>
         <div class="radarwrap">
           <div class="radar">
             <span class="ring r1"></span><span class="ring r2"></span>
@@ -129,27 +174,67 @@
             <span class="sweep"></span><span class="blip b1"></span><span class="blip b2"></span>
             <span class="center"></span>
           </div>
-          <div class="radarlabel">Always working</div>
+          <div class="radarlabel">Scanning</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="cardhead"><h2><span id="homeUnread">0</span> Unread alerts</h2><a class="viewall" onclick="switchTab('alerts')">View all</a></div>
+        <div id="homeAlerts"><div class="emptynote">No alerts yet.</div></div>
+      </div>
+
+      <div class="card">
+        <h2>Your removals</h2>
+        <div class="tiles" style="margin-top:1rem">
+          <div class="tile"><div class="tnum" id="tActive">0</div><div class="tlab">Active removals</div></div>
+          <div class="tile"><div class="tnum" id="tSent">0</div><div class="tlab">Requests sent</div></div>
+          <div class="tile"><div class="tnum" id="tConfirmed">0</div><div class="tlab">Confirmed removed</div></div>
+        </div>
+        <div class="psub">We send opt-out requests to data brokers, follow up until they confirm, and keep re-checking. A removal counts as confirmed once the broker verifies your number is gone.</div>
+      </div>
+
+      <div class="card">
+        <div class="threathead"><h2>Threat level</h2><span class="threatword" id="threatWord">High</span></div>
+        <div class="threatbar"><div class="threatfill" id="threatFill"></div></div>
+        <div class="threatscale"><span>Protected</span><span>Exposed</span></div>
+        <div class="psub">This lowers as we get your number removed from data brokers. <b id="threatCleared" style="color:#fff">0</b> of <b id="threatTotal" style="color:#fff">0</b> broker lists cleared so far.</div>
+      </div>
+
+      <div class="reassure">
+        <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v5c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V6l7-3z" stroke="#33C08D" stroke-width="2" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="#33C08D" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <div>
+          <b>We never stop.</b>
+          <p>As long as you're a member, we keep checking these lists and take your number back down any time it shows up again.</p>
+        </div>
+      </div>
+
+      <div class="help">Questions? Email us at <a href="mailto:company@spamcallstop.com">company@spamcallstop.com</a></div>
+    </div>
+
+    <!-- ALERTS -->
+    <div id="viewAlerts" style="display:none">
+      <div class="tophead">
+        <div><div class="hi">Alerts</div><div class="status sub">Updates on your removals</div></div>
+        <button class="markread" onclick="markAllRead()">Mark all read</button>
+      </div>
+      <div class="card"><div id="alertList"><div class="emptynote">Loading&hellip;</div></div></div>
+    </div>
+
+    <!-- ACCOUNT -->
+    <div id="viewAccount" style="display:none">
+      <div class="tophead">
+        <div><div class="hi">Account</div><div class="status sub" id="acctPlanLine"></div></div>
+      </div>
+      <div class="card">
+        <div class="acctlist">
+          <button onclick="membershipView('membership')">My membership <span class="chev">&rsaquo;</span></button>
+          <button onclick="showPanel('settings')">Account settings <span class="chev">&rsaquo;</span></button>
+          <a href="terms.html">Terms of Service <span class="chev">&rsaquo;</span></a>
+          <a href="privacy.html">Privacy Policy <span class="chev">&rsaquo;</span></a>
+          <button class="signoutbtn" onclick="signOut()">Sign out</button>
         </div>
       </div>
     </div>
-
-    <div class="card">
-      <h2>Your progress</h2>
-      <div class="ptop"><span class="big" id="cleared">0</span><span class="lab">spam lists cleared so far</span></div>
-      <div class="actively"><span class="lpulse"></span> Actively removing your number from more lists right now</div>
-      <div class="psub">We only count a list once it confirms your number is gone. We never stop checking, so this keeps going up.</div>
-    </div>
-
-    <div class="reassure">
-      <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v5c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V6l7-3z" stroke="#33C08D" stroke-width="2" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="#33C08D" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-      <div>
-        <b>We never stop.</b>
-        <p>As long as you're a member, we keep checking these lists and take your number back down any time it shows up again.</p>
-      </div>
-    </div>
-
-    <div class="help">Questions? Email us at <a href="mailto:company@spamcallstop.com">company@spamcallstop.com</a></div>
   </div>
 
   <div class="signin" id="signin" style="display:none">
@@ -160,6 +245,22 @@
     <div class="simsg" id="simsg"></div>
   </div>
 </div>
+
+<nav class="botnav" id="botnav" hidden>
+  <button class="navbtn active" id="navHome" onclick="switchTab('home')" aria-label="Home">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M4 11l8-7 8 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10v9h12v-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Home
+  </button>
+  <button class="navbtn" id="navAlerts" onclick="switchTab('alerts')" aria-label="Alerts">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M6 9a6 6 0 0112 0c0 5 2 6 2 6H4s2-1 2-6z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 19a2 2 0 004 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    Alerts
+    <span class="badge" id="navBadge" hidden>0</span>
+  </button>
+  <button class="navbtn" id="navAccount" onclick="switchTab('account')" aria-label="Account">
+    <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/><path d="M4 20c0-3.3 3.6-6 8-6s8 2.7 8 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    Account
+  </button>
+</nav>
 
 <div class="acctmodal" id="acctModal" hidden>
   <div class="acctmodal-bg" onclick="hidePanel()"></div>
@@ -176,14 +277,108 @@
     if(t){ try{ sessionStorage.setItem('scstop_ctoken', t); }catch(e){} return t; }
     try{ return sessionStorage.getItem('scstop_ctoken') || ''; }catch(e){ return ''; }
   }
-  function show(id){ ['loading','dash','signin'].forEach(function(x){ document.getElementById(x).style.display = (x===id)?'block':'none'; }); }
+  function show(id){
+    ['loading','dash','signin'].forEach(function(x){ var el=document.getElementById(x); if(el) el.style.display=(x===id)?'block':'none'; });
+    var bn=document.getElementById('botnav'); if(bn) bn.hidden = (id!=='dash');
+  }
   function signOut(){ try{ sessionStorage.removeItem('scstop_ctoken'); }catch(e){} location.href='account.html'; }
+  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function setNum(id,n){ var el=document.getElementById(id); if(el) el.textContent = (typeof n==='number')?n:0; }
 
   var MY_PLAN = '';
-  function toggleMenu(e){ if(e) e.stopPropagation(); var d=document.getElementById('menuDrop'); d.hidden = !d.hidden; }
-  document.addEventListener('click', function(e){ var m=document.getElementById('profileMenu'), d=document.getElementById('menuDrop'); if(d && !d.hidden && m && !m.contains(e.target)){ d.hidden = true; } });
+
+  /* ---- tabs ---- */
+  function switchTab(tab){
+    ['Home','Alerts','Account'].forEach(function(x){
+      var v=document.getElementById('view'+x); if(v) v.style.display = (x.toLowerCase()===tab)?'block':'none';
+      var n=document.getElementById('nav'+x); if(n) n.classList.toggle('active', x.toLowerCase()===tab);
+    });
+    if(tab==='alerts'){ loadAlerts(true); }
+    try{ window.scrollTo(0,0); }catch(e){}
+  }
+
+  /* ---- alerts ---- */
+  function timeAgo(s){
+    if(!s) return '';
+    var iso = String(s).replace(' ','T'); if(!/[zZ]|[+\-]\d\d:?\d\d$/.test(iso)) iso += 'Z';
+    var t = new Date(iso).getTime(); if(isNaN(t)) return '';
+    var d = Math.max(0, Date.now()-t), m=60000,h=3600000,dy=86400000;
+    if(d<m) return 'just now';
+    if(d<h) return Math.floor(d/m)+'m ago';
+    if(d<dy) return Math.floor(d/h)+'h ago';
+    if(d<7*dy) return Math.floor(d/dy)+'d ago';
+    return new Date(t).toLocaleDateString();
+  }
+  function alertMeta(k){
+    if(k==='removed'||k==='no_record') return {cls:'good', g:'✓'};
+    if(k==='needs_followup') return {cls:'warn', g:'!'};
+    return {cls:'info', g:'↗'};
+  }
+  function alertHTML(a){
+    var m = alertMeta(a.kind);
+    return '<div class="alertrow"><div class="alert-ic '+m.cls+'">'+m.g+'</div>'
+      + '<div class="alert-bd"><div class="alert-title">'+esc(a.title||'')+'</div>'
+      + (a.body?'<div class="alert-body">'+esc(a.body)+'</div>':'')
+      + '<div class="alert-time">'+timeAgo(a.created_at)+'</div></div></div>';
+  }
+  function renderAlerts(list){
+    var full=document.getElementById('alertList'), home=document.getElementById('homeAlerts');
+    if(!list.length){
+      if(full) full.innerHTML='<div class="emptynote">No alerts yet. We\'ll post here each time we send a removal request or hear back from a data broker.</div>';
+      if(home) home.innerHTML='<div class="emptynote">No alerts yet. We\'ll let you know the moment something happens.</div>';
+      return;
+    }
+    if(full) full.innerHTML=list.map(alertHTML).join('');
+    if(home) home.innerHTML=list.slice(0,3).map(alertHTML).join('');
+  }
+  function setUnread(n){
+    n = n||0;
+    var b=document.getElementById('navBadge'); if(b){ b.textContent=(n>9?'9+':String(n)); b.hidden=!(n>0); }
+    var h=document.getElementById('homeUnread'); if(h) h.textContent=n;
+  }
+  function threatLevel(p){
+    if(p>66) return {w:'High', c:'#E0533B'};
+    if(p>33) return {w:'Medium', c:'#E0A23C'};
+    if(p>0)  return {w:'Low', c:'#33C08D'};
+    return {w:'Clear', c:'#33C08D'};
+  }
+  function setThreat(pct, cleared, total){
+    pct = Math.max(0, Math.min(100, Math.round(pct)));
+    var lv = threatLevel(pct);
+    var w=document.getElementById('threatWord'); if(w){ w.textContent=lv.w; w.style.color=lv.c; }
+    var c=document.getElementById('threatCleared'); if(c) c.textContent=cleared;
+    var t=document.getElementById('threatTotal'); if(t) t.textContent=total;
+    var f=document.getElementById('threatFill'); if(f){ f.style.background=lv.c; setTimeout(function(){ f.style.width=pct+'%'; }, 80); }
+  }
+  var ALERTS_CACHE = null;
+  function renderAlertsSkeleton(){
+    var sk = '<div class="skelrow"><div class="skel" style="width:31px;height:31px;border-radius:50%"></div><div style="flex:1"><div class="skel" style="width:55%;height:14px"></div><div class="skel" style="width:85%;height:12px;margin-top:7px"></div></div></div>';
+    var full=document.getElementById('alertList'); if(full) full.innerHTML = sk+sk+sk;
+    var home=document.getElementById('homeAlerts'); if(home) home.innerHTML = sk+sk;
+  }
+  function loadAlerts(markRead){
+    var t=getToken(); if(!t) return;
+    // Instant paint from the in-memory cache (stale-while-revalidate); skeleton
+    // only shows on the very first load when there's nothing cached yet.
+    if(ALERTS_CACHE){ renderAlerts(ALERTS_CACHE); } else { renderAlertsSkeleton(); }
+    if(markRead){ setUnread(0); } // optimistic: clear the badge immediately
+    fetch('/api/alerts', { headers:{ 'x-customer-token': t } })
+      .then(function(r){ return r.json().catch(function(){return null;}); })
+      .then(function(d){
+        if(!d || !d.ok) return;
+        ALERTS_CACHE = d.alerts||[];
+        renderAlerts(ALERTS_CACHE);
+        if(!markRead){ setUnread(d.unread||0); }
+        if(markRead && (d.unread||0)>0){
+          fetch('/api/alerts/read', { method:'POST', headers:{ 'Content-Type':'application/json','x-customer-token': t }, body:'{}' })
+            .then(function(){ setUnread(0); }).catch(function(){});
+        }
+      }).catch(function(){});
+  }
+  function markAllRead(){ loadAlerts(true); }
+
+  /* ---- account modal (membership + settings) ---- */
   function openModal(title){
-    document.getElementById('menuDrop').hidden = true;
     document.getElementById('panelTitle').textContent = title;
     document.getElementById('acctModal').hidden = false;
   }
@@ -258,29 +453,43 @@
       });
   }
 
+  /* ---- sign in + load ---- */
   function showSignin(note){
     show('signin');
     try{ var em0 = sessionStorage.getItem('scstop_email'); if(em0){ var e0=document.getElementById('em'); if(e0 && !e0.value) e0.value = em0; } }catch(e){}
     if(note){ var n=document.getElementById('simsg'); if(n) n.textContent = note; }
   }
 
+  var ME_CACHE = null;
+  function applyMe(d){
+    document.getElementById('firstName').textContent = d.firstName || 'there';
+    setNum('tActive', (typeof d.active==='number')?d.active:(d.inProgress||0));
+    setNum('tSent', d.requestsSent||0);
+    setNum('tConfirmed', (typeof d.confirmedRemoved==='number')?d.confirmedRemoved:(d.cleared||0));
+    var _conf=(typeof d.confirmedRemoved==='number')?d.confirmedRemoved:(d.cleared||0);
+    setThreat(typeof d.threatPct==='number'?d.threatPct:100, _conf, (d.active||0)+_conf);
+    MY_PLAN = (d.plan === 'Dual') ? 'Couple' : (d.plan ? 'Individual' : '');
+    var pl=document.getElementById('acctPlanLine'); if(pl) pl.textContent = MY_PLAN ? (MY_PLAN+' plan, active') : '';
+    setUnread(d.unread||0);
+  }
   function loadMe(t){
     t = t || getToken();
     if(!t){ showSignin(''); return; }
+    // Instant paint from the in-memory cache, then revalidate in the background.
+    if(ME_CACHE){ applyMe(ME_CACHE); show('dash'); switchTab('home'); }
     fetch('/api/me', { headers: { 'x-customer-token': t } })
       .then(function(r){ return r.json().catch(function(){ return null; }); })
       .then(function(d){
         if(d && d.ok){
-          document.getElementById('firstName').textContent = d.firstName ? (', '+d.firstName) : '';
-          document.getElementById('cleared').textContent = (typeof d.cleared==='number') ? d.cleared : 0;
-          document.getElementById('profileMenu').style.display = 'block';
-          document.getElementById('avatarBtn').textContent = (d.firstName || 'Y').charAt(0).toUpperCase();
-          MY_PLAN = (d.plan === 'Dual') ? 'Couple' : (d.plan ? 'Individual' : '');
+          ME_CACHE = d;
+          applyMe(d);
           show('dash');
+          switchTab('home');
+          loadAlerts(false);
           try{ if(sessionStorage.getItem('scstop_welcome_back')==='1'){ var wb=document.getElementById('welcomeBack'); if(wb) wb.hidden=false; sessionStorage.removeItem('scstop_welcome_back'); } }catch(e){}
-        } else { showSignin(''); }
+        } else if(!ME_CACHE){ showSignin(''); }
       })
-      .catch(function(){ showSignin(''); });
+      .catch(function(){ if(!ME_CACHE) showSignin(''); });
   }
 
   // After paying, the dashboard opens straight from the Stripe session (email
@@ -298,7 +507,7 @@
 
   function start(){
     var t = getToken();
-    if(t){ loadMe(t); return; }
+    if(t){ show('loading'); loadMe(t); return; }
     var sid = new URLSearchParams(location.search).get('session_id');
     if(sid){ show('loading'); tryStripeSession(sid, 0); return; }
     showSignin('');
