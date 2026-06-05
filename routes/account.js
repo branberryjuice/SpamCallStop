@@ -81,7 +81,9 @@ router.get('/account/session', async (req, res) => {
     }
     if (!c) return res.json({ ok: false, error: 'pending' });
     const firstName = (c.name || '').trim().split(/\s+/)[0] || '';
-    return res.json({ ok: true, token: token.signCustomer(c.id), firstName: firstName });
+    const amount = Number.isFinite(session.amount_total) ? Math.round(session.amount_total) / 100 : undefined;
+    const currency = session.currency ? String(session.currency).toUpperCase() : 'USD';
+    return res.json({ ok: true, token: token.signCustomer(c.id), firstName: firstName, amount: amount, currency: currency });
   } catch (e) {
     console.error('[account] session exchange error:', e && e.message);
     return res.json({ ok: false, error: 'pending' });
