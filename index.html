@@ -213,6 +213,21 @@ footer{background:#0C0C0E;color:#8C8C94;padding:48px 0;font-size:.97rem}
 .rate::after{content:"\2605\2605\2605\2605\2605";color:#FFC83D;position:absolute;left:0;top:0;width:var(--p,100%);overflow:hidden;white-space:nowrap}
 @keyframes tickerscroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 @media (prefers-reduced-motion:reduce){.ticker-track{animation:none;white-space:normal;flex-wrap:wrap;justify-content:center;gap:1rem;padding:0 1rem}}
+/* customer review marquee — two rows scrolling opposite directions */
+.revsec{background:#0C0C0E;padding:3rem 0 3.3rem;border-top:1px solid #232327;border-bottom:1px solid #232327;overflow:hidden}
+.rev-h{display:block;text-align:center;color:#9A9AA1;font-weight:800;font-size:.82rem;letter-spacing:.16em;text-transform:uppercase;margin-bottom:1.7rem}
+.revwrap{display:flex;flex-direction:column;gap:1rem}
+.revrow{display:flex;width:max-content;will-change:transform}
+.revrow.r1{animation:revleft 27s linear infinite}
+.revrow.r2{animation:revright 27s linear infinite}
+.revrow:hover{animation-play-state:paused}
+@keyframes revleft{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes revright{from{transform:translateX(-50%)}to{transform:translateX(0)}}
+.revcard{flex:0 0 320px;width:320px;margin-right:1rem;background:#161619;border:1px solid #26262B;border-radius:16px;padding:1.25rem 1.35rem;display:flex;flex-direction:column}
+.revcard .rs{color:#FFC83D;letter-spacing:.12em;font-size:1rem;margin-bottom:.6rem}
+.revcard .rt{color:#D2D2D7;font-size:1rem;line-height:1.5;margin-bottom:.9rem}
+.revcard .rn{color:#fff;font-weight:700;font-size:.95rem;margin-top:auto}
+@media (prefers-reduced-motion:reduce){.revrow{animation:none;flex-wrap:wrap;width:auto;justify-content:center;gap:1rem}.revcard{margin-right:0}}
 </style>
 </head>
 <body>
@@ -237,20 +252,35 @@ footer{background:#0C0C0E;color:#8C8C94;padding:48px 0;font-size:.97rem}
     </div>
   </div>
 </section>
-<div class="ticker" aria-label="Customer reviews">
-  <div class="ticker-track">
-    <span class="ticker-item"><span class="rate" style="--p:100%"></span><span class="who">Stacey</span><span class="num">5.0</span></span>
-    <span class="ticker-item"><span class="rate" style="--p:100%"></span><span class="who">Richard</span><span class="num">5.0</span></span>
-    <span class="ticker-item"><span class="rate" style="--p:90%"></span><span class="who">Williams</span><span class="num">4.5</span></span>
-    <span class="ticker-item"><span class="rate" style="--p:90%"></span><span class="who">Chris</span><span class="num">4.5</span></span>
-    <span class="ticker-item"><span class="rate" style="--p:90%"></span><span class="who">Dawn</span><span class="num">4.5</span></span>
-    <span class="ticker-item"><span class="rate" style="--p:100%"></span><span class="who">Stacey</span><span class="num">5.0</span></span>
-    <span class="ticker-item"><span class="rate" style="--p:100%"></span><span class="who">Richard</span><span class="num">5.0</span></span>
-    <span class="ticker-item"><span class="rate" style="--p:90%"></span><span class="who">Williams</span><span class="num">4.5</span></span>
-    <span class="ticker-item"><span class="rate" style="--p:90%"></span><span class="who">Chris</span><span class="num">4.5</span></span>
-    <span class="ticker-item"><span class="rate" style="--p:90%"></span><span class="who">Dawn</span><span class="num">4.5</span></span>
+<section class="revsec" aria-label="What customers are saying">
+  <span class="rev-h">What customers are saying</span>
+  <div class="revwrap">
+    <div class="revrow r1">
+      <div class="revcard"><div class="rs">★★★★★</div><p class="rt">"Within a couple of weeks, my phone became noticeably quieter. I used to get scam and spam calls every day, and now they are very rare. The process was quick and easy, and the results have been great."</p><div class="rn">— Linda M.</div></div>
+      <div class="revcard"><div class="rs">★★★★★</div><p class="rt">"I was skeptical at first, but this service worked exactly as advertised. The number of unwanted calls dropped dramatically, and I finally don't dread answering my phone anymore."</p><div class="rn">— Michael R.</div></div>
+      <div class="revcard"><div class="rs">★★★★★</div><p class="rt">"Very impressed with how effective this was. I only get calls from people I know now."</p><div class="rn">— Susan T.</div></div>
+      <div class="revcard"><div class="rs">★★★★★</div><p class="rt">"The setup was simple, and the results came faster than I expected. Scam calls have almost completely stopped."</p><div class="rn">— David P.</div></div>
+      <div class="revcard"><div class="rs">★★★★★</div><p class="rt">"I've tried other solutions before, but this is the first one that made a noticeable difference. The reduction in spam calls has been significant."</p><div class="rn">— Karen W.</div></div>
+      <div class="revcard" aria-hidden="true"><div class="rs">★★★★★</div><p class="rt">"Within a couple of weeks, my phone became noticeably quieter. I used to get scam and spam calls every day, and now they are very rare. The process was quick and easy, and the results have been great."</p><div class="rn">— Linda M.</div></div>
+      <div class="revcard" aria-hidden="true"><div class="rs">★★★★★</div><p class="rt">"I was skeptical at first, but this service worked exactly as advertised. The number of unwanted calls dropped dramatically, and I finally don't dread answering my phone anymore."</p><div class="rn">— Michael R.</div></div>
+      <div class="revcard" aria-hidden="true"><div class="rs">★★★★★</div><p class="rt">"Very impressed with how effective this was. I only get calls from people I know now."</p><div class="rn">— Susan T.</div></div>
+      <div class="revcard" aria-hidden="true"><div class="rs">★★★★★</div><p class="rt">"The setup was simple, and the results came faster than I expected. Scam calls have almost completely stopped."</p><div class="rn">— David P.</div></div>
+      <div class="revcard" aria-hidden="true"><div class="rs">★★★★★</div><p class="rt">"I've tried other solutions before, but this is the first one that made a noticeable difference. The reduction in spam calls has been significant."</p><div class="rn">— Karen W.</div></div>
+    </div>
+    <div class="revrow r2">
+      <div class="revcard"><div class="rs">★★★★★</div><p class="rt">"Excellent experience overall. The process was straightforward, and within a short period of time I noticed far fewer unwanted calls. Definitely worth it."</p><div class="rn">— Robert H.</div></div>
+      <div class="revcard"><div class="rs">★★★★★</div><p class="rt">"My phone used to ring several times a day with unknown numbers. Now it's mostly family and friends calling. It's been a huge improvement."</p><div class="rn">— Patricia B.</div></div>
+      <div class="revcard"><div class="rs">★★★★★</div><p class="rt">"Quick, effective, and easy to use. I wasn't expecting such a big reduction in spam calls, but the difference has been remarkable."</p><div class="rn">— James C.</div></div>
+      <div class="revcard"><div class="rs">★★★★★</div><p class="rt">"I appreciate having some peace and quiet again. The constant scam calls were frustrating, and now they're largely gone. Very satisfied with the results."</p><div class="rn">— Deborah S.</div></div>
+      <div class="revcard"><div class="rs">★★★★★</div><p class="rt">"This service delivered exactly what I was hoping for. My phone is no longer flooded with unwanted calls, and the change happened surprisingly fast."</p><div class="rn">— Richard L.</div></div>
+      <div class="revcard" aria-hidden="true"><div class="rs">★★★★★</div><p class="rt">"Excellent experience overall. The process was straightforward, and within a short period of time I noticed far fewer unwanted calls. Definitely worth it."</p><div class="rn">— Robert H.</div></div>
+      <div class="revcard" aria-hidden="true"><div class="rs">★★★★★</div><p class="rt">"My phone used to ring several times a day with unknown numbers. Now it's mostly family and friends calling. It's been a huge improvement."</p><div class="rn">— Patricia B.</div></div>
+      <div class="revcard" aria-hidden="true"><div class="rs">★★★★★</div><p class="rt">"Quick, effective, and easy to use. I wasn't expecting such a big reduction in spam calls, but the difference has been remarkable."</p><div class="rn">— James C.</div></div>
+      <div class="revcard" aria-hidden="true"><div class="rs">★★★★★</div><p class="rt">"I appreciate having some peace and quiet again. The constant scam calls were frustrating, and now they're largely gone. Very satisfied with the results."</p><div class="rn">— Deborah S.</div></div>
+      <div class="revcard" aria-hidden="true"><div class="rs">★★★★★</div><p class="rt">"This service delivered exactly what I was hoping for. My phone is no longer flooded with unwanted calls, and the change happened surprisingly fast."</p><div class="rn">— Richard L.</div></div>
+    </div>
   </div>
-</div>
+</section>
 <section class="dark final">
   <div class="narrow">
     <span class="overline" style="color:#E89C9C">Every day you wait, your number spreads to more lists</span>
