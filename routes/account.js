@@ -69,8 +69,17 @@ router.get('/account/session', async (req, res) => {
       (session.customer_details && session.customer_details.email) ||
       (session.metadata && session.metadata.email) || ''
     ).trim().toLowerCase();
-    const c = email ? await db.getCustomerByEmail(email) : null;
-    if (!c) return res.json({ ok: false, error: 'pending' }); // webhook may not have created the customer yet
+    let c = email ? await db.getCustomerByEmail(email) : null;
+    if (!c) {
+      // Backstop: if the webhook hasn't created the customer (slow, missed, or
+      // misrouted), provision straight from the paid session here. Idempotent, so
+      // it never duplicates what the webhook will/did create.
+      try {
+        const prov = await require('../lib/provision').provisionFromSession(session, { sideEffects: true, sendWelcome: true });
+        c = prov.customer;
+      } catch (pe) { console.error('[account] session provision error:', pe && pe.message); }
+    }
+    if (!c) return res.json({ ok: false, error: 'pending' });
     const firstName = (c.name || '').trim().split(/\s+/)[0] || '';
     return res.json({ ok: true, token: token.signCustomer(c.id), firstName: firstName });
   } catch (e) {
