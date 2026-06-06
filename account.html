@@ -9,132 +9,135 @@
 <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0B0B0D; --panel:#141417; --line:#26262B; --ink:#FFFFFF; --muted:#8A8A93; --muted2:#B6B6BE;
-    --accent:#B52A2A; --green:#33C08D; --green2:#46D29C; --gtint:rgba(51,192,141,.14); --gline:rgba(51,192,141,.34);
+    --bg:#F4F6F4; --card:#FFFFFF; --line:#E4E7E4; --line2:#D3D7D3; --ink:#1A1A1A; --muted:#6B6B72; --muted2:#4A4A50;
+    --green:#1F7A4D; --green2:#2A9D63; --green-soft:#E7F1EB; --gline:rgba(31,122,77,.22);
+    --red:#C0392B; --red-soft:#FBEAE7; --amber:#C9871A; --amber-soft:#FAF1DF;
     --font:'Libre Franklin',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
   }
   *{margin:0;padding:0;box-sizing:border-box}
   body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased}
   .wrap{max-width:720px;margin:0 auto;padding:1.2rem 1.3rem 6rem}
-  .bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
-  .word{font-weight:800;font-size:1.2rem;color:#fff;text-decoration:none}
-  .word .cr{color:var(--accent)}.word .cg{color:var(--muted)}
+  .bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem}
+  .word{font-weight:800;font-size:1.2rem;color:var(--ink);text-decoration:none}
+  .word .cr{color:var(--red)}.word .cg{color:var(--ink)}
 
-  /* greeting header */
-  .tophead{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin:.3rem 0 1.2rem}
-  .hi{font-size:1.7rem;font-weight:800;color:#fff;letter-spacing:-.02em}
+  .tophead{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin:.3rem 0 1.1rem}
+  .hi{font-size:1.7rem;font-weight:800;color:var(--ink);letter-spacing:-.02em}
   .status{display:inline-flex;align-items:center;gap:.45rem;color:var(--green);font-weight:700;font-size:.98rem;margin-top:.3rem}
-  .status.sub{color:var(--muted2)}
+  .status.sub{color:var(--muted)}
   .status .dot{flex:0 0 auto;width:19px;height:19px;border-radius:50%;background:var(--green);display:inline-flex;align-items:center;justify-content:center}
 
-  /* radar */
-  .radarwrap{flex:0 0 auto;text-align:center}
-  .radarlabel{margin-top:.4rem;font-size:.72rem;font-weight:800;color:var(--green);letter-spacing:.02em}
-  .radar{position:relative;width:80px;height:80px;border-radius:50%;background:rgba(51,192,141,.10);border:1.5px solid var(--gline);overflow:hidden}
-  .ring{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);border:1px solid rgba(51,192,141,.32);border-radius:50%}
-  .ring.r1{width:72%;height:72%}.ring.r2{width:44%;height:44%}
-  .cross{position:absolute;background:rgba(51,192,141,.22)}
-  .cross.h{top:50%;left:0;right:0;height:1px}.cross.v{left:50%;top:0;bottom:0;width:1px}
-  .sweep{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,rgba(70,210,156,.62),rgba(70,210,156,.12) 45deg,rgba(70,210,156,0) 85deg);animation:spin 5.5s linear infinite}
-  @keyframes spin{to{transform:rotate(-360deg)}}
-  .center{position:absolute;top:50%;left:50%;width:7px;height:7px;border-radius:50%;background:var(--green2);transform:translate(-50%,-50%)}
-  .blip{position:absolute;width:6px;height:6px;border-radius:50%;background:var(--green2);opacity:0;animation:blip 5.5s ease-out infinite}
-  .blip.b1{top:32%;left:36%;animation-delay:1.4s}.blip.b2{top:60%;left:62%;animation-delay:3.6s}
-  @keyframes blip{0%,100%{opacity:0;transform:scale(.6)}10%{opacity:1;transform:scale(1)}40%{opacity:0}}
-
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:1.3rem 1.4rem;margin-top:1.05rem}
-  .card h2{font-size:1.18rem;font-weight:800;color:#fff}
-  .cardhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:1.3rem 1.4rem;margin-top:1.05rem}
+  .card h2{font-size:1.15rem;font-weight:800;color:var(--ink)}
+  .cardhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem}
   .viewall{color:var(--green);font-weight:700;font-size:.95rem;cursor:pointer;text-decoration:none}
-  .psub{color:var(--muted);font-size:.95rem;margin-top:.9rem}
+  .newtag{color:var(--green);font-weight:800;font-size:.85rem}
 
-  /* stat tiles */
-  .tiles{display:flex;gap:.7rem}
-  .tile{flex:1;background:#0F0F12;border:1px solid var(--line);border-radius:14px;padding:1rem .5rem;text-align:center}
-  .tnum{font-size:2rem;font-weight:800;color:var(--green);line-height:1;letter-spacing:-.02em}
-  .tlab{color:var(--muted2);font-size:.82rem;font-weight:600;margin-top:.4rem;line-height:1.25}
-  .ptop{display:flex;align-items:baseline;gap:.6rem;flex-wrap:wrap}
-  .ptop .big{font-size:2.5rem;font-weight:800;color:var(--green);line-height:1;letter-spacing:-.02em}
-  .ptop .lab{color:var(--muted2);font-size:1.02rem;font-weight:600;flex:1;min-width:9rem}
-  .threathead{display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem}
-  .threatword{font-weight:800;font-size:1.05rem;color:#E0533B}
-  .threatbar{height:14px;background:#0F0F12;border:1px solid var(--line);border-radius:9px;overflow:hidden}
-  .threatfill{height:100%;width:100%;border-radius:inherit;background:#E0533B;transition:width 1.2s cubic-bezier(.22,.61,.36,1),background .8s ease}
-  .threatscale{display:flex;justify-content:space-between;color:var(--muted);font-size:.78rem;font-weight:600;margin-top:.45rem}
+  /* score */
+  .scorecard{text-align:center}
+  .kick{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin-bottom:.1rem}
+  .gwrap{position:relative;width:230px;margin:.1rem auto 0}
+  .num{position:absolute;left:0;right:0;top:50px;text-align:center}
+  .num b{font-size:3.1rem;font-weight:900;letter-spacing:-.03em;line-height:1;color:var(--muted)}
+  .num span{display:block;font-size:.7rem;color:var(--muted);font-weight:700;margin-top:-2px}
+  .slabel{font-size:1.05rem;font-weight:800;margin-top:-2px;color:var(--muted)}
+  .delta{display:inline-flex;align-items:center;gap:6px;font-size:.85rem;font-weight:800;color:var(--green);background:var(--green-soft);padding:5px 13px;border-radius:999px;margin-top:9px}
+  .delta.amber{color:var(--amber);background:var(--amber-soft)}
+  .ssub{color:var(--muted);font-size:.86rem;margin:.7rem auto 0;max-width:42ch;line-height:1.45}
+  .steps{display:flex;justify-content:space-between;gap:4px;margin-top:1.3rem}
+  .step{flex:1;text-align:center;position:relative}
+  .step .d{width:13px;height:13px;border-radius:50%;background:var(--line2);margin:0 auto 6px;border:2px solid var(--card);position:relative;z-index:2}
+  .step.done .d{background:var(--green)} .step.cur .d{background:var(--green);box-shadow:0 0 0 4px var(--green-soft)}
+  .step .t{font-size:.64rem;font-weight:700;color:var(--muted);line-height:1.2}
+  .step.cur .t,.step.done .t{color:var(--ink)}
+  .step:not(:last-child):after{content:"";position:absolute;top:6px;left:50%;width:100%;height:2px;background:var(--line2);z-index:1}
+  .step.done:not(:last-child):after{background:var(--green)}
 
-  /* alerts */
+  /* protection list */
+  .plist .prow{display:flex;align-items:center;gap:.8rem;padding:.8rem 0;border-top:1px solid var(--line)}
+  .plist .prow:first-child{border-top:none}
+  .ic{flex:0 0 auto;width:34px;height:34px;border-radius:10px;background:var(--green-soft);display:flex;align-items:center;justify-content:center;color:var(--green)}
+  .ic svg{width:18px;height:18px}
+  .pt{flex:1;min-width:0}
+  .pt b{display:block;font-size:.98rem;font-weight:700;color:var(--ink)}
+  .pt span{font-size:.84rem;color:var(--muted)}
+  .pill{font-size:.72rem;font-weight:800;padding:3px 10px;border-radius:999px;color:var(--green);background:var(--green-soft);white-space:nowrap}
+
+  /* stage meanings */
+  .srow{padding:.7rem 0;border-top:1px solid var(--line)}
+  .srow:first-child{border-top:none}
+  .srow b{color:var(--ink);font-weight:800;font-size:.98rem}
+  .srow span{display:block;color:var(--muted);font-size:.88rem;margin-top:.1rem;line-height:1.4}
+
+  /* alerts / activity */
   .alertrow{display:flex;gap:.8rem;align-items:flex-start;padding:.85rem 0;border-top:1px solid var(--line)}
   .alertrow:first-child{border-top:none;padding-top:0}
   .alert-ic{flex:0 0 auto;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1rem}
-  .alert-ic.good{background:var(--gtint);color:var(--green);border:1px solid var(--gline)}
-  .alert-ic.info{background:rgba(106,169,255,.12);color:#6aa9ff;border:1px solid rgba(106,169,255,.3)}
-  .alert-ic.warn{background:rgba(231,184,75,.12);color:#e7b84b;border:1px solid rgba(231,184,75,.3)}
+  .alert-ic.good{background:var(--green-soft);color:var(--green)}
+  .alert-ic.info{background:#E8F0FB;color:#2C6FB5}
+  .alert-ic.warn{background:var(--amber-soft);color:var(--amber)}
   .alert-bd{flex:1;min-width:0}
-  .alert-title{font-weight:700;color:#fff;font-size:1rem}
+  .alert-title{font-weight:700;color:var(--ink);font-size:1rem}
   .alert-body{color:var(--muted2);font-size:.93rem;margin-top:.12rem}
   .alert-time{color:var(--muted);font-size:.8rem;margin-top:.25rem}
-  .emptynote{color:var(--muted);text-align:center;padding:1.4rem .5rem;font-size:.97rem}
+  .emptynote{color:var(--muted);text-align:center;padding:1.3rem .5rem;font-size:.96rem}
 
-  .reassure{background:var(--gtint);border:1px solid var(--gline);border-radius:18px;padding:1.2rem 1.4rem;margin-top:1.05rem;display:flex;gap:.9rem;align-items:flex-start}
-  .reassure .ic{flex:0 0 auto;width:40px;height:40px;border-radius:50%;background:rgba(51,192,141,.12);border:1px solid var(--gline);display:flex;align-items:center;justify-content:center;color:var(--green)}
-  .reassure b{display:block;font-size:1.08rem;font-weight:800;margin-bottom:.2rem;color:#fff}
-  .reassure p{color:#A9C9B8;font-size:1rem}
+  .reassure{background:var(--green-soft);border:1px solid var(--gline);border-radius:18px;padding:1.2rem 1.4rem;margin-top:1.05rem;display:flex;gap:.9rem;align-items:flex-start}
+  .reassure .ic{width:40px;height:40px;border-radius:50%;background:#fff;border:1px solid var(--gline)}
+  .reassure b{display:block;font-size:1.08rem;font-weight:800;margin-bottom:.2rem;color:var(--ink)}
+  .reassure p{color:var(--muted2);font-size:.98rem}
   .help{text-align:center;color:var(--muted);font-size:.95rem;margin-top:1.5rem}
   .help a{color:var(--green);font-weight:700}
-  .welcomeback{background:var(--gtint);border:1px solid var(--gline);color:#A9C9B8;border-radius:14px;padding:.85rem 1.1rem;margin-bottom:1rem;font-weight:700}
+  .welcomeback{background:var(--green-soft);border:1px solid var(--gline);color:var(--muted2);border-radius:14px;padding:.85rem 1.1rem;margin-bottom:1rem;font-weight:700}
   .welcomeback[hidden]{display:none}
 
-  /* account tab list */
   .acctlist{display:flex;flex-direction:column}
   .acctlist a,.acctlist button{display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;background:none;border:none;border-top:1px solid var(--line);color:var(--ink);font-family:var(--font);font-size:1.02rem;font-weight:600;padding:1rem .2rem;cursor:pointer;text-decoration:none}
   .acctlist a:first-child,.acctlist button:first-child{border-top:none}
   .acctlist .chev{color:var(--muted);font-size:1.3rem;line-height:1}
-  .acctlist .signoutbtn{color:var(--accent)}
+  .acctlist .signoutbtn{color:var(--red)}
   .markread{background:none;border:1px solid var(--line);color:var(--muted2);font-family:var(--font);font-weight:700;font-size:.85rem;padding:.5rem .8rem;border-radius:9px;cursor:pointer}
 
-  /* membership / settings modal */
   .acctmodal{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:1.2rem}
   .acctmodal[hidden]{display:none}
-  .acctmodal-bg{position:absolute;inset:0;background:rgba(0,0,0,.6)}
-  .acctmodal-card{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:1.6rem 1.7rem;max-width:420px;width:100%}
-  .acctmodal-card h2{font-size:1.25rem;font-weight:800;margin-bottom:.7rem;color:#fff}
+  .acctmodal-bg{position:absolute;inset:0;background:rgba(20,20,20,.45)}
+  .acctmodal-card{position:relative;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:1.6rem 1.7rem;max-width:420px;width:100%}
+  .acctmodal-card h2{font-size:1.25rem;font-weight:800;margin-bottom:.7rem;color:var(--ink)}
   .acctmodal-card p{color:var(--muted2);font-size:1rem;line-height:1.5}
   .acctmodal-card a{color:var(--green);font-weight:700}
   .acctmodal-x{position:absolute;top:.9rem;right:1rem;background:none;border:none;color:var(--muted);font-size:1.6rem;line-height:1;cursor:pointer}
-  .acctmodal-card .mopt{background:#0F0F12;border:1px solid var(--line);border-radius:12px;padding:.9rem 1rem;margin-top:.8rem}
-  .acctmodal-card .mopt b{display:block;color:#fff;font-size:1rem;margin-bottom:.15rem}
+  .acctmodal-card .mopt{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:.9rem 1rem;margin-top:.8rem}
+  .acctmodal-card .mopt b{display:block;color:var(--ink);font-size:1rem;margin-bottom:.15rem}
   .acctmodal-card .mopt p{color:var(--muted);font-size:.92rem;margin-bottom:.5rem}
   .acctmodal-card .mlink{color:var(--green);font-weight:700;cursor:pointer;text-decoration:none}
   .acctmodal-card .mrow{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-top:1.1rem}
   .acctmodal-card .mback{color:var(--muted2);font-weight:700;cursor:pointer;text-decoration:none}
   .acctmodal-card .mcancel{color:var(--muted);font-weight:600;font-size:.9rem;cursor:pointer;text-decoration:underline}
   .acctmodal-card .mkeep{color:var(--green);font-weight:700;cursor:pointer;text-decoration:none}
-  .acctmodal-card .mcancelbtn{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:.7rem 1rem;font-family:var(--font);font-weight:700;font-size:.95rem;cursor:pointer;flex:0 0 auto}
+  .acctmodal-card .mcancelbtn{background:var(--red);color:#fff;border:none;border-radius:10px;padding:.7rem 1rem;font-family:var(--font);font-weight:700;font-size:.95rem;cursor:pointer;flex:0 0 auto}
   .acctmodal-card .mcancelbtn:disabled{opacity:.6;cursor:default}
   .acctmodal-card .mcancelmsg{color:var(--muted2);font-size:.9rem;margin-top:.8rem;min-height:1.1em}
 
-  /* sign in */
-  .signin{max-width:460px;margin:2.5rem auto 0;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:2rem 1.8rem;text-align:center}
-  .signin h1{font-size:1.55rem;font-weight:800;margin-bottom:.5rem;color:#fff}
+  .signin{max-width:460px;margin:2.5rem auto 0;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:2rem 1.8rem;text-align:center}
+  .signin h1{font-size:1.5rem;font-weight:800;margin-bottom:.5rem;color:var(--ink)}
   .signin p{color:var(--muted2);font-size:1.02rem;max-width:34ch;margin:0 auto}
-  .signin input{width:100%;background:#0F0F12;border:1.5px solid var(--line);color:#fff;border-radius:10px;padding:.85rem 1rem;min-height:52px;font-size:1.05rem;margin:1.2rem 0 .8rem}
+  .signin input{width:100%;background:#fff;border:1.5px solid var(--line);color:var(--ink);border-radius:10px;padding:.85rem 1rem;min-height:52px;font-size:1.05rem;margin:1.2rem 0 .8rem}
   .signin input:focus{outline:none;border-color:var(--green)}
-  .signin button{width:100%;background:var(--green);color:#06130D;border:none;border-radius:10px;padding:.95rem;font-weight:800;font-size:1.06rem;cursor:pointer}
+  .signin button{width:100%;background:var(--green);color:#fff;border:none;border-radius:10px;padding:.95rem;font-weight:800;font-size:1.06rem;cursor:pointer}
   .signin button:hover{background:var(--green2)}
   .simsg{color:var(--muted2);font-size:.95rem;margin-top:.9rem;min-height:1.2em}
+
   .loading{padding:1.2rem 0 0}
-  .skel{background:#16161a;background-image:linear-gradient(90deg,rgba(255,255,255,0) 0,rgba(255,255,255,.05) 50%,rgba(255,255,255,0) 100%);background-size:200% 100%;background-repeat:no-repeat;border-radius:12px;animation:skelsh 1.3s ease-in-out infinite}
+  .skel{background:#ECEFEC;background-image:linear-gradient(90deg,rgba(0,0,0,0) 0,rgba(0,0,0,.045) 50%,rgba(0,0,0,0) 100%);background-size:200% 100%;background-repeat:no-repeat;border-radius:12px;animation:skelsh 1.3s ease-in-out infinite}
   @keyframes skelsh{0%{background-position:-120% 0}100%{background-position:120% 0}}
   .skelhead{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:1.2rem}
-  .skelrow{display:flex;gap:.8rem;align-items:center;padding:.6rem 0}
 
-  /* bottom nav */
-  .botnav{position:fixed;left:0;right:0;bottom:0;background:rgba(11,11,13,.96);border-top:1px solid var(--line);display:flex;z-index:60;backdrop-filter:blur(8px)}
+  .botnav{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.97);border-top:1px solid var(--line);display:flex;z-index:60;backdrop-filter:blur(8px)}
   .botnav[hidden]{display:none}
   .navbtn{flex:1;background:none;border:none;color:var(--muted);font-family:var(--font);font-weight:700;font-size:.72rem;padding:.55rem 0 .7rem;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:.18rem;position:relative}
   .navbtn svg{width:23px;height:23px;display:block}
   .navbtn.active{color:var(--green)}
-  .badge{position:absolute;top:.2rem;left:calc(50% + .55rem);background:var(--accent);color:#fff;font-size:.62rem;font-weight:800;min-width:16px;height:16px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 .25rem}
+  .badge{position:absolute;top:.2rem;left:calc(50% + .55rem);background:var(--red);color:#fff;font-size:.62rem;font-weight:800;min-width:16px;height:16px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 .25rem}
   .badge[hidden]{display:none}
 </style>
 </head>
@@ -150,10 +153,9 @@
         <div class="skel" style="width:150px;height:26px"></div>
         <div class="skel" style="width:115px;height:14px;margin-top:9px"></div>
       </div>
-      <div class="skel" style="width:58px;height:58px;border-radius:50%"></div>
     </div>
-    <div class="skel" style="height:128px;margin-bottom:11px"></div>
-    <div class="skel" style="height:128px;margin-bottom:11px"></div>
+    <div class="skel" style="height:250px;margin-bottom:11px"></div>
+    <div class="skel" style="height:150px;margin-bottom:11px"></div>
     <div class="skel" style="height:96px"></div>
   </div>
 
@@ -165,43 +167,52 @@
       <div class="tophead">
         <div>
           <div class="hi">Hi, <span id="firstName">there</span></div>
-          <div class="status"><span class="dot"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="#06130D" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span> Monitoring active</div>
+          <div class="status"><span class="dot"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span> You're protected</div>
         </div>
-        <div class="radarwrap">
-          <div class="radar">
-            <span class="ring r1"></span><span class="ring r2"></span>
-            <span class="cross h"></span><span class="cross v"></span>
-            <span class="sweep"></span><span class="blip b1"></span><span class="blip b2"></span>
-            <span class="center"></span>
-          </div>
-          <div class="radarlabel">Scanning</div>
+      </div>
+
+      <div class="card scorecard">
+        <div class="kick">Your protection score</div>
+        <div class="gwrap">
+          <svg viewBox="0 0 230 134" width="230" height="134" aria-hidden="true">
+            <defs><linearGradient id="grad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#C0392B"/><stop offset="0.27" stop-color="#E2701B"/><stop offset="0.5" stop-color="#E8B10A"/><stop offset="0.73" stop-color="#7CB342"/><stop offset="1" stop-color="#1F7A4D"/>
+            </linearGradient></defs>
+            <path d="M20 115 A95 95 0 0 1 210 115" fill="none" stroke="url(#grad)" stroke-width="15" stroke-linecap="round"/>
+            <circle id="scoreMarker" cx="29" cy="74.6" r="11" fill="#fff" stroke="#C0392B" stroke-width="4"/>
+            <text x="12" y="131" font-size="10.5" fill="#A6A6AD" font-weight="600">0</text>
+            <text x="208" y="131" font-size="10.5" fill="#A6A6AD" font-weight="600" text-anchor="end">100</text>
+          </svg>
+          <div class="num"><b id="scoreNum">&mdash;</b><span>out of 100</span></div>
+        </div>
+        <div class="slabel" id="scoreLabel">&mdash;</div>
+        <div class="delta amber" id="scoreDelta">&mdash;</div>
+        <div class="ssub">This rises as we clear your number from the broker lists, and keeps climbing the longer you stay protected. We never stop at &ldquo;done.&rdquo;</div>
+        <div class="steps">
+          <div class="step cur" id="s0"><div class="d"></div><div class="t">Setting up</div></div>
+          <div class="step" id="s1"><div class="d"></div><div class="t">Active</div></div>
+          <div class="step" id="s2"><div class="d"></div><div class="t">Strengthening</div></div>
+          <div class="step" id="s3"><div class="d"></div><div class="t">Holding strong</div></div>
         </div>
       </div>
 
       <div class="card">
-        <div class="cardhead"><h2><span id="homeUnread">0</span> Unread alerts</h2><a class="viewall" onclick="switchTab('alerts')">View all</a></div>
-        <div id="homeAlerts"><div class="emptynote">No alerts yet.</div></div>
-      </div>
-
-      <div class="card">
-        <h2>Your removals</h2>
-        <div class="tiles" style="margin-top:1rem">
-          <div class="tile"><div class="tnum" id="tActive">0</div><div class="tlab">Active removals</div></div>
-          <div class="tile"><div class="tnum" id="tSent">0</div><div class="tlab">Requests sent</div></div>
-          <div class="tile"><div class="tnum" id="tConfirmed">0</div><div class="tlab">Confirmed removed</div></div>
+        <h2>How we're protecting you</h2>
+        <div class="plist" style="margin-top:.5rem">
+          <div class="prow"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7l8-4z" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div class="pt"><b>Removals</b><span>Across the broker lists, re-checking</span></div><span class="pill">Active</span></div>
+          <div class="prow"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/></svg></span><div class="pt"><b>24/7 monitoring</b><span>Watching for your number to reappear</span></div><span class="pill">On</span></div>
+          <div class="prow"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12a8 8 0 0114-5l2 2M20 12a8 8 0 01-14 5l-2-2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 4v4h-4M4 20v-4h4" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div class="pt"><b>Weekly re-checks</b><span>We re-scan and take it down again</span></div><span class="pill">On</span></div>
         </div>
-        <div class="psub">We send opt-out requests to data brokers, follow up until they confirm, and keep re-checking. A removal counts as confirmed once the broker verifies your number is gone.</div>
       </div>
 
       <div class="card">
-        <div class="threathead"><h2>Threat level</h2><span class="threatword" id="threatWord">High</span></div>
-        <div class="threatbar"><div class="threatfill" id="threatFill"></div></div>
-        <div class="threatscale"><span>Protected</span><span>Exposed</span></div>
-        <div class="psub">This lowers as we get your number removed from data brokers. <b id="threatCleared" style="color:#fff">0</b> of <b id="threatTotal" style="color:#fff">0</b> broker lists cleared so far.</div>
+        <div class="cardhead"><h2>Latest activity</h2><span class="newtag" id="homeUnread"></span></div>
+        <div id="homeAlerts"><div class="emptynote">No activity yet &mdash; we'll post here the moment something happens.</div></div>
+        <div style="text-align:center;margin-top:.6rem"><a class="viewall" onclick="switchTab('protection')">View all activity &rarr;</a></div>
       </div>
 
       <div class="reassure">
-        <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v5c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V6l7-3z" stroke="#33C08D" stroke-width="2" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="#33C08D" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="ic" style="display:flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v5c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V6l7-3z" stroke="#1F7A4D" stroke-width="2" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="#1F7A4D" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
         <div>
           <b>We never stop.</b>
           <p>As long as you're a member, we keep checking these lists and take your number back down any time it shows up again.</p>
@@ -211,13 +222,25 @@
       <div class="help">Questions? Email us at <a href="mailto:company@spamcallstop.com">company@spamcallstop.com</a></div>
     </div>
 
-    <!-- ALERTS -->
-    <div id="viewAlerts" style="display:none">
+    <!-- PROTECTION -->
+    <div id="viewProtection" style="display:none">
       <div class="tophead">
-        <div><div class="hi">Alerts</div><div class="status sub">Updates on your removals</div></div>
+        <div><div class="hi">Your protection</div><div class="status sub">Your progress and activity</div></div>
         <button class="markread" onclick="markAllRead()">Mark all read</button>
       </div>
-      <div class="card"><div id="alertList"><div class="emptynote">Loading&hellip;</div></div></div>
+      <div class="card">
+        <h2>What your stage means</h2>
+        <div style="margin-top:.5rem">
+          <div class="srow"><b>Setting up</b><span>We file your first removals and switch on monitoring.</span></div>
+          <div class="srow"><b>Active</b><span>Opt-out requests are out across the broker lists.</span></div>
+          <div class="srow"><b>Strengthening</b><span>Brokers confirm and your exposure keeps dropping.</span></div>
+          <div class="srow"><b>Holding strong</b><span>You're well protected &mdash; we keep watching and re-removing, for good.</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2 style="margin-bottom:.7rem">Activity</h2>
+        <div id="alertList"><div class="emptynote">Loading&hellip;</div></div>
+      </div>
     </div>
 
     <!-- ACCOUNT -->
@@ -238,7 +261,7 @@
   </div>
 
   <div class="signin" id="signin" style="display:none">
-    <h1>See your removal progress</h1>
+    <h1>See your protection score</h1>
     <p>Sign in with the phone number you're protecting and we'll text you a code.</p>
     <div id="siPhoneStep">
       <input id="siPhone" type="tel" inputmode="tel" placeholder="(555) 555-5555" autocomplete="tel">
@@ -262,9 +285,9 @@
     <svg viewBox="0 0 24 24" fill="none"><path d="M4 11l8-7 8 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10v9h12v-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     Home
   </button>
-  <button class="navbtn" id="navAlerts" onclick="switchTab('alerts')" aria-label="Alerts">
-    <svg viewBox="0 0 24 24" fill="none"><path d="M6 9a6 6 0 0112 0c0 5 2 6 2 6H4s2-1 2-6z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 19a2 2 0 004 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-    Alerts
+  <button class="navbtn" id="navProtection" onclick="switchTab('protection')" aria-label="Protection">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7l8-4z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+    Protection
     <span class="badge" id="navBadge" hidden>0</span>
   </button>
   <button class="navbtn" id="navAccount" onclick="switchTab('account')" aria-label="Account">
@@ -294,21 +317,41 @@
   }
   function signOut(){ try{ sessionStorage.removeItem('scstop_ctoken'); }catch(e){} location.href='account.html'; }
   function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-  function setNum(id,n){ var el=document.getElementById(id); if(el) el.textContent = (typeof n==='number')?n:0; }
 
   var MY_PLAN = '';
 
   /* ---- tabs ---- */
   function switchTab(tab){
-    ['Home','Alerts','Account'].forEach(function(x){
+    ['Home','Protection','Account'].forEach(function(x){
       var v=document.getElementById('view'+x); if(v) v.style.display = (x.toLowerCase()===tab)?'block':'none';
       var n=document.getElementById('nav'+x); if(n) n.classList.toggle('active', x.toLowerCase()===tab);
     });
-    if(tab==='alerts'){ loadAlerts(true); }
+    if(tab==='protection'){ loadAlerts(true); }
     try{ window.scrollTo(0,0); }catch(e){}
   }
 
-  /* ---- alerts ---- */
+  /* ---- protection score ---- */
+  function scoreZone(s){
+    if(s<40) return { c:'#C0392B', lab:'Exposed' };
+    if(s<70) return { c:'#C9871A', lab:'Building' };
+    return { c:'#1F7A4D', lab:'Strong & rising' };
+  }
+  function setScore(score, delta, stageIdx){
+    score = Math.max(0, Math.min(100, Math.round(score||0)));
+    var z = scoreZone(score), f = score/100, r = 95, cx = 115, cy = 115, a = Math.PI*(1-f);
+    var mx = cx + r*Math.cos(a), my = cy - r*Math.sin(a);
+    var m = document.getElementById('scoreMarker'); if(m){ m.setAttribute('cx', mx.toFixed(1)); m.setAttribute('cy', my.toFixed(1)); m.setAttribute('stroke', z.c); }
+    var n = document.getElementById('scoreNum'); if(n){ n.textContent = score; n.style.color = z.c; }
+    var l = document.getElementById('scoreLabel'); if(l){ l.textContent = z.lab; l.style.color = z.c; }
+    var dl = document.getElementById('scoreDelta');
+    if(dl){
+      if(delta > 0){ dl.innerHTML = '&#9650; ' + delta + ' points since you joined'; dl.className = 'delta'; }
+      else { dl.textContent = 'Day 1 — the climb starts here'; dl.className = 'delta amber'; }
+    }
+    for(var i=0;i<4;i++){ var st=document.getElementById('s'+i); if(st){ st.className = 'step' + (i<stageIdx?' done':'') + (i===stageIdx?' cur':''); } }
+  }
+
+  /* ---- activity / alerts ---- */
   function timeAgo(s){
     if(!s) return '';
     var iso = String(s).replace(' ','T'); if(!/[zZ]|[+\-]\d\d:?\d\d$/.test(iso)) iso += 'Z';
@@ -335,8 +378,8 @@
   function renderAlerts(list){
     var full=document.getElementById('alertList'), home=document.getElementById('homeAlerts');
     if(!list.length){
-      if(full) full.innerHTML='<div class="emptynote">No alerts yet. We\'ll post here each time we send a removal request or hear back from a data broker.</div>';
-      if(home) home.innerHTML='<div class="emptynote">No alerts yet. We\'ll let you know the moment something happens.</div>';
+      if(full) full.innerHTML='<div class="emptynote">No activity yet. We\'ll post here each time we send a removal request or hear back from a data broker.</div>';
+      if(home) home.innerHTML='<div class="emptynote">No activity yet &mdash; we\'ll let you know the moment something happens.</div>';
       return;
     }
     if(full) full.innerHTML=list.map(alertHTML).join('');
@@ -345,25 +388,11 @@
   function setUnread(n){
     n = n||0;
     var b=document.getElementById('navBadge'); if(b){ b.textContent=(n>9?'9+':String(n)); b.hidden=!(n>0); }
-    var h=document.getElementById('homeUnread'); if(h) h.textContent=n;
-  }
-  function threatLevel(p){
-    if(p>66) return {w:'High', c:'#E0533B'};
-    if(p>33) return {w:'Medium', c:'#E0A23C'};
-    if(p>0)  return {w:'Low', c:'#33C08D'};
-    return {w:'Clear', c:'#33C08D'};
-  }
-  function setThreat(pct, cleared, total){
-    pct = Math.max(0, Math.min(100, Math.round(pct)));
-    var lv = threatLevel(pct);
-    var w=document.getElementById('threatWord'); if(w){ w.textContent=lv.w; w.style.color=lv.c; }
-    var c=document.getElementById('threatCleared'); if(c) c.textContent=cleared;
-    var t=document.getElementById('threatTotal'); if(t) t.textContent=total;
-    var f=document.getElementById('threatFill'); if(f){ f.style.background=lv.c; setTimeout(function(){ f.style.width=pct+'%'; }, 80); }
+    var h=document.getElementById('homeUnread'); if(h) h.textContent = n>0 ? (n+' new') : '';
   }
   var ALERTS_CACHE = null;
   function renderAlertsSkeleton(){
-    var sk = '<div class="skelrow"><div class="skel" style="width:31px;height:31px;border-radius:50%"></div><div style="flex:1"><div class="skel" style="width:55%;height:14px"></div><div class="skel" style="width:85%;height:12px;margin-top:7px"></div></div></div>';
+    var sk = '<div class="alertrow"><div class="skel" style="width:34px;height:34px;border-radius:50%"></div><div style="flex:1"><div class="skel" style="width:55%;height:14px"></div><div class="skel" style="width:85%;height:12px;margin-top:7px"></div></div></div>';
     var full=document.getElementById('alertList'); if(full) full.innerHTML = sk+sk+sk;
     var home=document.getElementById('homeAlerts'); if(home) home.innerHTML = sk+sk;
   }
@@ -411,7 +440,7 @@
     if(view==='manage'){
       openModal('Manage membership');
       b.innerHTML =
-        '<p>You\'re on the <b style="color:#fff">'+plan+'</b> plan. Here\'s what else your membership can do.</p>'
+        '<p>You\'re on the <b style="color:var(--ink)">'+plan+'</b> plan. Here\'s what else your membership can do.</p>'
         + '<div class="mopt"><b>Protect a second number</b><p>Add a partner\'s phone or a second number of your own to your protection.</p>'
         + '<a class="mlink" href="mailto:company@spamcallstop.com?subject=Add%20a%20second%20number">Add a number &rarr;</a></div>'
         + '<div class="mopt"><b>Switch to yearly billing</b><p>Pay once a year instead of monthly and save.</p>'
@@ -439,7 +468,7 @@
     }
     openModal('Your membership');
     b.innerHTML =
-      '<p>You\'re on the <b style="color:#fff">'+plan+'</b> plan, billed automatically so your number stays protected without you having to remember anything.</p>'
+      '<p>You\'re on the <b style="color:var(--ink)">'+plan+'</b> plan, billed automatically so your number stays protected without you having to remember anything.</p>'
       + '<div class="mrow"><span></span><a class="mlink" onclick="membershipView(\'manage\')">Manage membership &rarr;</a></div>';
   }
 
@@ -476,11 +505,11 @@
   var ME_CACHE = null;
   function applyMe(d){
     document.getElementById('firstName').textContent = d.firstName || 'there';
-    setNum('tActive', (typeof d.active==='number')?d.active:(d.inProgress||0));
-    setNum('tSent', d.requestsSent||0);
-    setNum('tConfirmed', (typeof d.confirmedRemoved==='number')?d.confirmedRemoved:(d.cleared||0));
-    var _conf=(typeof d.confirmedRemoved==='number')?d.confirmedRemoved:(d.cleared||0);
-    setThreat(typeof d.threatPct==='number'?d.threatPct:100, _conf, (d.active||0)+_conf);
+    var score = (typeof d.protectionScore==='number') ? d.protectionScore
+      : Math.max(8, Math.min(95, Math.round(14 + Math.max(0, 100-(typeof d.threatPct==='number'?d.threatPct:100))*0.70)));
+    var delta = (typeof d.scoreDelta==='number') ? d.scoreDelta : Math.max(0, score-14);
+    var stage = (typeof d.stageIndex==='number') ? d.stageIndex : (score>=80?3:score>=50?2:score>=25?1:0);
+    setScore(score, delta, stage);
     MY_PLAN = (d.plan === 'Dual') ? 'Couple' : (d.plan ? 'Individual' : '');
     var pl=document.getElementById('acctPlanLine'); if(pl) pl.textContent = MY_PLAN ? (MY_PLAN+' plan, active') : '';
     setUnread(d.unread||0);

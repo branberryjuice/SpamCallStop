@@ -27,6 +27,32 @@ function ipOf(req) {
 }
 function baseUrl() { return process.env.PUBLIC_BASE_URL || 'https://spamcallstop.com'; }
 
+// Protection Score: one 0-100 number for the customer dashboard, derived from
+// REAL progress (exposure cleared = inverse of threatPct) plus a small tenure
+// bonus for time enrolled. Starts ~14 (red) at signup, climbs as broker lists
+// clear and the longer they stay protected, and is capped at 95 so it never
+// reads a "100% done" — protection is ongoing. Never fabricated.
+function protectionScore(createdAt, threatPct) {
+  const SIGNUP_BASE = 14;
+  const threat = (typeof threatPct === 'number') ? threatPct : 100;
+  const cleared = Math.max(0, 100 - threat);
+  let joined = Date.now();
+  if (createdAt) {
+    let s = String(createdAt);
+    if (s.indexOf('T') === -1) s = s.replace(' ', 'T');
+    if (!/[zZ]|[+\-]\d\d:?\d\d$/.test(s)) s += 'Z';
+    const t = new Date(s).getTime();
+    if (!isNaN(t)) joined = t;
+  }
+  const weeks = Math.max(0, (Date.now() - joined) / (7 * 24 * 3600 * 1000));
+  const tenure = Math.min(weeks, 12); // up to +12 just for staying protected
+  let score = Math.round(SIGNUP_BASE + cleared * 0.70 + tenure);
+  score = Math.max(8, Math.min(95, score));
+  let stage = 0;
+  if (score >= 80) stage = 3; else if (score >= 50) stage = 2; else if (score >= 25) stage = 1;
+  return { score: score, delta: Math.max(0, score - SIGNUP_BASE), stage: stage };
+}
+
 router.get('/me', async (req, res) => {
   // Prefer the token in a header so it doesn't land in access logs / referrers;
   // fall back to the query param for the emailed link's first hop.
@@ -40,10 +66,12 @@ router.get('/me', async (req, res) => {
     let unread = 0;
     try { unread = await db.countUnreadAlerts(id); } catch (ue) {}
     const firstName = (c.name || '').trim().split(/\s+/)[0] || '';
+    const score = protectionScore(c.created_at, stats.threatPct);
     res.json({ ok: true, name: c.name || '', firstName: firstName, plan: c.plan || '',
       cleared: stats.cleared, inProgress: stats.inProgress,
       requestsSent: stats.requestsSent, confirmedRemoved: stats.confirmedRemoved, active: stats.active,
-      threatPct: stats.threatPct, unread: unread });
+      threatPct: stats.threatPct, unread: unread,
+      protectionScore: score.score, scoreDelta: score.delta, stageIndex: score.stage });
   } catch (e) {
     console.error('[account] me error:', e && e.message);
     res.status(500).json({ ok: false, error: 'server_error' });
