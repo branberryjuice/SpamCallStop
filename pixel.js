@@ -14,8 +14,8 @@
  */
 (function () {
   var GA4_ID = 'G-XXXXXXXXXX';
-  var GOOGLE_ADS_ID = 'AW-XXXXXXXXX';
-  var GOOGLE_ADS_PURCHASE_LABEL = 'PASTE_LABEL';
+  var GOOGLE_ADS_ID = 'AW-18191545804';
+  var GOOGLE_ADS_PURCHASE_LABEL = 'fcVECNK7kbocEMzrs-JD';
 
   function isSet(v) { return !!v && v.indexOf('XXXX') === -1 && v.indexOf('PASTE_') === -1; }
   var adsOn = isSet(GOOGLE_ADS_ID);
