@@ -19,13 +19,29 @@
   .wrap{max-width:720px;margin:0 auto;padding:1.2rem 1.3rem 6rem}
   .bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem}
   .word{font-weight:800;font-size:1.2rem;color:var(--ink);text-decoration:none}
-  .word .cr{color:var(--red)}.word .cg{color:var(--ink)}
+  .word .cr{color:#B52A2A}.word .cg{color:var(--muted)}
 
   .tophead{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin:.3rem 0 1.1rem}
   .hi{font-size:1.7rem;font-weight:800;color:var(--ink);letter-spacing:-.02em}
   .status{display:inline-flex;align-items:center;gap:.45rem;color:var(--green);font-weight:700;font-size:.98rem;margin-top:.3rem}
   .status.sub{color:var(--muted)}
   .status .dot{flex:0 0 auto;width:19px;height:19px;border-radius:50%;background:var(--green);display:inline-flex;align-items:center;justify-content:center}
+
+  /* radar */
+  .radarwrap{flex:0 0 auto;text-align:center}
+  .radar{position:relative;width:66px;height:66px;border-radius:50%;background:var(--green-soft);border:1.5px solid var(--gline);overflow:hidden}
+  .ring{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);border:1px solid rgba(31,122,77,.26);border-radius:50%}
+  .ring.r1{width:70%;height:70%}.ring.r2{width:42%;height:42%}
+  .cross{position:absolute;background:rgba(31,122,77,.16)}
+  .cross.h{top:50%;left:0;right:0;height:1px}.cross.v{left:50%;top:0;bottom:0;width:1px}
+  .sweep{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,rgba(31,122,77,.5),rgba(31,122,77,.08) 45deg,rgba(31,122,77,0) 85deg);animation:spin 5.5s linear infinite}
+  @keyframes spin{to{transform:rotate(-360deg)}}
+  .rcenter{position:absolute;top:50%;left:50%;width:7px;height:7px;border-radius:50%;background:var(--green);transform:translate(-50%,-50%)}
+  .blip{position:absolute;width:6px;height:6px;border-radius:50%;background:var(--green);opacity:0;animation:blip 5.5s ease-out infinite}
+  .blip.b1{top:30%;left:36%;animation-delay:1.4s}.blip.b2{top:60%;left:62%;animation-delay:3.6s}
+  @keyframes blip{0%,100%{opacity:0;transform:scale(.6)}10%{opacity:1;transform:scale(1)}40%{opacity:0}}
+  .radarlabel{margin-top:.35rem;font-size:.66rem;font-weight:800;color:var(--green);letter-spacing:.03em;text-transform:uppercase}
+  @media (prefers-reduced-motion:reduce){.sweep,.blip{animation:none}.blip{opacity:.85}}
 
   .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:1.3rem 1.4rem;margin-top:1.05rem}
   .card h2{font-size:1.15rem;font-weight:800;color:var(--ink)}
@@ -160,7 +176,6 @@
   </div>
 
   <div id="dash" style="display:none">
-    <div class="welcomeback" id="welcomeBack" hidden>You're already protected. Welcome back to your dashboard.</div>
 
     <!-- HOME -->
     <div id="viewHome">
@@ -168,6 +183,15 @@
         <div>
           <div class="hi">Hi, <span id="firstName">there</span></div>
           <div class="status"><span class="dot"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span> You're protected</div>
+        </div>
+        <div class="radarwrap">
+          <div class="radar">
+            <span class="ring r1"></span><span class="ring r2"></span>
+            <span class="cross h"></span><span class="cross v"></span>
+            <span class="sweep"></span><span class="blip b1"></span><span class="blip b2"></span>
+            <span class="rcenter"></span>
+          </div>
+          <div class="radarlabel">Scanning</div>
         </div>
       </div>
 
@@ -183,10 +207,10 @@
             <text x="12" y="131" font-size="10.5" fill="#A6A6AD" font-weight="600">0</text>
             <text x="208" y="131" font-size="10.5" fill="#A6A6AD" font-weight="600" text-anchor="end">100</text>
           </svg>
-          <div class="num"><b id="scoreNum">&mdash;</b><span>out of 100</span></div>
+          <div class="num"><b id="scoreNum"></b><span>out of 100</span></div>
         </div>
-        <div class="slabel" id="scoreLabel">&mdash;</div>
-        <div class="delta amber" id="scoreDelta">&mdash;</div>
+        <div class="slabel" id="scoreLabel"></div>
+        <div class="delta amber" id="scoreDelta"></div>
         <div class="ssub">This rises as we clear your number from the broker lists, and keeps climbing the longer you stay protected. We never stop at &ldquo;done.&rdquo;</div>
         <div class="steps">
           <div class="step cur" id="s0"><div class="d"></div><div class="t">Setting up</div></div>
@@ -199,15 +223,15 @@
       <div class="card">
         <h2>How we're protecting you</h2>
         <div class="plist" style="margin-top:.5rem">
-          <div class="prow"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7l8-4z" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div class="pt"><b>Removals</b><span>Across the broker lists, re-checking</span></div><span class="pill">Active</span></div>
+          <div class="prow"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7l8-4z" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div class="pt"><b>Removals</b><span>Across the broker lists, checking again</span></div><span class="pill">Active</span></div>
           <div class="prow"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/></svg></span><div class="pt"><b>24/7 monitoring</b><span>Watching for your number to reappear</span></div><span class="pill">On</span></div>
-          <div class="prow"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12a8 8 0 0114-5l2 2M20 12a8 8 0 01-14 5l-2-2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 4v4h-4M4 20v-4h4" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div class="pt"><b>Weekly re-checks</b><span>We re-scan and take it down again</span></div><span class="pill">On</span></div>
+          <div class="prow"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12a8 8 0 0114-5l2 2M20 12a8 8 0 01-14 5l-2-2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 4v4h-4M4 20v-4h4" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div class="pt"><b>Weekly checks</b><span>We keep scanning and take it down again</span></div><span class="pill">On</span></div>
         </div>
       </div>
 
       <div class="card">
         <div class="cardhead"><h2>Latest activity</h2><span class="newtag" id="homeUnread"></span></div>
-        <div id="homeAlerts"><div class="emptynote">No activity yet &mdash; we'll post here the moment something happens.</div></div>
+        <div id="homeAlerts"><div class="emptynote">No activity yet. We'll post here the moment something happens.</div></div>
         <div style="text-align:center;margin-top:.6rem"><a class="viewall" onclick="switchTab('protection')">View all activity &rarr;</a></div>
       </div>
 
@@ -232,9 +256,9 @@
         <h2>What your stage means</h2>
         <div style="margin-top:.5rem">
           <div class="srow"><b>Setting up</b><span>We file your first removals and switch on monitoring.</span></div>
-          <div class="srow"><b>Active</b><span>Opt-out requests are out across the broker lists.</span></div>
+          <div class="srow"><b>Active</b><span>Removal requests are out across the broker lists.</span></div>
           <div class="srow"><b>Strengthening</b><span>Brokers confirm and your exposure keeps dropping.</span></div>
-          <div class="srow"><b>Holding strong</b><span>You're well protected &mdash; we keep watching and re-removing, for good.</span></div>
+          <div class="srow"><b>Holding strong</b><span>You're well protected. We keep watching and taking it down again, for good.</span></div>
         </div>
       </div>
       <div class="card">
@@ -346,7 +370,7 @@
     var dl = document.getElementById('scoreDelta');
     if(dl){
       if(delta > 0){ dl.innerHTML = '&#9650; ' + delta + ' points since you joined'; dl.className = 'delta'; }
-      else { dl.textContent = 'Day 1 — the climb starts here'; dl.className = 'delta amber'; }
+      else { dl.textContent = 'Day 1. The climb starts here.'; dl.className = 'delta amber'; }
     }
     for(var i=0;i<4;i++){ var st=document.getElementById('s'+i); if(st){ st.className = 'step' + (i<stageIdx?' done':'') + (i===stageIdx?' cur':''); } }
   }
@@ -379,7 +403,7 @@
     var full=document.getElementById('alertList'), home=document.getElementById('homeAlerts');
     if(!list.length){
       if(full) full.innerHTML='<div class="emptynote">No activity yet. We\'ll post here each time we send a removal request or hear back from a data broker.</div>';
-      if(home) home.innerHTML='<div class="emptynote">No activity yet &mdash; we\'ll let you know the moment something happens.</div>';
+      if(home) home.innerHTML='<div class="emptynote">No activity yet. We\'ll let you know the moment something happens.</div>';
       return;
     }
     if(full) full.innerHTML=list.map(alertHTML).join('');
@@ -528,21 +552,20 @@
           show('dash');
           switchTab('home');
           loadAlerts(false);
-          try{ if(sessionStorage.getItem('scstop_welcome_back')==='1'){ var wb=document.getElementById('welcomeBack'); if(wb) wb.hidden=false; sessionStorage.removeItem('scstop_welcome_back'); } }catch(e){}
         } else if(!ME_CACHE){ showSignin(''); }
       })
       .catch(function(){ if(!ME_CACHE) showSignin(''); });
   }
 
   // After paying, the dashboard opens straight from the Stripe session (email
-  // pulled from Stripe) — no sign-in wall. Falls back softly to the email link.
+  // pulled from Stripe), no wall. Falls back softly to the email link.
   function tryStripeSession(sid, attempt){
     fetch('/api/account/session?session_id=' + encodeURIComponent(sid))
       .then(function(r){ return r.json().catch(function(){ return null; }); })
       .then(function(d){
         if(d && d.ok && d.token){ try{ sessionStorage.setItem('scstop_ctoken', d.token); }catch(e){} loadMe(d.token); return; }
         if(d && d.error==='pending' && attempt < 2){ setTimeout(function(){ tryStripeSession(sid, attempt+1); }, 2500); return; }
-        showSignin('Your dashboard is being set up — this can take a moment right after payment. Sign in with your phone number below, or use the link we emailed you.');
+        showSignin('Your dashboard is being set up. This can take a moment right after payment. Sign in with your phone number below, or use the link we emailed you.');
       })
       .catch(function(){ showSignin(''); });
   }
@@ -581,7 +604,7 @@
   }
 
   // Phone sign-in: text a code, verify, and (for an active member) land in the
-  // dashboard. No email needed — uses the number they're protecting.
+  // dashboard. No email needed, uses the number they're protecting.
   var SI_PHONE = '';
   function signinSendCode(){
     var p = (document.getElementById('siPhone').value || '').replace(/\D/g,'').slice(-10);

@@ -161,7 +161,7 @@
         <span class="tag">Exposed</span>
       </div>
       <div class="idrow">
-        <span class="idname" id="idname">&mdash;</span>
+        <span class="idname" id="idname"></span>
         <span class="idage" id="idage"></span>
       </div>
       <div class="drow" id="carrierRow" hidden><span class="k">Carrier</span><span class="v" id="carrierVal"></span></div>
@@ -315,7 +315,7 @@
 
   /* ---- after SMS verification, enrich the card with name / carrier / line type when
          Twilio returns them. The phone number is already the anchor, so we never blank
-         it out — the page always shows exposed data no matter what the lookup returns. ---- */
+         it out, the page always shows exposed data no matter what the lookup returns. ---- */
   (function loadIdentity(){
     if(!PHONE || !TOKEN) return;
     fetch('/api/lookup', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ phone: PHONE, token: TOKEN }) })
@@ -369,7 +369,7 @@
   function setBilling(b){ billing = b; render(); }
   function selectPlan(p){ plan = p; var w=document.getElementById('pw2wrap'); if(w) w.hidden = (p !== 'dual'); render(); }
 
-  /* ---- straight to Stripe Checkout — Stripe collects name + email + card; we
+  /* ---- straight to Stripe Checkout. Stripe collects name + email + card; we
          supply the already-verified phone (+ a 2nd number for Couple). ---- */
   function showPwErr(m){ var el = document.getElementById('pwErr'); if(el) el.textContent = m; }
   function goCheckout(){
@@ -397,7 +397,7 @@
       .catch(function(){ if(btn){ btn.disabled = false; btn.innerHTML = 'Continue to secure checkout &rarr;'; } showPwErr('Something went wrong. Please try again.'); });
   }
 
-  /* ---- "Not you?" — correct the displayed name and carry it into signup ---- */
+  /* ---- "Not you?": correct the displayed name and carry it into signup ---- */
   function toggleNotYou(){
     var f = document.getElementById('notYouForm');
     f.hidden = !f.hidden;
