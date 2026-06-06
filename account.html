@@ -29,15 +29,15 @@
 
   /* radar */
   .radarwrap{flex:0 0 auto;text-align:center}
-  .radar{position:relative;width:66px;height:66px;border-radius:50%;background:var(--green-soft);border:1.5px solid var(--gline);overflow:hidden}
+  .radar{position:relative;width:92px;height:92px;border-radius:50%;background:var(--green-soft);border:1.5px solid var(--gline);overflow:hidden}
   .ring{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);border:1px solid rgba(31,122,77,.26);border-radius:50%}
   .ring.r1{width:70%;height:70%}.ring.r2{width:42%;height:42%}
   .cross{position:absolute;background:rgba(31,122,77,.16)}
   .cross.h{top:50%;left:0;right:0;height:1px}.cross.v{left:50%;top:0;bottom:0;width:1px}
   .sweep{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,rgba(31,122,77,.5),rgba(31,122,77,.08) 45deg,rgba(31,122,77,0) 85deg);animation:spin 5.5s linear infinite}
   @keyframes spin{to{transform:rotate(-360deg)}}
-  .rcenter{position:absolute;top:50%;left:50%;width:7px;height:7px;border-radius:50%;background:var(--green);transform:translate(-50%,-50%)}
-  .blip{position:absolute;width:6px;height:6px;border-radius:50%;background:var(--green);opacity:0;animation:blip 5.5s ease-out infinite}
+  .rcenter{position:absolute;top:50%;left:50%;width:10px;height:10px;border-radius:50%;background:var(--green);transform:translate(-50%,-50%)}
+  .blip{position:absolute;width:8px;height:8px;border-radius:50%;background:var(--green);opacity:0;animation:blip 5.5s ease-out infinite}
   .blip.b1{top:30%;left:36%;animation-delay:1.4s}.blip.b2{top:60%;left:62%;animation-delay:3.6s}
   @keyframes blip{0%,100%{opacity:0;transform:scale(.6)}10%{opacity:1;transform:scale(1)}40%{opacity:0}}
   .radarlabel{margin-top:.35rem;font-size:.66rem;font-weight:800;color:var(--green);letter-spacing:.03em;text-transform:uppercase}
