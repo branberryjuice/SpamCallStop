@@ -81,11 +81,12 @@
   .rfoot a{color:#9A9AA2;text-decoration:underline}
 
   /* paywall modal tweaks (on top of styles.css .modal) */
-  .pw .modal-card{max-width:600px;padding:0;overflow:hidden}
+  .pw .modal-card{max-width:600px;padding:0;overflow:hidden;max-height:92vh;display:flex;flex-direction:column}
+  .pw-head{flex:0 0 auto}
   .pw-head{background:var(--ink);color:#fff;padding:1.3rem 1.6rem}
   .pw-head h2{color:#fff;font-size:1.35rem;letter-spacing:-.01em;margin-bottom:.2rem}
   .pw-head p{color:#C7C7CD;font-size:.95rem}
-  .pw-body{padding:1.4rem 1.6rem 1.7rem}
+  .pw-body{padding:1.4rem 1.6rem 1.7rem;flex:1 1 auto;overflow-y:auto}
   .pw-toggle{display:flex;justify-content:center;align-items:center;gap:.6rem;margin:.2rem 0 1.3rem}
   .pw-toggle button{font-family:var(--font);font-weight:700;font-size:.98rem;border:1.5px solid var(--border-strong);background:#fff;color:var(--muted);padding:.55rem 1.15rem;border-radius:var(--r);cursor:pointer}
   .pw-toggle button.active{background:var(--ink);color:#fff;border-color:var(--ink)}
@@ -112,6 +113,23 @@
   .pw-trust{display:flex;flex-wrap:wrap;justify-content:center;gap:.4rem 1.1rem;margin-top:.95rem;color:var(--muted);font-weight:600;font-size:.82rem}
   .pw-trust span{display:inline-flex;align-items:center;gap:.35rem}
   .pw-fine{text-align:center;color:var(--muted);font-size:.78rem;margin-top:.8rem;line-height:1.5}
+  .pw-gets{list-style:none;margin:0 0 1.2rem;padding:0}
+  .pw-gets li{display:flex;gap:.5rem;align-items:flex-start;padding:.28rem 0;color:var(--text);font-size:.94rem;font-weight:600}
+  .pw-gets li svg{flex:0 0 auto;margin-top:.15rem}
+  .pw-guar{display:flex;gap:.7rem;background:#F1F7F3;border:1px solid #CDE5D8;border-radius:var(--r-lg);padding:.95rem 1.1rem;margin-top:1.2rem}
+  .pw-guar .gic{flex:0 0 auto;color:#1F7A4D}
+  .pw-guar b{display:block;color:#16331F;font-size:.95rem;margin-bottom:.35rem}
+  .pw-guar ul{list-style:none;margin:0;padding:0}
+  .pw-guar li{padding:.12rem 0;color:#2E5740;font-size:.86rem;font-weight:600;line-height:1.4}
+  .pw-steps{display:flex;gap:.5rem;margin-top:1.1rem}
+  .pw-step{flex:1;background:var(--surface);border-radius:var(--r);padding:.65rem .4rem;font-size:.72rem;font-weight:700;color:var(--text);text-align:center;line-height:1.25}
+  .pw-step .s-n{display:block;width:20px;height:20px;line-height:20px;border-radius:50%;background:var(--accent);color:#fff;font-size:.72rem;margin:0 auto .35rem}
+  .pw-review{background:#fff;border:1px solid var(--border);border-radius:var(--r-lg);padding:.95rem 1.1rem;margin-top:1.2rem;text-align:center}
+  .pw-stars{color:#E8A93C;font-size:1.05rem;letter-spacing:2px}
+  .pw-review p{color:var(--text);font-size:.9rem;line-height:1.5;margin:.4rem 0 .35rem;font-style:italic}
+  .pw-rev-name{color:var(--muted);font-size:.8rem;font-weight:700}
+  .pw-plan .savebadge[hidden]{display:none}
+  .pw-was[hidden]{display:none}
   @media (max-width:520px){.pw-plans{grid-template-columns:1fr}}
 </style>
 </head>
@@ -210,41 +228,49 @@
     <button class="modal-x" onclick="closePaywall()" aria-label="Close">&times;</button>
 
     <div class="pw-head">
-      <h2>Start removing your data</h2>
-      <p>Pick a plan to begin opt-out requests to every site that has your number.</p>
+      <h2>Start removing your number</h2>
+      <p>We send opt-out requests to the sites that have your number, then keep it off.</p>
     </div>
 
     <div class="pw-body">
+      <!-- what you get -->
+      <ul class="pw-gets">
+        <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#1F7A4D" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>We find the sites listing your number</li>
+        <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#1F7A4D" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>We send the removal requests for you</li>
+        <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#1F7A4D" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>We re-check and take it down again, every month</li>
+        <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#1F7A4D" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>24/7 help whenever you need it</li>
+      </ul>
+
       <!-- billing toggle -->
       <div class="pw-toggle">
-        <button id="tgMonthly" onclick="setBilling('monthly')">Monthly</button>
-        <button id="tgYearly" class="active" onclick="setBilling('yearly')">Yearly</button>
+        <button id="tgMonthly" class="active" onclick="setBilling('monthly')">Monthly</button>
+        <button id="tgYearly" onclick="setBilling('yearly')">Yearly</button>
         <span class="pw-save">2 months free</span>
       </div>
 
       <!-- plans -->
       <div class="pw-plans">
         <div class="pw-plan sel" id="planSolo" onclick="selectPlan('solo')">
-          <span class="savebadge" id="soloSave">Save 34%</span>
+          <span class="savebadge" id="soloSave" hidden></span>
           <span class="radio"></span>
           <div class="pn">Individual</div>
           <div class="pw-who">One phone number</div>
-          <div class="pw-was"><s id="soloWas">$290/yr</s></div>
-          <div class="pp"><span>$</span><span id="soloPrice">190</span><span id="soloPer">/yr</span></div>
-          <div class="pbill" id="soloBill">Billed yearly</div>
+          <div class="pw-was" id="soloWasWrap" hidden><s id="soloWas"></s></div>
+          <div class="pp"><span>$</span><span id="soloPrice">19</span><span id="soloPer">/mo</span></div>
+          <div class="pbill" id="soloBill">Billed monthly</div>
         </div>
         <div class="pw-plan" id="planDual" onclick="selectPlan('dual')">
-          <span class="savebadge" id="dualSave">Save 50%</span>
+          <span class="savebadge" id="dualSave" hidden></span>
           <span class="radio"></span>
           <div class="pn">Couple</div>
           <div class="pw-who">Two phone numbers</div>
-          <div class="pw-was"><s id="dualWas">$580/yr</s></div>
-          <div class="pp"><span>$</span><span id="dualPrice">290</span><span id="dualPer">/yr</span></div>
-          <div class="pbill" id="dualBill">Billed yearly</div>
+          <div class="pw-was" id="dualWasWrap" hidden><s id="dualWas"></s></div>
+          <div class="pp"><span>$</span><span id="dualPrice">29</span><span id="dualPer">/mo</span></div>
+          <div class="pbill" id="dualBill">Billed monthly</div>
         </div>
       </div>
 
-      <div class="pw-total"><span>Total due today</span><span class="amt" id="pwTotal">$190.00</span></div>
+      <div class="pw-total"><span>Total due today</span><span class="amt" id="pwTotal">$19.00</span></div>
 
       <div id="pw2wrap" hidden style="margin-top:.9rem">
         <label for="pwPhone2" style="display:block;font-weight:700;font-size:.85rem;color:var(--muted);margin-bottom:.35rem">Second phone number to protect</label>
@@ -252,14 +278,41 @@
       </div>
       <p id="pwErr" role="alert" style="color:var(--accent);font-size:.85rem;min-height:1em;margin-top:.5rem;text-align:center"></p>
 
+      <!-- guarantee -->
+      <div class="pw-guar">
+        <span class="gic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v5c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V6l7-3z" stroke="#1F7A4D" stroke-width="1.9" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="#1F7A4D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <div>
+          <b>Our promise</b>
+          <ul>
+            <li>Cancel anytime. No contract.</li>
+            <li>If it's not gone in 90 days, we keep working free until it is.</li>
+            <li>If it ever comes back, we take it down again at no extra charge.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- what happens next -->
+      <div class="pw-steps">
+        <div class="pw-step"><span class="s-n">1</span>We start in 24 to 48 hours</div>
+        <div class="pw-step"><span class="s-n">2</span>Your dashboard opens right away</div>
+        <div class="pw-step"><span class="s-n">3</span>The calls get quieter, for good</div>
+      </div>
+
+      <!-- social proof -->
+      <div class="pw-review">
+        <div class="pw-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p>"Within a couple of weeks my phone became noticeably quieter. I used to get scam and spam calls every day, and now they're very rare."</p>
+        <span class="pw-rev-name">Linda M.</span>
+      </div>
+
       <div class="pw-cta">
         <button class="btn btn--accent btn--lg" onclick="goCheckout()">Continue to secure checkout &rarr;</button>
       </div>
 
       <div class="pw-trust">
         <span>&#128274; Secure checkout by Stripe</span>
+        <span>&#10003; We never sell your number</span>
         <span>&#10003; Cancel anytime</span>
-        <span>&#10003; US-based support</span>
       </div>
       <p class="pw-fine">You enter your card on Stripe's secure, encrypted page. By starting you authorize SpamCallStop to act as your agent to request removal of your information from data-broker sites. Subscription renews automatically until cancelled. See <a href="terms.html">Terms of Service</a> and <a href="privacy.html">Privacy Policy</a>.</p>
     </div>
@@ -336,7 +389,7 @@
   document.addEventListener('keydown', function(e){ if(e.key==='Escape') closePaywall(); });
 
   /* ---- plan + billing state (prices match lib/pricing.js: Solo 19/190, Dual 29/290) ---- */
-  var billing = 'yearly', plan = 'solo';
+  var billing = 'monthly', plan = 'solo';
   // Pre-select from a prior choice (e.g. the pricing page) if present.
   (function(){
     try {
@@ -344,22 +397,26 @@
       var sb = sessionStorage.getItem('scstop_billing'); if(sb === 'y') billing = 'yearly'; else if(sb === 'm') billing = 'monthly';
     } catch(e){}
   })();
+  // Honest pricing: monthly carries no "discount". Yearly is framed against the
+  // true monthly-billed-annually cost ($19x12 = $228, $29x12 = $348), i.e. 2 months free.
   var PRICE = {
-    monthly:{ solo:{n:19, wasN:29, per:'/mo', was:'$29/mo', bill:'Billed monthly', total:'$19.00'}, dual:{n:29, wasN:58, per:'/mo', was:'$58/mo', bill:'Billed monthly', total:'$29.00'} },
-    yearly: { solo:{n:190, wasN:290, per:'/yr', was:'$290/yr', bill:'Billed yearly &middot; $15.83/mo', total:'$190.00'}, dual:{n:290, wasN:580, per:'/yr', was:'$580/yr', bill:'Billed yearly &middot; $24.17/mo', total:'$290.00'} }
+    monthly:{ solo:{n:19, per:'/mo', was:'', save:'', bill:'Billed monthly', total:'$19.00'}, dual:{n:29, per:'/mo', was:'', save:'', bill:'Billed monthly', total:'$29.00'} },
+    yearly: { solo:{n:190, per:'/yr', was:'$228/yr', save:'2 months free', bill:'$15.83/mo, billed yearly', total:'$190.00'}, dual:{n:290, per:'/yr', was:'$348/yr', save:'2 months free', bill:'$24.17/mo, billed yearly', total:'$290.00'} }
   };
+  function setSave(id, txt){ var b=document.getElementById(id); if(b){ b.textContent = txt || ''; b.hidden = !txt; } }
+  function setWas(wrapId, sId, txt){ var w=document.getElementById(wrapId), s=document.getElementById(sId); if(w) w.hidden = !txt; if(s) s.textContent = txt || ''; }
   function render(){
     var s = PRICE[billing].solo, d = PRICE[billing].dual;
     document.getElementById('soloPrice').textContent = s.n;
     document.getElementById('soloPer').textContent = s.per;
-    document.getElementById('soloBill').innerHTML = s.bill;
-    document.getElementById('soloWas').textContent = s.was;
+    document.getElementById('soloBill').textContent = s.bill;
     document.getElementById('dualPrice').textContent = d.n;
     document.getElementById('dualPer').textContent = d.per;
-    document.getElementById('dualBill').innerHTML = d.bill;
-    document.getElementById('dualWas').textContent = d.was;
-    document.getElementById('soloSave').textContent = 'Save ' + Math.round((1 - s.n / s.wasN) * 100) + '%';
-    document.getElementById('dualSave').textContent = 'Save ' + Math.round((1 - d.n / d.wasN) * 100) + '%';
+    document.getElementById('dualBill').textContent = d.bill;
+    setWas('soloWasWrap','soloWas', s.was);
+    setWas('dualWasWrap','dualWas', d.was);
+    setSave('soloSave', s.save);
+    setSave('dualSave', d.save);
     document.getElementById('pwTotal').textContent = PRICE[billing][plan].total;
     document.getElementById('planSolo').classList.toggle('sel', plan==='solo');
     document.getElementById('planDual').classList.toggle('sel', plan==='dual');
