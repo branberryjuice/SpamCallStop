@@ -80,6 +80,37 @@
   .rfoot{max-width:760px;margin:2.2rem auto 0;padding:1.4rem var(--pad) 2.4rem;border-top:1px solid #1E1E22;color:#6E6E77;font-size:.82rem;display:flex;flex-wrap:wrap;gap:.4rem 1.2rem;align-items:center;justify-content:center;text-align:center}
   .rfoot a{color:#9A9AA2;text-decoration:underline}
 
+  /* ---- exposed-profile reveal (one combined bubble) ---- */
+  .exbubble{background:#141417;border:1px solid #2A2A2F;border-radius:var(--r-lg);overflow:hidden;margin:1.2rem 0}
+  .exmeter{padding:1rem 1.2rem;border-bottom:1px solid #2A2A2F}
+  .exmtop{display:flex;justify-content:space-between;align-items:center;margin-bottom:.55rem}
+  .exlab{font-size:.84rem;font-weight:800;color:#8E8E97;text-transform:uppercase;letter-spacing:.05em}
+  .exstat{margin-top:.7rem;font-size:.98rem;color:#B6B6BE;font-weight:700}
+  .exstat b{color:var(--accent);font-weight:900;font-size:1.25rem;margin-right:.15rem}
+  .exsect{padding:.7rem 1.2rem .85rem}
+  .exsect+.exsect{border-top:1px solid #232327}
+  .exctaw+.exsect{border-top:1px solid #232327}
+  .exsh{font-size:.8rem;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:#8E8E97;margin:.4rem 0 .55rem}
+  .exname{font-size:1.8rem;font-weight:900;color:#fff;line-height:1.12;letter-spacing:-.01em;margin:.2rem 0 .65rem;word-break:break-word}
+  .exrow{display:flex;justify-content:space-between;gap:1rem;align-items:center;padding:.45rem 0;font-size:1.1rem}
+  .exrow+.exrow{border-top:1px solid rgba(255,255,255,.05)}
+  .exrow .k{color:#8E8E97;font-weight:600}
+  .exrow .v{color:#fff;font-weight:800;text-align:right}
+  .exrow .v.email{font-size:1rem;word-break:break-all}
+  .exposedtag{display:inline-block;background:var(--accent);color:#fff;font-size:.74rem;font-weight:800;padding:.18rem .55rem;border-radius:6px;text-transform:uppercase;letter-spacing:.05em}
+  .expub{display:inline-block;font-size:.66rem;font-weight:800;color:#fff;background:var(--accent);border-radius:6px;padding:.08rem .42rem;margin-left:.45rem;vertical-align:2px;text-transform:uppercase;letter-spacing:.04em}
+  .exaddr{font-weight:800;font-size:1.25rem;color:#fff;margin:.15rem 0 .35rem;word-break:break-word}
+  .exhint{font-size:.88rem;color:#8E8E97;line-height:1.45}
+  .exrel{display:flex;justify-content:space-between;align-items:center;padding:.46rem 0;font-size:1.1rem}
+  .exrel+.exrel{border-top:1px solid rgba(255,255,255,.05)}
+  .exrel .nm{font-weight:800;color:#fff}
+  .exrel .meta{color:#8E8E97;font-weight:700;font-size:.95rem}
+  .exmore{font-size:.95rem;color:var(--accent);font-weight:800;padding:.6rem 1.2rem .2rem}
+  .exctaw{padding:.95rem 1.2rem 1.1rem;border-top:1px solid #2A2A2F}
+  .excta{display:block;width:100%;background:#1E9E57;color:#fff;border:none;border-radius:12px;font-family:var(--font);font-size:1.2rem;font-weight:800;padding:1.1rem;cursor:pointer;letter-spacing:.01em;box-shadow:0 10px 26px -12px rgba(30,158,87,.6)}
+  .excta:hover{filter:brightness(1.08)}
+  .exctanote{text-align:center;color:#8E8E97;font-size:.9rem;margin-top:.6rem;font-weight:600}
+
   /* paywall modal tweaks (on top of styles.css .modal) */
   .pw .modal-card{max-width:600px;padding:0;overflow:hidden;max-height:92vh;display:flex;flex-direction:column}
   .pw-head{flex:0 0 auto}
@@ -144,73 +175,66 @@
 
 <section class="rsec">
   <div class="rwrap">
-    <span class="rover">Scan complete</span>
-    <h1 class="rh1">Your info is <span class="accent">exposed</span>.</h1>
+    <h1 class="rh1">Your info is <span class="accent">exposed</span></h1>
 
-    <!-- RISK LEVEL meter (animates up to High) -->
-    <div class="riskcard">
-      <div class="rtop">
-        <span class="rlabel">Risk Level</span>
-        <span class="riskpill" id="riskPill">Calculating&hellip;</span>
-      </div>
-      <div class="meter"><i id="meterFill"></i></div>
-      <div class="scale"><span>Low</span><span>Medium</span><span id="scaleHigh">High</span><span>Critical</span></div>
-    </div>
+    <!-- one combined bubble: exposure level + profile + CTA + relatives -->
+    <div class="exbubble">
 
-    <div class="recs">
-      <span class="n" id="recCount">0</span>
-      <span class="t">+ data-broker and people-search sites buy and sell numbers like yours</span>
-    </div>
-
-    <div class="cta-final" style="margin:1.5rem 0 .2rem">
-      <button class="btn btn--accent btn--lg" onclick="openPaywall()">Remove my data &rarr;</button>
-      <p class="cta-note">Takes about 2 minutes. We start removing your number right away.</p>
-    </div>
-  </div>
-</section>
-
-<section style="padding:0 0 8px">
-  <div class="rwrap">
-
-    <!-- YOUR PERSONAL DATA (filled from the OTP-gated lookup for the verified owner) -->
-    <div class="dcard">
-      <div class="dhead">
-        <h3>Your Personal Data</h3>
-        <span class="tag">Exposed</span>
-      </div>
-      <div class="idrow">
-        <span class="idname" id="idname"></span>
-        <span class="idage" id="idage"></span>
-      </div>
-      <div class="drow" id="carrierRow" hidden><span class="k">Carrier</span><span class="v" id="carrierVal"></span></div>
-      <div class="drow" id="lineRow" hidden><span class="k">Line type</span><span class="v" id="lineVal"></span></div>
-    </div>
-
-    <div class="notyou-wrap">
-      <button class="notyou" id="notYouBtn" onclick="toggleNotYou()">Not you?</button>
-      <div class="notyou-form" id="notYouForm" hidden>
-        <p class="nyf-lead">Not the right person? Add your name and we'll make sure we remove the right records.</p>
-        <div class="nyf-row">
-          <input id="nyFirst" type="text" placeholder="First name" autocomplete="given-name">
-          <input id="nyLast" type="text" placeholder="Last name" autocomplete="family-name">
+      <div class="exmeter">
+        <div class="exmtop">
+          <span class="exlab">Exposure level</span>
+          <span class="riskpill" id="riskPill">Calculating&hellip;</span>
         </div>
-        <button class="btn btn--accent" onclick="updateResults()">Update my results &rarr;</button>
+        <div class="meter"><i id="meterFill"></i></div>
+        <div class="exstat"><b id="exCount">18</b> personal data points exposed <span id="scaleHigh" hidden></span></div>
       </div>
-    </div>
 
-    <!-- WHERE FOUND -->
-    <div class="dcard">
-      <div class="dhead">
-        <h3>Your information is exposed</h3>
+      <div class="exsect">
+        <div class="exname" id="idname"></div>
+        <div class="exrow"><span class="k">Date of birth</span><span class="v" id="vDob"></span></div>
+        <div class="exrow"><span class="k">Gender</span><span class="v" id="vGender"></span></div>
+        <div class="exrow"><span class="k">Ethnicity</span><span class="v" id="vEth"></span></div>
+        <div class="exrow"><span class="k">Primary language</span><span class="v" id="vLang"></span></div>
+        <div class="exrow"><span class="k">Children</span><span class="v" id="vKids"></span></div>
+        <div class="exrow"><span class="k">Email</span><span class="v email" id="vEmail"></span></div>
       </div>
-      <div class="sitesnote">Your number is bought and sold across data-broker and people-search sites. When you start, we find the real sites listing your number, send removal requests, and keep checking every month.</div>
+
+      <div class="exsect">
+        <div class="exsh">Address <span class="expub">Public record</span></div>
+        <div class="exaddr" id="vAddr"></div>
+        <div class="exhint">Data brokers publish your address history, both current and past.</div>
+      </div>
+
+      <div class="exctaw">
+        <button class="excta" onclick="openPaywall()">Remove my information &rarr;</button>
+        <div class="exctanote">Takes about 2 minutes. We start within 24 to 48 hours.</div>
+      </div>
+
+      <div class="exsect" id="relSect" hidden>
+        <div class="exsh">Relatives</div>
+        <div id="relList"></div>
+        <div class="exhint" style="margin-top:.5rem">Scammers use relatives to sound credible and target your family.</div>
+      </div>
+
+      <div class="exmore">+ more records across dozens of data-broker sites</div>
+
+      <div class="notyou-wrap" style="text-align:center;padding:.2rem 1.2rem 1rem">
+        <button class="notyou" id="notYouBtn" onclick="toggleNotYou()">Not you?</button>
+        <div class="notyou-form" id="notYouForm" hidden>
+          <p class="nyf-lead">Not the right person? Add your name and we'll make sure we remove the right records.</p>
+          <div class="nyf-row">
+            <input id="nyFirst" type="text" placeholder="First name" autocomplete="given-name">
+            <input id="nyLast" type="text" placeholder="Last name" autocomplete="family-name">
+          </div>
+          <button class="btn btn--accent" onclick="updateResults()">Update my results &rarr;</button>
+        </div>
+      </div>
     </div>
 
     <div class="cta-final">
-      <button class="btn btn--accent btn--lg" onclick="openPaywall()">Remove my data &rarr;</button>
+      <button class="excta" onclick="openPaywall()">Remove my information &rarr;</button>
       <p class="cta-note">We request removal from the sites listing your number, then keep checking every month.</p>
     </div>
-
   </div>
 </section>
 
@@ -366,9 +390,18 @@
     var c = setInterval(function(){ n += step; if(n >= target){ n = target; clearInterval(c); } el.textContent = n; }, 24);
   })();
 
-  /* ---- after SMS verification, enrich the card with name / carrier / line type when
-         Twilio returns them. The phone number is already the anchor, so we never blank
-         it out, the page always shows exposed data no matter what the lookup returns. ---- */
+  /* ---- field helpers: show a value, or a red "Exposed" box when it's missing ---- */
+  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function setF(id, val){
+    var el = document.getElementById(id); if(!el) return;
+    if(val){ el.textContent = val; }
+    else { el.innerHTML = '<span class="exposedtag">Exposed</span>'; }
+  }
+  // Start every field as "Exposed"; the lookup fills in whatever it actually finds.
+  ['vDob','vGender','vEth','vLang','vKids','vEmail','vAddr'].forEach(function(id){ setF(id, ''); });
+
+  /* ---- after SMS verification, pull the verified owner's full Caller ID Plus
+         profile and fill the card. Anything missing stays "Exposed". ---- */
   (function loadIdentity(){
     if(!PHONE || !TOKEN) return;
     fetch('/api/lookup', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ phone: PHONE, token: TOKEN }) })
@@ -376,9 +409,25 @@
       .then(function(d){
         if(!d || !d.ok) return;
         if(d.name){ document.getElementById('idname').textContent = d.name; try{ sessionStorage.setItem('scstop_name', d.name); }catch(e){} }
-        if(d.age){ document.getElementById('idage').textContent = 'Age ' + d.age; }
-        if(d.carrier){ document.getElementById('carrierVal').textContent = d.carrier; document.getElementById('carrierRow').hidden = false; }
-        if(d.lineType){ var lt = String(d.lineType); document.getElementById('lineVal').textContent = lt.charAt(0).toUpperCase() + lt.slice(1); document.getElementById('lineRow').hidden = false; }
+        var dobAge = [d.dob, d.age ? ('age ' + d.age) : ''].filter(Boolean).join('  ·  ');
+        if(dobAge) setF('vDob', dobAge);
+        if(d.gender) setF('vGender', d.gender);
+        if(d.ethnicity) setF('vEth', d.ethnicity);
+        if(d.language) setF('vLang', d.language);
+        if(d.children) setF('vKids', d.children);
+        if(d.email) setF('vEmail', d.email);
+        if(d.address && d.hasAddress){
+          var a = d.address;
+          var cs = [a.city, a.state].filter(Boolean).join(', ');
+          var full = [a.line, [cs, a.postal].filter(Boolean).join(' ')].filter(Boolean).join(', ');
+          if(full) setF('vAddr', full);
+        }
+        if(d.relatives && d.relatives.length){
+          var html = '';
+          d.relatives.slice(0, 5).forEach(function(r){ html += '<div class="exrel"><span class="nm">' + esc(r.name) + '</span><span class="meta">' + esc(r.age) + '</span></div>'; });
+          var rl = document.getElementById('relList'); if(rl) rl.innerHTML = html;
+          var rs = document.getElementById('relSect'); if(rs) rs.hidden = false;
+        }
       })
       .catch(function(){});
   })();
