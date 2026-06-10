@@ -261,7 +261,7 @@
       <p>We send opt-out requests to the sites that have your number, then keep it off.</p>
     </div>
 
-    <div class="pw-body">
+    <div class="pw-body" id="pwOffer">
       <!-- what you get -->
       <ul class="pw-gets">
         <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#1F7A4D" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>We find the sites listing your number</li>
@@ -339,17 +339,25 @@
         <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> We never sell your number</span>
         <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Cancel anytime</span>
       </div>
-      <p class="pw-fine">You enter your card on Stripe's secure, encrypted page. By starting you authorize SpamCallStop to act as your agent to request removal of your information from data-broker sites. Subscription renews automatically until cancelled. See <a href="terms.html">Terms of Service</a> and <a href="privacy.html">Privacy Policy</a>.</p>
+      <p class="pw-fine">Your card is processed securely by Stripe, right on this page — your card details never touch our servers. By starting you authorize SpamCallStop to act as your agent to request removal of your information from data-broker sites. Subscription renews automatically until cancelled. See <a href="terms.html">Terms of Service</a> and <a href="privacy.html">Privacy Policy</a>.</p>
     </div>
 
     <!-- sticky checkout bar: pinned to the bottom of the popup, always visible while scrolling -->
-    <div class="pw-foot">
+    <div class="pw-foot" id="pwFoot">
       <p class="pw-foot-err" id="pwFootErr" role="alert"></p>
       <button class="btn btn--accent btn--lg js-checkout" onclick="goCheckout()">Continue to secure checkout &rarr;</button>
+    </div>
+
+    <!-- in-page Stripe checkout: the embedded card form mounts here when the
+         customer taps Continue (no redirect). Shown in place of the offer. -->
+    <div class="pw-body" id="pwCheckoutView" style="display:none">
+      <button type="button" onclick="showOfferView()" style="background:none;border:none;font-family:inherit;font-weight:700;font-size:.95rem;color:var(--muted);cursor:pointer;padding:.2rem 0 .1rem;margin-bottom:.7rem">&larr; Back</button>
+      <div id="pwCheckout"></div>
     </div>
   </div>
 </div>
 
+<script src="https://js.stripe.com/v3/"></script>
 <script src="track.js"></script>
 <script>
   /* ---- read the verified-owner session (set by index.html + verify.html) ---- */
@@ -441,7 +449,7 @@
 
   /* ---- paywall open/close ---- */
   function openPaywall(){ document.getElementById('paywall').hidden = false; document.body.style.overflow='hidden'; if(window.scstopTrack) scstopTrack('paywall_open'); }
-  function closePaywall(){ document.getElementById('paywall').hidden = true; document.body.style.overflow=''; }
+  function closePaywall(){ try{ showOfferView(); }catch(e){} document.getElementById('paywall').hidden = true; document.body.style.overflow=''; }
   document.addEventListener('keydown', function(e){ if(e.key==='Escape') closePaywall(); });
 
   /* ---- plan + billing state (prices match lib/pricing.js: Solo 19/190, Dual 29/290) ---- */
@@ -482,9 +490,43 @@
   function setBilling(b){ billing = b; render(); }
   function selectPlan(p){ plan = p; var w=document.getElementById('pw2wrap'); if(w) w.hidden = (p !== 'dual'); render(); }
 
-  /* ---- straight to Stripe Checkout. Stripe collects name + email + card; we
-         supply the already-verified phone (+ a 2nd number for Couple). ---- */
+  /* ---- in-page checkout: Stripe's card form mounts inside this popup (no
+         redirect). Stripe collects name + email + card; we supply the already-
+         verified phone (+ a 2nd number for Couple). If Stripe.js can't load for
+         any reason, we fall back to the original hosted redirect so the money
+         path never breaks. ---- */
   function showPwErr(m){ ['pwErr','pwFootErr'].forEach(function(id){ var el = document.getElementById(id); if(el) el.textContent = m; }); }
+  function resetCheckoutBtns(){ document.querySelectorAll('.js-checkout').forEach(function(b){ b.disabled = false; b.innerHTML = 'Continue to secure checkout &rarr;'; }); }
+
+  // Lazily create the Stripe instance from the publishable key. Resolves null if
+  // Stripe.js didn't load or no key is configured (→ caller uses hosted redirect).
+  function ensureStripe(){
+    if(window._scStripe) return Promise.resolve(window._scStripe);
+    if(!window.Stripe) return Promise.resolve(null);
+    return fetch('/api/config').then(function(r){ return r.json().catch(function(){ return null; }); })
+      .then(function(c){
+        var pk = c && c.publishableKey;
+        if(!pk){ return null; }
+        try { window._scStripe = Stripe(pk); return window._scStripe; } catch(e){ return null; }
+      })
+      .catch(function(){ return null; });
+  }
+
+  function showCheckoutView(){
+    var o=document.getElementById('pwOffer'); if(o) o.style.display='none';
+    var f=document.getElementById('pwFoot'); if(f) f.style.display='none';
+    var v=document.getElementById('pwCheckoutView'); if(v){ v.style.display='block'; v.scrollTop=0; }
+    var h=document.querySelector('#paywall .pw-head h2'); if(h) h.textContent='Secure checkout';
+  }
+  function showOfferView(){
+    try { if(window._scEmbedded){ window._scEmbedded.destroy(); window._scEmbedded=null; } } catch(e){}
+    var v=document.getElementById('pwCheckoutView'); if(v) v.style.display='none';
+    var o=document.getElementById('pwOffer'); if(o) o.style.display='';
+    var f=document.getElementById('pwFoot'); if(f) f.style.display='';
+    var h=document.querySelector('#paywall .pw-head h2'); if(h) h.textContent='Start removing your number';
+    resetCheckoutBtns();
+  }
+
   function goCheckout(){
     var planKey = (plan === 'dual') ? 'Dual' : 'Solo';
     var bill = (billing === 'yearly') ? 'y' : 'm';
@@ -498,16 +540,43 @@
     try { sessionStorage.setItem('scstop_plan', planKey); sessionStorage.setItem('scstop_billing', bill); } catch(e){}
     var btns = document.querySelectorAll('.js-checkout');
     btns.forEach(function(b){ b.disabled = true; b.textContent = 'Starting secure checkout…'; });
-    fetch('/api/checkout', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ plan: planKey, billing: bill, phone: PHONE, phone2: phone2, visitor_id: (window.scstopVid ? scstopVid() : '') })
-    }).then(function(r){ return r.json().catch(function(){ return null; }); })
-      .then(function(d){
-        if(d && d.ok && d.url){ if(window.scstopTrack) scstopTrack('checkout_started'); location.href = d.url; return; }
-        btns.forEach(function(b){ b.disabled = false; b.innerHTML = 'Continue to secure checkout &rarr;'; });
-        showPwErr((d && d.error === 'payments_not_configured') ? 'Secure checkout is not turned on yet. Please try again shortly.' : 'We could not start checkout. Please try again.');
-      })
-      .catch(function(){ btns.forEach(function(b){ b.disabled = false; b.innerHTML = 'Continue to secure checkout &rarr;'; }); showPwErr('Something went wrong. Please try again.'); });
+    var payload = { plan: planKey, billing: bill, phone: PHONE, phone2: phone2, visitor_id: (window.scstopVid ? scstopVid() : '') };
+
+    // Hosted redirect — the original flow, kept as the automatic fallback.
+    function hostedCheckout(){
+      return fetch('/api/checkout', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) })
+        .then(function(r){ return r.json().catch(function(){ return null; }); })
+        .then(function(d){
+          if(d && d.ok && d.url){ if(window.scstopTrack) scstopTrack('checkout_started'); location.href = d.url; return; }
+          resetCheckoutBtns();
+          showPwErr((d && d.error === 'payments_not_configured') ? 'Secure checkout is not turned on yet. Please try again shortly.' : 'We could not start checkout. Please try again.');
+        })
+        .catch(function(){ resetCheckoutBtns(); showPwErr('Something went wrong. Please try again.'); });
+    }
+
+    // Preferred path: ask for an embedded session and mount Stripe's card form
+    // right here. Any failure (no Stripe.js, no key, mount error) → hosted redirect.
+    ensureStripe().then(function(stripe){
+      if(!stripe){ return hostedCheckout(); }
+      return fetch('/api/checkout', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(Object.assign({ embedded:true }, payload)) })
+        .then(function(r){ return r.json().catch(function(){ return null; }); })
+        .then(function(d){
+          if(d && d.ok && d.clientSecret){
+            return stripe.initEmbeddedCheckout({ clientSecret: d.clientSecret })
+              .then(function(checkout){
+                try { if(window._scEmbedded){ window._scEmbedded.destroy(); } } catch(e){}
+                window._scEmbedded = checkout;
+                showCheckoutView();
+                checkout.mount('#pwCheckout');
+                if(window.scstopTrack) scstopTrack('checkout_started');
+              })
+              .catch(function(){ return hostedCheckout(); });
+          }
+          if(d && d.ok && d.url){ if(window.scstopTrack) scstopTrack('checkout_started'); location.href = d.url; return; }
+          return hostedCheckout();
+        })
+        .catch(function(){ return hostedCheckout(); });
+    });
   }
 
   /* ---- "Not you?": correct the displayed name and carry it into signup ---- */

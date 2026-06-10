@@ -3,11 +3,13 @@
 /**
  * POST /api/checkout — create a Stripe Checkout Session (subscription).
  *
- * Body: { name, email, phone, plan: 'Solo'|'Dual', billing: 'm'|'y', bump: bool }
- * Returns: { ok:true, url } to redirect the browser to Stripe's hosted page,
+ * Body: { name, email, phone, plan: 'Solo'|'Dual', billing: 'm'|'y', bump: bool, embedded?: bool }
+ * Returns: { ok:true, clientSecret } for the in-page embedded checkout (embedded:true),
+ *          or { ok:true, url } to redirect to Stripe's hosted page (default/fallback),
  *          or { ok:false, error } on problems.
  *
- * We never collect card data ourselves — Stripe's hosted checkout does that.
+ * We never collect card data ourselves — Stripe's checkout (hosted or embedded
+ * via Stripe.js) does that, so card details never touch our server.
  */
 
 const express = require('express');
@@ -29,21 +31,36 @@ router.post('/checkout', express.json(), async (req, res) => {
     const billing = b.billing === 'y' ? 'y' : 'm';
     const bump = b.bump === true || b.bump === '1' || b.bump === 1;
     const visitorId = String(b.visitor_id || '').slice(0, 64); // ties the sale to the funnel journey
+    const embedded = b.embedded === true || b.embedded === '1' || b.embedded === 1;
 
     const base = process.env.PUBLIC_BASE_URL || (req.protocol + '://' + req.get('host'));
 
-    const session = await stripe.checkout.sessions.create({
+    const params = {
       mode: 'subscription',
       line_items: buildLineItems({ plan, billing, bump }),
       customer_email: email || undefined,
       allow_promotion_codes: true,
       metadata: { name, phone, phone2, plan, billing, bump: bump ? '1' : '0', visitor_id: visitorId },
       subscription_data: { metadata: { name, phone, phone2, plan, billing } },
-      success_url: base + '/thank-you.html?session_id={CHECKOUT_SESSION_ID}',
-      cancel_url: base + '/checkout.html',
-    });
+    };
 
-    return res.json({ ok: true, url: session.url });
+    if (embedded) {
+      // In-page checkout: Stripe.js mounts the card form on our own page. Embedded
+      // mode uses return_url (no success_url/cancel_url) and hands the browser a
+      // client_secret instead of a hosted redirect URL.
+      params.ui_mode = 'embedded';
+      params.return_url = base + '/thank-you.html?session_id={CHECKOUT_SESSION_ID}';
+    } else {
+      // Hosted redirect (the original flow) — kept as the automatic fallback.
+      params.success_url = base + '/thank-you.html?session_id={CHECKOUT_SESSION_ID}';
+      params.cancel_url = base + '/checkout.html';
+    }
+
+    const session = await stripe.checkout.sessions.create(params);
+
+    return res.json(embedded
+      ? { ok: true, clientSecret: session.client_secret }
+      : { ok: true, url: session.url });
   } catch (err) {
     console.error('checkout error:', err && err.message ? err.message : err);
     return res.status(500).json({ ok: false, error: 'checkout_failed' });

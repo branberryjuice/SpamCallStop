@@ -43,6 +43,13 @@ app.get('/api/health', (req, res) => {
   res.json({ ok: true, service: 'spamcallstop', time: new Date().toISOString() });
 });
 
+// Public client config. Only the Stripe *publishable* key (safe to expose by
+// design) so the in-page embedded checkout can initialize Stripe.js. Empty
+// string when unset, which makes the paywall fall back to hosted redirect.
+app.get('/api/config', (req, res) => {
+  res.json({ ok: true, publishableKey: process.env.STRIPE_PUBLISHABLE_KEY || '' });
+});
+
 // Backstop rate limit across the API (per IP). Stripe webhook + Resend inbound
 // + health are exempt inside the limiter so those callers aren't throttled.
 app.use('/api', apiRateLimit());
