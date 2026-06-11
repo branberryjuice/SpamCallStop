@@ -16,6 +16,7 @@
   var GA4_ID = 'G-XXXXXXXXXX';
   var GOOGLE_ADS_ID = 'AW-18191545804';
   var GOOGLE_ADS_PURCHASE_LABEL = 'fcVECNK7kbocEMzrs-JD';
+  var UET_TAG_ID = '343254708'; // Microsoft Advertising (Bing) UET tag
 
   function isSet(v) { return !!v && v.indexOf('XXXX') === -1 && v.indexOf('PASTE_') === -1; }
   var adsOn = isSet(GOOGLE_ADS_ID);
@@ -23,8 +24,14 @@
 
   // Always expose the purchase tracker (it no-ops safely if tags aren't configured).
   window.scstopTrackPurchase = function (value, currency, txnId) {
-    if (typeof window.gtag !== 'function') return;
     currency = currency || 'USD';
+    // Microsoft Advertising (Bing) UET purchase conversion — fires independently of Google.
+    if (window.uetq) {
+      var ue = { event_category: 'ecommerce' };
+      if (typeof value === 'number') { ue.revenue_value = value; ue.currency = currency; }
+      window.uetq.push('event', 'purchase', ue);
+    }
+    if (typeof window.gtag !== 'function') return;
     if (adsOn && isSet(GOOGLE_ADS_PURCHASE_LABEL)) {
       var conv = { send_to: GOOGLE_ADS_ID + '/' + GOOGLE_ADS_PURCHASE_LABEL };
       if (typeof value === 'number') { conv.value = value; conv.currency = currency; }
@@ -39,7 +46,27 @@
     }
   };
 
-  if (!adsOn && !ga4On) return; // nothing configured yet — load nothing
+  // --- Microsoft Advertising UET tag (Bing) -------------------------------
+  // Loads on every page that includes pixel.js, independent of the Google tags,
+  // so the ad click is captured on the landing page and conversions can fire.
+  if (isSet(UET_TAG_ID)) {
+    (function (w, d, t, u, o) {
+      w[u] = w[u] || []; o.ts = (new Date).getTime();
+      var n = d.createElement(t);
+      n.src = 'https://bat.bing.net/bat.js?ti=' + o.ti + ('uetq' != u ? '&q=' + u : '');
+      n.async = 1;
+      n.onload = n.onreadystatechange = function () {
+        var s = this.readyState;
+        if (!s || 'loaded' === s || 'complete' === s) {
+          o.q = w[u]; w[u] = new UET(o); w[u].push('pageLoad');
+          n.onload = n.onreadystatechange = null;
+        }
+      };
+      var i = d.getElementsByTagName(t)[0]; i.parentNode.insertBefore(n, i);
+    })(window, document, 'script', 'uetq', { ti: UET_TAG_ID, enableAutoSpaTracking: true });
+  }
+
+  if (!adsOn && !ga4On) return; // no Google tags configured — UET still loaded above
 
   // Load gtag.js once (async) and configure GA4 and/or Google Ads.
   var primary = ga4On ? GA4_ID : GOOGLE_ADS_ID;
