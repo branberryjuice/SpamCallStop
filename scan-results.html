@@ -197,7 +197,6 @@
       <div class="exsect">
         <div class="exname" id="idname"></div>
         <div class="exrow"><span class="k">Date of birth</span><span class="v" id="vDob"></span></div>
-        <div class="exrow"><span class="k">Gender</span><span class="v" id="vGender"></span></div>
         <div class="exrow"><span class="k">Ethnicity</span><span class="v" id="vEth"></span></div>
         <div class="exrow"><span class="k">Primary language</span><span class="v" id="vLang"></span></div>
         <div class="exrow"><span class="k">Children</span><span class="v" id="vKids"></span></div>
@@ -414,7 +413,7 @@
     else { el.innerHTML = '<span class="exposedtag">Exposed</span>'; }
   }
   // Start every field as "Exposed"; the lookup fills in whatever it actually finds.
-  ['vDob','vGender','vEth','vLang','vKids','vEmail','vAddr'].forEach(function(id){ setF(id, ''); });
+  ['vDob','vEth','vLang','vKids','vEmail','vAddr'].forEach(function(id){ setF(id, ''); });
 
   /* ---- after SMS verification, pull the verified owner's full Caller ID Plus
          profile and fill the card. Anything missing stays "Exposed". ---- */
@@ -427,7 +426,6 @@
         if(d.name){ document.getElementById('idname').textContent = d.name; try{ sessionStorage.setItem('scstop_name', d.name); }catch(e){} }
         var dobAge = [d.dob, d.age ? ('age ' + d.age) : ''].filter(Boolean).join('  ·  ');
         if(dobAge) setF('vDob', dobAge);
-        if(d.gender) setF('vGender', d.gender);
         if(d.ethnicity) setF('vEth', d.ethnicity);
         if(d.language) setF('vLang', d.language);
         if(d.children) setF('vKids', d.children);
