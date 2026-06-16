@@ -195,6 +195,7 @@
 
       <div class="exsect">
         <div class="exname" id="idname"></div>
+        <div class="exrow"><span class="k">Phone</span><span class="v" id="vPhone"></span></div>
         <div class="exrow"><span class="k">Date of birth</span><span class="v" id="vDob"></span></div>
         <div class="exrow"><span class="k">Ethnicity</span><span class="v" id="vEth"></span></div>
         <div class="exrow"><span class="k">Primary language</span><span class="v" id="vLang"></span></div>
@@ -382,6 +383,7 @@
       // tap-to-call pill behind it (the format-detection meta alone isn't enough).
       var safe = '<a class="nolink">' + pretty + '</a>';
       document.getElementById('idname').innerHTML = safe;
+      var phEl = document.getElementById('vPhone'); if(phEl) phEl.innerHTML = safe;
     }
   })();
 
