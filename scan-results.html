@@ -180,18 +180,17 @@
 
 <section class="rsec">
   <div class="rwrap">
-    <h1 class="rh1">Your info is <span class="accent">exposed</span></h1>
+    <h1 class="rh1">Data <span class="accent">found</span></h1>
 
     <!-- one combined bubble: exposure level + profile + CTA + relatives -->
     <div class="exbubble">
 
       <div class="exmeter">
         <div class="exmtop">
-          <span class="exlab">Exposure level</span>
+          <span class="exlab">Risk level</span>
           <span class="riskpill" id="riskPill">Calculating&hellip;</span>
         </div>
         <div class="meter"><i id="meterFill"></i></div>
-        <div class="exstat"><b id="exCount">18</b> personal data points exposed <span id="scaleHigh" hidden></span></div>
       </div>
 
       <div class="exsect">
@@ -217,7 +216,7 @@
       <div class="exsect" id="relSect" hidden>
         <div class="exsh">Relatives</div>
         <div id="relList"></div>
-        <div class="exhint" style="margin-top:.5rem">Scammers use relatives to sound credible and target your family.</div>
+        <div class="exhint" style="margin-top:.5rem">Data-broker profiles often list the names of your relatives too.</div>
       </div>
 
       <div class="exmore">+ more records across dozens of data-broker sites</div>
@@ -394,7 +393,6 @@
     setTimeout(function(){
       pill.textContent = 'High';
       pill.classList.add('high');
-      document.getElementById('scaleHigh').classList.add('on');
     }, 1500);
   })();
 
@@ -410,7 +408,7 @@
   function setF(id, val){
     var el = document.getElementById(id); if(!el) return;
     if(val){ el.textContent = val; }
-    else { el.innerHTML = '<span class="exposedtag">Exposed</span>'; }
+    else { el.innerHTML = '<span class="exposedtag">Listed</span>'; }
   }
   // Start every field as "Exposed"; the lookup fills in whatever it actually finds.
   ['vDob','vEth','vLang','vKids','vEmail','vAddr'].forEach(function(id){ setF(id, ''); });
