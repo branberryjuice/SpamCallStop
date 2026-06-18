@@ -78,6 +78,7 @@
   <div class="top">
     <div class="brand">Spam<span class="cr">Call</span>Stop<span class="cg">.com</span><span class="tag">Analytics</span></div>
     <div class="controls">
+      <button class="rangebtn" onclick="setRange('today',this)">Today</button>
       <button class="rangebtn" onclick="setRange('24h',this)">24h</button>
       <button class="rangebtn" onclick="setRange('7d',this)">7d</button>
       <button class="rangebtn active" onclick="setRange('30d',this)">30d</button>
@@ -105,6 +106,8 @@
     <div class="card"><h2>Visitors &amp; purchases</h2><div class="chartbox" id="trend"></div></div>
     <div class="card"><h2>Revenue</h2><div class="chartbox" id="revenue"></div></div>
   </div>
+
+  <div class="card"><h2>Customers</h2><div id="customers"></div></div>
 
   <div class="card"><h2>People (phone &amp; email entered)</h2><div id="leads"></div></div>
 </div>
@@ -134,7 +137,7 @@
     if(key){ try{ localStorage.setItem('scstop_admin_key', key); }catch(e){} }
     setRibbon('Loading&hellip;');
     var opts = key ? { headers: { 'x-admin-key': key } } : {};
-    fetch('/api/analytics/funnel?range='+RANGE, opts)
+    fetch('/api/analytics/funnel?range='+RANGE+'&tz='+(new Date().getTimezoneOffset()), opts)
       .then(function(r){ return r.json().catch(function(){ return null; }); })
       .then(function(d){
         if(!d || !d.ok){ setRibbon((d&&d.error==='unauthorized') ? 'Enter your admin key, then Reload.' : 'Could not load analytics.'); return; }
@@ -157,6 +160,7 @@
     renderTrend(d.series||[], d.bucket);
     renderRevenue(d.series||[], d.bucket);
     renderLeads(d.leads||[]);
+    renderCustomers(d.leads||[]);
   }
 
   function renderFunnel(funnel){
@@ -218,6 +222,19 @@
         return '<div class="lrow"><span class="lphone">'+esc(fmtPhone(p.phone))+'</span>'+
           '<span class="lemail">'+esc(p.email||'—')+'</span>'+
           '<span class="lstage" style="color:'+col+'">'+esc(p.stage)+'</span>'+
+          '<span class="lwhen">'+fmtWhen(p.when)+'</span></div>';
+      }).join('');
+  }
+
+  function renderCustomers(leads){
+    var el = document.getElementById('customers'); if(!el) return;
+    var custs = (leads||[]).filter(function(p){ return p.stage==='Purchased'; });
+    if(!custs.length){ el.innerHTML = '<div class="muted">No customers yet.</div>'; return; }
+    el.innerHTML = '<div class="lhead"><span>Email</span><span>Phone</span><span></span><span>When</span></div>' +
+      custs.map(function(p){
+        return '<div class="lrow"><span class="lemail" style="color:#33C08D">'+esc(p.email||'—')+'</span>'+
+          '<span class="lphone">'+esc(fmtPhone(p.phone))+'</span>'+
+          '<span class="lstage" style="color:#33C08D">Customer</span>'+
           '<span class="lwhen">'+fmtWhen(p.when)+'</span></div>';
       }).join('');
   }

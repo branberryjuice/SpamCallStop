@@ -39,6 +39,7 @@ const STAGES = [
 
 const HOUR = 3600000, DAY = 86400000;
 const RANGES = {
+  'today': { bucketMs: HOUR, bucket: 'hour' }, // since local midnight; ms computed per-request
   '24h': { ms: 24 * HOUR, bucketMs: HOUR, bucket: 'hour' },
   '7d': { ms: 7 * DAY, bucketMs: DAY, bucket: 'day' },
   '30d': { ms: 30 * DAY, bucketMs: DAY, bucket: 'day' },
@@ -51,7 +52,17 @@ router.get('/analytics/funnel', async (req, res) => {
   const range = RANGES[req.query.range] ? req.query.range : '30d';
   const cfg = RANGES[range];
   const now = Date.now();
-  const sinceISO = new Date(now - cfg.ms).toISOString();
+  let sinceMs;
+  if (range === 'today') {
+    // Start of the viewer's local calendar day. tz = browser getTimezoneOffset() in minutes.
+    const off = parseInt(req.query.tz, 10);
+    const tzMin = Number.isFinite(off) ? off : 0;
+    const localNow = now - tzMin * 60000;
+    sinceMs = Math.floor(localNow / DAY) * DAY + tzMin * 60000;
+  } else {
+    sinceMs = now - cfg.ms;
+  }
+  const sinceISO = new Date(sinceMs).toISOString();
 
   try {
     const rows = await db.getFunnelEventsSince(sinceISO);
@@ -66,7 +77,7 @@ router.get('/analytics/funnel', async (req, res) => {
     const phoneSet = new Set(), emailSet = new Set();
     let purchases = 0, revenueCents = 0;
 
-    const alignedStart = Math.floor((now - cfg.ms) / cfg.bucketMs) * cfg.bucketMs;
+    const alignedStart = Math.floor(sinceMs / cfg.bucketMs) * cfg.bucketMs;
     const nB = Math.max(1, Math.ceil((now - alignedStart) / cfg.bucketMs));
     const buckets = [];
     for (let i = 0; i < nB; i++) buckets.push({ ts: alignedStart + i * cfg.bucketMs, vis: new Set(), purchases: 0, revenueCents: 0 });
