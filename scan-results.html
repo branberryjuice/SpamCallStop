@@ -306,6 +306,13 @@
       </div>
       <p id="pwErr" role="alert" style="color:var(--accent);font-size:.85rem;min-height:1em;margin-top:.5rem;text-align:center"></p>
 
+      <!-- where to send the removal report: captures email before Stripe so we can
+           follow up with people who don't finish checkout. Non-blocking. -->
+      <div class="pw-email" style="margin-top:.9rem">
+        <label for="pwEmail" style="display:block;font-weight:700;font-size:.85rem;color:var(--muted);margin-bottom:.35rem">Where should we send your removal report?</label>
+        <input id="pwEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@email.com" onchange="captureEmail()" onblur="captureEmail()" style="width:100%;font-family:var(--font);font-size:1rem;color:var(--text);padding:.75rem .9rem;min-height:48px;background:#fff;border:1.5px solid var(--border-strong);border-radius:var(--r)">
+      </div>
+
       <!-- guarantee -->
       <div class="pw-guar">
         <span class="gic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v5c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V6l7-3z" stroke="#1F7A4D" stroke-width="1.9" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="#1F7A4D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
@@ -451,6 +458,22 @@
   function closePaywall(){ try{ showOfferView(); }catch(e){} document.getElementById('paywall').hidden = true; document.body.style.overflow=''; }
   document.addEventListener('keydown', function(e){ if(e.key==='Escape') closePaywall(); });
 
+  /* ---- capture the email the moment it's entered (before Stripe), so we can
+         follow up with people who open the paywall but don't finish checkout.
+         Reuses the already-allowed 'paywall_open' event with the email attached;
+         analytics dedupes by visitor, so funnel counts are unaffected. Returns
+         the raw value so goCheckout can prefill Stripe with it. Non-blocking. ---- */
+  var _emailCaptured = '';
+  function captureEmail(){
+    var el = document.getElementById('pwEmail'); if(!el) return '';
+    var v = (el.value || '').trim();
+    if(/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v) && v !== _emailCaptured){
+      _emailCaptured = v;
+      if(window.scstopTrack) scstopTrack('paywall_open', { email: v, phone: PHONE });
+    }
+    return v;
+  }
+
   /* ---- plan + billing state (prices match lib/pricing.js: Solo 19/190, Dual 29/290) ---- */
   var billing = 'monthly', plan = 'solo';
   // Pre-select from a prior choice (e.g. the pricing page) if present.
@@ -539,7 +562,8 @@
     try { sessionStorage.setItem('scstop_plan', planKey); sessionStorage.setItem('scstop_billing', bill); } catch(e){}
     var btns = document.querySelectorAll('.js-checkout');
     btns.forEach(function(b){ b.disabled = true; b.textContent = 'Starting secure checkout…'; });
-    var payload = { plan: planKey, billing: bill, phone: PHONE, phone2: phone2, visitor_id: (window.scstopVid ? scstopVid() : '') };
+    var email = captureEmail();
+    var payload = { plan: planKey, billing: bill, phone: PHONE, phone2: phone2, email: email, visitor_id: (window.scstopVid ? scstopVid() : '') };
 
     // Hosted redirect — the original flow, kept as the automatic fallback.
     function hostedCheckout(){

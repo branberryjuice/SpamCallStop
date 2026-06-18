@@ -115,6 +115,35 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
     }
   }
 
+  // Abandoned-cart recovery: a checkout session expired unpaid. Stripe gives us
+  // the email the customer entered + a one-click resume URL. Email it to them.
+  if (event.type === 'checkout.session.expired') {
+    let fresh = true;
+    try { fresh = await markEventProcessed(event.id); }
+    catch (de) { console.error('[webhook] dedupe store error (failing open):', de && de.message); }
+    if (!fresh) return res.json({ received: true, duplicate: true });
+
+    const s = event.data.object;
+    const cd = s.customer_details || {};
+    const email = s.customer_email || cd.email || (s.metadata && s.metadata.email) || '';
+    const recoveryUrl = s.after_expiration && s.after_expiration.recovery && s.after_expiration.recovery.url;
+    // Don't email on test-mode unless explicitly opted in.
+    const allowSideEffects = event.livemode === true || process.env.PROCESS_TEST_EVENTS === '1';
+
+    if (allowSideEffects && email && recoveryUrl) {
+      try {
+        const msg = require('../lib/emails').recoveryEmail(recoveryUrl);
+        await require('../lib/resend').send({ to: email, from: process.env.EMAIL_FROM, replyTo: 'company@spamcallstop.com', subject: msg.subject, text: msg.text, html: msg.html });
+        console.log('[recovery] abandoned-cart email sent to', maskEmail(email));
+      } catch (re) {
+        console.error('[recovery] send failed:', re && re.message);
+      }
+    } else {
+      console.log('[recovery] expired session — no email (missing email/recovery URL or test-mode).');
+    }
+    return res.json({ received: true });
+  }
+
   return res.json({ received: true });
 });
 

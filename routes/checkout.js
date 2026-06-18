@@ -42,6 +42,10 @@ router.post('/checkout', express.json(), async (req, res) => {
       allow_promotion_codes: true,
       metadata: { name, phone, phone2, plan, billing, bump: bump ? '1' : '0', visitor_id: visitorId },
       subscription_data: { metadata: { name, phone, phone2, plan, billing } },
+      // Abandoned-cart recovery: if this session expires unpaid, Stripe fires
+      // `checkout.session.expired` carrying a ~30-day resume URL + the email the
+      // customer entered, so we can email them a one-click "finish" link.
+      after_expiration: { recovery: { enabled: true } },
     };
 
     if (embedded) {
@@ -56,7 +60,20 @@ router.post('/checkout', express.json(), async (req, res) => {
       params.cancel_url = base + '/checkout.html';
     }
 
-    const session = await stripe.checkout.sessions.create(params);
+    // Fail-safe: if Stripe rejects `after_expiration` for this config, retry
+    // without it so recovery can never block the money path.
+    let session;
+    try {
+      session = await stripe.checkout.sessions.create(params);
+    } catch (createErr) {
+      if (params.after_expiration) {
+        console.warn('checkout: retrying without after_expiration:', createErr && createErr.message);
+        delete params.after_expiration;
+        session = await stripe.checkout.sessions.create(params);
+      } else {
+        throw createErr;
+      }
+    }
 
     return res.json(embedded
       ? { ok: true, clientSecret: session.client_secret }
