@@ -11,7 +11,7 @@
 
 const express = require('express');
 const router = express.Router();
-const { listCustomersWithNumbers } = require('../lib/customers');
+const { listCustomersWithNumbers, findCustomersByPhone, deleteCustomersByIds } = require('../lib/customers');
 const { planLabel } = require('../lib/pricing');
 const digest = require('../lib/digest');
 
@@ -67,6 +67,29 @@ router.get('/admin/daily-digest', async (req, res) => {
   } catch (e) {
     console.error('[admin] digest error:', e && e.message);
     res.status(500).json({ ok: false, error: 'digest_failed' });
+  }
+});
+
+// Hard-delete a customer (and all their related rows) by phone number. Used to
+// reset a test number so it can run a fresh signup/trial from scratch. Requires
+// the admin key AND an explicit confirm=1, so it can't fire by accident.
+//   POST /api/admin/delete-customer { phone, confirm: 1 }
+router.post('/admin/delete-customer', express.json(), async (req, res) => {
+  if (!authed(req)) return res.status(401).json({ ok: false, error: 'unauthorized' });
+  const phone = String((req.body && req.body.phone) || '').trim();
+  const confirm = String((req.body && req.body.confirm) || '');
+  if (!phone) return res.status(400).json({ ok: false, error: 'phone_required' });
+  if (confirm !== '1' && confirm !== 'true') return res.status(400).json({ ok: false, error: 'confirm_required' });
+  try {
+    const matches = await findCustomersByPhone(phone);
+    if (!matches.length) return res.json({ ok: true, deleted: 0, ids: [], note: 'no customer matched that phone' });
+    const ids = matches.map((c) => c.id);
+    const deleted = await deleteCustomersByIds(ids);
+    console.log('[admin] deleted customers by phone', ids.join(','), '=>', deleted);
+    res.json({ ok: true, deleted: deleted, ids: ids });
+  } catch (e) {
+    console.error('[admin] delete error:', e && e.message);
+    res.status(500).json({ ok: false, error: 'delete_failed' });
   }
 });
 
