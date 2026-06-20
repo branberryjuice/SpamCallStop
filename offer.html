@@ -24,7 +24,7 @@
     <h1 class="display" style="margin:.6rem auto .4rem;max-width:18ch">Here is how we make the calls <span class="accent">stop. For good.</span></h1>
     <p class="lead muted" style="max-width:46ch;margin:0 auto">We take your number off every site we found. Then we keep watching, day and night, so it never goes back up. You do nothing but enter your number once.</p>
     <div style="margin-top:1.8rem">
-      <a class="btn btn--accent btn--lg" href="#plans">Get protected &rarr; from $19 a month</a>
+      <a class="btn btn--accent btn--lg" href="#plans">Get protected &rarr; from $14.99 a month</a>
       <p class="fine" style="margin-top:.7rem">No long contract. Cancel anytime.</p>
     </div>
   </div>
@@ -47,7 +47,7 @@
       <div class="stack-row"><span class="ck"><svg width="14" height="14" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#1F7A4D" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="t"><b>Bonus: we sign you up for Do Not Call</b><small>Plus a simple guide for the few calls that slip through</small></span><span class="v">$49 value</span></div>
       <div class="stack-row"><span class="ck"><svg width="14" height="14" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#1F7A4D" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="t"><b>Bonus: scam alert texts</b><small>Easy heads up about new scams going around</small></span><span class="v">$79 value</span></div>
       <div class="stack-total"><span class="l">Total value</span><span class="r">$1,573 a year</span></div>
-      <div class="stack-price"><div class="small">Your price today</div><div class="big">$19<span> a month</span></div><div class="small" style="color:var(--muted);text-transform:none;letter-spacing:0;font-weight:600">or $190 a year. That is 2 months free</div></div>
+      <div class="stack-price"><div class="small">Your price today</div><div class="big">$14.99<span> a month</span></div><div class="small" style="color:var(--muted);text-transform:none;letter-spacing:0;font-weight:600">or $149 a year. That is 2 months free</div></div>
     </div>
   </div>
 </section>
@@ -68,7 +68,7 @@
       <div class="plan feat">
         <span class="badge">Most popular</span>
         <h3>Individual</h3><div class="who">Protect one person</div>
-        <div class="price" id="soloP">$19<span>/mo</span></div>
+        <div class="price" id="soloP">$14.99<span>/mo</span></div>
         <div class="billed" id="soloB">Billed monthly. Cancel anytime</div>
         <ul>
           <li><span class="pk"><svg width="13" height="13" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#1F7A4D" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Everything in The Stop The Calls Plan</li>
@@ -80,7 +80,7 @@
       </div>
       <div class="plan">
         <h3>Couple</h3><div class="who">Protect two people</div>
-        <div class="price" id="dualP">$29<span>/mo</span></div>
+        <div class="price" id="dualP">$22.99<span>/mo</span></div>
         <div class="billed" id="dualB">Billed monthly. Cancel anytime</div>
         <ul>
           <li><span class="pk"><svg width="13" height="13" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#1F7A4D" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Everything in Individual, for two people</li>
@@ -157,11 +157,11 @@
     var sP=document.getElementById('soloP'),sB=document.getElementById('soloB');
     var dP=document.getElementById('dualP'),dB=document.getElementById('dualB');
     if(m==='y'){tY.classList.add('active');tM.classList.remove('active');
-      sP.innerHTML='<span style="text-decoration:line-through;color:var(--muted);font-weight:700;font-size:1.1rem;margin-right:.35rem">$228</span>$190<span>/yr</span>';sB.textContent='Just $15.83 a month. 2 months free';
-      dP.innerHTML='<span style="text-decoration:line-through;color:var(--muted);font-weight:700;font-size:1.1rem;margin-right:.35rem">$348</span>$290<span>/yr</span>';dB.textContent='Just $24.17 a month. 2 months free';
+      sP.innerHTML='<span style="text-decoration:line-through;color:var(--muted);font-weight:700;font-size:1.1rem;margin-right:.35rem">$179.88</span>$149<span>/yr</span>';sB.textContent='Just $12.42 a month. 2 months free';
+      dP.innerHTML='<span style="text-decoration:line-through;color:var(--muted);font-weight:700;font-size:1.1rem;margin-right:.35rem">$275.88</span>$229<span>/yr</span>';dB.textContent='Just $19.08 a month. 2 months free';
     }else{tM.classList.add('active');tY.classList.remove('active');
-      sP.innerHTML='$19<span>/mo</span>';sB.textContent='Billed monthly. Cancel anytime';
-      dP.innerHTML='$29<span>/mo</span>';dB.textContent='Billed monthly. Cancel anytime';}
+      sP.innerHTML='$14.99<span>/mo</span>';sB.textContent='Billed monthly. Cancel anytime';
+      dP.innerHTML='$22.99<span>/mo</span>';dB.textContent='Billed monthly. Cancel anytime';}
   }
   function choose(plan){
     // Remember the chosen plan, then send them through the scan + SMS verify flow.

@@ -284,7 +284,7 @@
           <div class="pn">Individual</div>
           <div class="pw-who">One phone number</div>
           <div class="pw-was" id="soloWasWrap" hidden><s id="soloWas"></s></div>
-          <div class="pp"><span>$</span><span id="soloPrice">19</span><span id="soloPer">/mo</span></div>
+          <div class="pp"><span>$</span><span id="soloPrice">14.99</span><span id="soloPer">/mo</span></div>
           <div class="pbill" id="soloBill">Billed monthly</div>
         </div>
         <div class="pw-plan" id="planDual" onclick="selectPlan('dual')">
@@ -293,12 +293,13 @@
           <div class="pn">Couple</div>
           <div class="pw-who">Two phone numbers</div>
           <div class="pw-was" id="dualWasWrap" hidden><s id="dualWas"></s></div>
-          <div class="pp"><span>$</span><span id="dualPrice">29</span><span id="dualPer">/mo</span></div>
+          <div class="pp"><span>$</span><span id="dualPrice">22.99</span><span id="dualPer">/mo</span></div>
           <div class="pbill" id="dualBill">Billed monthly</div>
         </div>
       </div>
 
-      <div class="pw-total"><span>Total due today</span><span class="amt" id="pwTotal">$19.00</span></div>
+      <div class="pw-total"><span>Due today</span><span class="amt" id="pwTotal">$0.00</span></div>
+      <div class="pw-trialnote" id="pwTrialNote" style="font-size:.9rem;color:var(--muted);text-align:center;margin-top:.45rem;line-height:1.4">Free for 7 days, then <b id="pwThen">$14.99/mo</b>. Cancel anytime — we'll email you before your first charge.</div>
 
       <div id="pw2wrap" hidden style="margin-top:.9rem">
         <label for="pwPhone2" style="display:block;font-weight:700;font-size:.85rem;color:var(--muted);margin-bottom:.35rem">Second phone number to protect</label>
@@ -345,13 +346,13 @@
         <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> We never sell your number</span>
         <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Cancel anytime</span>
       </div>
-      <p class="pw-fine">Your card is processed securely by Stripe, right on this page — your card details never touch our servers. By starting you authorize SpamCallStop to act as your agent to request removal of your information from data-broker sites. Subscription renews automatically until cancelled. See <a href="terms.html">Terms of Service</a> and <a href="privacy.html">Privacy Policy</a>.</p>
+      <p class="pw-fine">You won't be charged today. After your 7-day free trial, your plan renews automatically at the price shown above unless you cancel before the trial ends — and we'll email you a reminder before your first charge. Cancel anytime from your dashboard. Your card is processed securely by Stripe, right on this page — your card details never touch our servers. By starting you authorize SpamCallStop to act as your agent to request removal of your information from data-broker sites. See <a href="terms.html">Terms of Service</a> and <a href="privacy.html">Privacy Policy</a>.</p>
     </div>
 
     <!-- sticky checkout bar: pinned to the bottom of the popup, always visible while scrolling -->
     <div class="pw-foot" id="pwFoot">
       <p class="pw-foot-err" id="pwFootErr" role="alert"></p>
-      <button class="btn btn--accent btn--lg js-checkout" onclick="goCheckout()">Continue to secure checkout &rarr;</button>
+      <button class="btn btn--accent btn--lg js-checkout" onclick="goCheckout()">Start my 7-day free trial &rarr;</button>
     </div>
 
     <!-- in-page Stripe checkout: the embedded card form mounts here when the
@@ -484,10 +485,10 @@
     } catch(e){}
   })();
   // Honest pricing: monthly carries no "discount". Yearly is framed against the
-  // true monthly-billed-annually cost ($19x12 = $228, $29x12 = $348), i.e. 2 months free.
+  // true monthly-billed-annually cost ($14.99x12 = $179.88, $22.99x12 = $275.88), i.e. 2 months free.
   var PRICE = {
-    monthly:{ solo:{n:19, per:'/mo', was:'', save:'', bill:'Billed monthly', total:'$19.00'}, dual:{n:29, per:'/mo', was:'', save:'', bill:'Billed monthly', total:'$29.00'} },
-    yearly: { solo:{n:190, per:'/yr', was:'$228/yr', save:'2 months free', bill:'$15.83/mo, billed yearly', total:'$190.00'}, dual:{n:290, per:'/yr', was:'$348/yr', save:'2 months free', bill:'$24.17/mo, billed yearly', total:'$290.00'} }
+    monthly:{ solo:{n:'14.99', per:'/mo', was:'', save:'', bill:'Billed monthly', total:'$14.99'}, dual:{n:'22.99', per:'/mo', was:'', save:'', bill:'Billed monthly', total:'$22.99'} },
+    yearly: { solo:{n:149, per:'/yr', was:'$179.88/yr', save:'2 months free', bill:'$12.42/mo, billed yearly', total:'$149.00'}, dual:{n:229, per:'/yr', was:'$275.88/yr', save:'2 months free', bill:'$19.08/mo, billed yearly', total:'$229.00'} }
   };
   function setSave(id, txt){ var b=document.getElementById(id); if(b){ b.textContent = txt || ''; b.hidden = !txt; } }
   function setWas(wrapId, sId, txt){ var w=document.getElementById(wrapId), s=document.getElementById(sId); if(w) w.hidden = !txt; if(s) s.textContent = txt || ''; }
@@ -503,7 +504,8 @@
     setWas('dualWasWrap','dualWas', d.was);
     setSave('soloSave', s.save);
     setSave('dualSave', d.save);
-    document.getElementById('pwTotal').textContent = PRICE[billing][plan].total;
+    document.getElementById('pwTotal').textContent = '$0.00';
+    var thenEl = document.getElementById('pwThen'); if(thenEl){ thenEl.textContent = PRICE[billing][plan].total + PRICE[billing][plan].per; }
     document.getElementById('planSolo').classList.toggle('sel', plan==='solo');
     document.getElementById('planDual').classList.toggle('sel', plan==='dual');
     document.getElementById('tgMonthly').classList.toggle('active', billing==='monthly');
@@ -518,7 +520,7 @@
          any reason, we fall back to the original hosted redirect so the money
          path never breaks. ---- */
   function showPwErr(m){ ['pwErr','pwFootErr'].forEach(function(id){ var el = document.getElementById(id); if(el) el.textContent = m; }); }
-  function resetCheckoutBtns(){ document.querySelectorAll('.js-checkout').forEach(function(b){ b.disabled = false; b.innerHTML = 'Continue to secure checkout &rarr;'; }); }
+  function resetCheckoutBtns(){ document.querySelectorAll('.js-checkout').forEach(function(b){ b.disabled = false; b.innerHTML = 'Start my 7-day free trial &rarr;'; }); }
 
   // Lazily create the Stripe instance from the publishable key. Resolves null if
   // Stripe.js didn't load or no key is configured (→ caller uses hosted redirect).

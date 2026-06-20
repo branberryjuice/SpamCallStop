@@ -46,8 +46,8 @@
       <div>
         <div class="summary">
           <h3 style="margin-bottom:1rem">Order summary</h3>
-          <div class="sumrow"><span class="lbl"><span id="planName">Individual</span> plan (<span id="billName">monthly</span>)</span><span id="basePrice">$19/mo</span></div>
-          <div class="sumrow tot"><span>Total today</span><span id="totalPrice">$19/mo</span></div>
+          <div class="sumrow"><span class="lbl"><span id="planName">Individual</span> plan (<span id="billName">monthly</span>)</span><span id="basePrice">$14.99/mo</span></div>
+          <div class="sumrow tot"><span>Total today</span><span id="totalPrice">$14.99/mo</span></div>
           <ul class="trustlist">
             <li><span class="tk"><svg width="15" height="15" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#1F7A4D" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span> We never sell your number</li>
             <li><span class="tk"><svg width="15" height="15" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="#1F7A4D" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span> Cancel anytime. No contract</li>
@@ -76,11 +76,12 @@
 
 <script src="track.js"></script>
 <script>
-  var plan='Solo', billing='m', base=19;
+  var plan='Solo', billing='m', base='14.99';
+  var PR = { Solo:{ m:'14.99', y:'149' }, Dual:{ m:'22.99', y:'229' } };
   try {
     plan = sessionStorage.getItem('scstop_plan') || 'Solo';
     billing = sessionStorage.getItem('scstop_billing') || 'm';
-    base = parseInt(sessionStorage.getItem('scstop_price') || '19', 10);
+    base = sessionStorage.getItem('scstop_price') || (PR[plan]||PR.Solo)[billing==='y'?'y':'m'];
     var ph = sessionStorage.getItem('scstop_phone'); if(ph){ document.getElementById('ph2').value = ph; }
     var nm0 = sessionStorage.getItem('scstop_name'); if(nm0){ document.getElementById('nm').value = nm0; }
     var em0 = sessionStorage.getItem('scstop_email'); if(em0){ document.getElementById('em').value = em0; }

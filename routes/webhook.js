@@ -22,7 +22,7 @@
 const express = require('express');
 const router = express.Router();
 const stripe = require('../lib/stripe');
-const { saveCustomer, markEventProcessed, unmarkEventProcessed, maskEmail, recordFunnelEvent } = require('../lib/customers');
+const { saveCustomer, markEventProcessed, unmarkEventProcessed, maskEmail, recordFunnelEvent, getCustomerBySubscription } = require('../lib/customers');
 
 router.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
   if (!stripe) return res.status(503).send('payments not configured');
@@ -140,6 +140,43 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
       }
     } else {
       console.log('[recovery] expired session — no email (missing email/recovery URL or test-mode).');
+    }
+    return res.json({ received: true });
+  }
+
+  // Trial-ending reminder: Stripe fires this ~3 days before the first charge.
+  // The paywall promises "we'll email you before your first charge," so we make
+  // good on it here (and stay compliant with auto-renewal disclosure rules).
+  if (event.type === 'customer.subscription.trial_will_end') {
+    let fresh = true;
+    try { fresh = await markEventProcessed(event.id); }
+    catch (de) { console.error('[webhook] dedupe store error (failing open):', de && de.message); }
+    if (!fresh) return res.json({ received: true, duplicate: true });
+
+    const sub = event.data.object;
+    const allowSideEffects = event.livemode === true || process.env.PROCESS_TEST_EVENTS === '1';
+
+    try {
+      const cust = sub.id ? await getCustomerBySubscription(sub.id) : null;
+      if (allowSideEffects && cust && cust.email) {
+        // Total recurring amount (plan + any add-on) and the billing interval.
+        let cents = 0, interval = 'month';
+        ((sub.items && sub.items.data) || []).forEach(function (it) {
+          if (it.price) { cents += (it.price.unit_amount || 0) * (it.quantity || 1); if (it.price.recurring) interval = it.price.recurring.interval; }
+        });
+        const priceLabel = cents ? ('$' + (cents / 100).toFixed(2) + '/' + (interval === 'year' ? 'yr' : 'mo')) : '';
+        const chargeDate = sub.trial_end ? new Date(sub.trial_end * 1000).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
+
+        const base = process.env.PUBLIC_BASE_URL || 'https://spamcallstop.com';
+        const link = base + '/account.html?token=' + encodeURIComponent(require('../lib/token').signCustomer(cust.id));
+        const msg = require('../lib/emails').trialEndingEmail(cust, link, priceLabel, chargeDate);
+        await require('../lib/resend').send({ to: cust.email, from: process.env.EMAIL_FROM, replyTo: 'company@spamcallstop.com', subject: msg.subject, text: msg.text, html: msg.html });
+        console.log('[trial] reminder sent to', maskEmail(cust.email), 'charge', chargeDate || '(unknown)');
+      } else {
+        console.log('[trial] trial_will_end — no email (no matching customer/email or test-mode).');
+      }
+    } catch (te) {
+      console.error('[trial] reminder send failed:', te && te.message);
     }
     return res.json({ received: true });
   }

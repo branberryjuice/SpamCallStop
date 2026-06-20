@@ -41,7 +41,7 @@ router.post('/checkout', express.json(), async (req, res) => {
       customer_email: email || undefined,
       allow_promotion_codes: true,
       metadata: { name, phone, phone2, plan, billing, bump: bump ? '1' : '0', visitor_id: visitorId },
-      subscription_data: { metadata: { name, phone, phone2, plan, billing } },
+      subscription_data: { trial_period_days: 7, metadata: { name, phone, phone2, plan, billing } },
       // Abandoned-cart recovery: if this session expires unpaid, Stripe fires
       // `checkout.session.expired` carrying a ~30-day resume URL + the email the
       // customer entered, so we can email them a one-click "finish" link.
