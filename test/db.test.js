@@ -31,9 +31,15 @@ test('database critical paths', async (t) => {
     assert.ok(!(await db.getCustomerByPhoneHash(phoneHash('9998887777'))));
   });
 
-  await t.test('phone-hash login excludes canceling members', async () => {
+  await t.test('phone-hash login allows canceling members (still in paid period)', async () => {
     await db.saveCustomer({ email: 'c@d.com', name: 'Cee Cee', phone: '2125559999', plan: 'Individual', status: 'canceling' });
-    assert.ok(!(await db.getCustomerByPhoneHash(phoneHash('2125559999'))));
+    const found = await db.getCustomerByPhoneHash(phoneHash('2125559999'));
+    assert.ok(found && found.email === 'c@d.com');
+  });
+
+  await t.test('phone-hash login excludes fully canceled members', async () => {
+    await db.saveCustomer({ email: 'e@f.com', name: 'Eff Gee', phone: '3105551212', plan: 'Individual', status: 'canceled' });
+    assert.ok(!(await db.getCustomerByPhoneHash(phoneHash('3105551212'))));
   });
 
   await t.test('webhook idempotency: an event id records once, dup returns false', async () => {

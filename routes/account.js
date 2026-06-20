@@ -62,12 +62,19 @@ router.get('/me', async (req, res) => {
   try {
     const c = await db.getCustomerById(id);
     if (!c) return res.status(404).json({ ok: false, error: 'not_found' });
+    // Membership has fully ended: no dashboard data. Return just enough for the
+    // page to show a "your membership ended — reactivate" screen. This blocks a
+    // stale or emailed token from still pulling the live protection numbers.
+    if ((c.status || 'active') === 'canceled') {
+      const fn = (c.name || '').trim().split(/\s+/)[0] || '';
+      return res.json({ ok: true, access: false, status: 'canceled', name: c.name || '', firstName: fn, plan: c.plan || '' });
+    }
     const stats = await db.getRemovalStats(id);
     let unread = 0;
     try { unread = await db.countUnreadAlerts(id); } catch (ue) {}
     const firstName = (c.name || '').trim().split(/\s+/)[0] || '';
     const score = protectionScore(c.created_at, stats.threatPct);
-    res.json({ ok: true, name: c.name || '', firstName: firstName, plan: c.plan || '',
+    res.json({ ok: true, access: true, name: c.name || '', firstName: firstName, plan: c.plan || '',
       status: c.status || 'active',
       cleared: stats.cleared, inProgress: stats.inProgress,
       requestsSent: stats.requestsSent, confirmedRemoved: stats.confirmedRemoved, active: stats.active,
@@ -119,7 +126,12 @@ router.get('/account/session', async (req, res) => {
   }
 });
 
-// Cancel the signed-in customer's membership at the end of the paid period.
+// Cancel the signed-in customer's membership.
+//  - Still on the free trial (no charge yet): cancel IMMEDIATELY and end access
+//    now -> status 'canceled'. Nothing was paid, so there's no time to honor.
+//  - On a paid plan: cancel at period end -> status 'canceling'. They keep access
+//    through the time they already paid for, then the deleted webhook flips them
+//    to 'canceled'.
 router.post('/account/cancel', express.json(), async (req, res) => {
   const tok = String(req.headers['x-customer-token'] || (req.body && req.body.token) || '');
   const id = token.verifyCustomer(tok);
@@ -130,12 +142,28 @@ router.post('/account/cancel', express.json(), async (req, res) => {
   try {
     const c = await db.getCustomerById(id);
     if (!c) return res.status(404).json({ ok: false, error: 'not_found' });
+    let newStatus = 'canceling';
     if (stripe && c.stripe_subscription) {
-      try { await stripe.subscriptions.update(c.stripe_subscription, { cancel_at_period_end: true }); }
-      catch (se) { console.error('[account] stripe cancel error:', se && se.message); }
+      try {
+        const sub = await stripe.subscriptions.retrieve(c.stripe_subscription);
+        if (sub && sub.status === 'trialing') {
+          // In trial -> end it now (no charge), immediate lockout.
+          await stripe.subscriptions.cancel(c.stripe_subscription);
+          newStatus = 'canceled';
+        } else {
+          // Paid -> let them keep what they paid for.
+          await stripe.subscriptions.update(c.stripe_subscription, { cancel_at_period_end: true });
+          newStatus = 'canceling';
+        }
+      } catch (se) {
+        console.error('[account] stripe cancel error:', se && se.message);
+        // Fall back to a period-end cancel so we never leave a live sub uncanceled.
+        try { await stripe.subscriptions.update(c.stripe_subscription, { cancel_at_period_end: true }); } catch (se2) {}
+        newStatus = 'canceling';
+      }
     }
-    await db.updateStatus(id, 'canceling');
-    return res.json({ ok: true });
+    await db.updateStatus(id, newStatus);
+    return res.json({ ok: true, status: newStatus });
   } catch (e) {
     console.error('[account] cancel error:', e && e.message);
     return res.status(500).json({ ok: false, error: 'server_error' });

@@ -303,6 +303,13 @@
       <button id="sibtn" onclick="sendLink()">Email me my link</button>
     </div>
   </div>
+
+  <div class="signin" id="ended" style="display:none">
+    <h1>Your membership has ended</h1>
+    <p id="endedMsg">Your SpamCallStop protection is no longer active, so we've stopped removing your number from the data-broker lists that feed spam and scam calls. Reactivate any time to start protecting it again.</p>
+    <button onclick="location.href='/offer.html'">Reactivate my protection</button>
+    <button onclick="signOut()" style="width:auto;background:none;border:none;color:var(--muted2);font-family:var(--font);font-weight:600;font-size:.95rem;text-decoration:underline;cursor:pointer;margin-top:1rem">Sign out</button>
+  </div>
 </div>
 
 <nav class="botnav" id="botnav" hidden>
@@ -337,8 +344,16 @@
     try{ return sessionStorage.getItem('scstop_ctoken') || ''; }catch(e){ return ''; }
   }
   function show(id){
-    ['loading','dash','signin'].forEach(function(x){ var el=document.getElementById(x); if(el) el.style.display=(x===id)?'block':'none'; });
+    ['loading','dash','signin','ended'].forEach(function(x){ var el=document.getElementById(x); if(el) el.style.display=(x===id)?'block':'none'; });
     var bn=document.getElementById('botnav'); if(bn) bn.hidden = (id!=='dash');
+  }
+  function showEnded(d){
+    var msg=document.getElementById('endedMsg');
+    var nm=(d && d.firstName) ? (d.firstName) : '';
+    if(msg && nm){ msg.textContent = nm + ", your SpamCallStop protection is no longer active, so we've stopped removing your number from the data-broker lists. Reactivate any time to start protecting it again."; }
+    // Keep the token so this screen stays put on refresh; clearing happens on Sign out.
+    ME_CACHE = null;
+    show('ended');
   }
   function signOut(){ try{ sessionStorage.removeItem('scstop_ctoken'); }catch(e){} location.href='/'; }
   function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
@@ -506,7 +521,16 @@
     fetch('/api/account/cancel', { method:'POST', headers:{ 'Content-Type':'application/json', 'x-customer-token': t }, body:'{}' })
       .then(function(r){ return r.json(); })
       .then(function(d){
-        if(d && d.ok){ membershipView('canceled'); if(ME_CACHE){ ME_CACHE.status = 'canceling'; applyMe(ME_CACHE); } }
+        if(d && d.ok){
+          if(d.status === 'canceled'){
+            // Canceled during the free trial -> access ends now.
+            try{ hidePanel(); }catch(e){}
+            showEnded(ME_CACHE || {});
+          } else {
+            membershipView('canceled');
+            if(ME_CACHE){ ME_CACHE.status = 'canceling'; applyMe(ME_CACHE); }
+          }
+        }
         else {
           if(btn){ btn.disabled = false; btn.textContent = 'Cancel my membership'; }
           if(msg) msg.textContent = 'We couldn\'t cancel just now. Please email company@spamcallstop.com and we\'ll sort it out.';
@@ -564,7 +588,10 @@
     fetch('/api/me', { headers: { 'x-customer-token': t } })
       .then(function(r){ return r.json().catch(function(){ return null; }); })
       .then(function(d){
-        if(d && d.ok){
+        if(d && d.ok && d.access === false){
+          // Membership fully ended -> reactivate screen, no dashboard data.
+          showEnded(d);
+        } else if(d && d.ok){
           ME_CACHE = d;
           applyMe(d);
           show('dash');
