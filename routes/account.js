@@ -68,6 +68,7 @@ router.get('/me', async (req, res) => {
     const firstName = (c.name || '').trim().split(/\s+/)[0] || '';
     const score = protectionScore(c.created_at, stats.threatPct);
     res.json({ ok: true, name: c.name || '', firstName: firstName, plan: c.plan || '',
+      status: c.status || 'active',
       cleared: stats.cleared, inProgress: stats.inProgress,
       requestsSent: stats.requestsSent, confirmedRemoved: stats.confirmedRemoved, active: stats.active,
       threatPct: stats.threatPct, unread: unread,

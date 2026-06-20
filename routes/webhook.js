@@ -22,7 +22,7 @@
 const express = require('express');
 const router = express.Router();
 const stripe = require('../lib/stripe');
-const { saveCustomer, markEventProcessed, unmarkEventProcessed, maskEmail, recordFunnelEvent, getCustomerBySubscription } = require('../lib/customers');
+const { saveCustomer, markEventProcessed, unmarkEventProcessed, maskEmail, recordFunnelEvent, getCustomerBySubscription, updateStatus } = require('../lib/customers');
 
 router.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
   if (!stripe) return res.status(503).send('payments not configured');
@@ -177,6 +177,36 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
       }
     } catch (te) {
       console.error('[trial] reminder send failed:', te && te.message);
+    }
+    return res.json({ received: true });
+  }
+
+  // Keep our membership status in sync with Stripe. Without this, a cancellation
+  // made in the Stripe dashboard (or an auto-cancel after failed payment) never
+  // reaches the app, so the customer's dashboard would keep showing "protected."
+  //   deleted  -> 'canceled'   (subscription fully ended)
+  //   updated  -> 'canceling'  when set to cancel at period end, else 'active'
+  if (event.type === 'customer.subscription.deleted' || event.type === 'customer.subscription.updated') {
+    let fresh = true;
+    try { fresh = await markEventProcessed(event.id); }
+    catch (de) { console.error('[webhook] dedupe store error (failing open):', de && de.message); }
+    if (!fresh) return res.json({ received: true, duplicate: true });
+
+    const sub = event.data.object;
+    try {
+      const cust = sub.id ? await getCustomerBySubscription(sub.id) : null;
+      if (cust && cust.id) {
+        let status;
+        if (event.type === 'customer.subscription.deleted' || sub.status === 'canceled') status = 'canceled';
+        else if (sub.cancel_at_period_end) status = 'canceling';
+        else status = 'active';
+        await updateStatus(cust.id, status);
+        console.log('[subscription] customer', cust.id, 'status ->', status, '(' + event.type + ')');
+      } else {
+        console.log('[subscription] no matching customer for sub', sub.id, '(' + event.type + ')');
+      }
+    } catch (se) {
+      console.error('[subscription] status sync failed:', se && se.message);
     }
     return res.json({ received: true });
   }

@@ -25,6 +25,7 @@
   .hi{font-size:1.7rem;font-weight:800;color:var(--ink);letter-spacing:-.02em}
   .status{display:inline-flex;align-items:center;gap:.45rem;color:var(--green);font-weight:700;font-size:.98rem;margin-top:.3rem}
   .status.sub{color:var(--muted)}
+  .status.ending,.status.ended{color:var(--muted)}
   .status .dot{flex:0 0 auto;width:19px;height:19px;border-radius:50%;background:var(--green);display:inline-flex;align-items:center;justify-content:center}
 
   /* radar */
@@ -182,7 +183,7 @@
       <div class="tophead">
         <div>
           <div class="hi">Hi, <span id="firstName">there</span></div>
-          <div class="status"><span class="dot"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span> You're protected</div>
+          <div class="status" id="statusBanner"><span class="dot"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span> You're protected</div>
         </div>
         <div class="radarwrap">
           <div class="radar">
@@ -505,7 +506,7 @@
     fetch('/api/account/cancel', { method:'POST', headers:{ 'Content-Type':'application/json', 'x-customer-token': t }, body:'{}' })
       .then(function(r){ return r.json(); })
       .then(function(d){
-        if(d && d.ok){ membershipView('canceled'); }
+        if(d && d.ok){ membershipView('canceled'); if(ME_CACHE){ ME_CACHE.status = 'canceling'; applyMe(ME_CACHE); } }
         else {
           if(btn){ btn.disabled = false; btn.textContent = 'Cancel my membership'; }
           if(msg) msg.textContent = 'We couldn\'t cancel just now. Please email company@spamcallstop.com and we\'ll sort it out.';
@@ -535,7 +536,24 @@
     var stage = (typeof d.stageIndex==='number') ? d.stageIndex : (score>=80?3:score>=50?2:score>=25?1:0);
     setScore(score, delta, stage);
     MY_PLAN = (d.plan === 'Dual') ? 'Couple' : (d.plan ? 'Individual' : '');
-    var pl=document.getElementById('acctPlanLine'); if(pl) pl.textContent = MY_PLAN ? (MY_PLAN+' plan, active') : '';
+    // Drive the membership banner + account line from real status, so a cancel
+    // (in-app or in Stripe) is actually reflected instead of always "protected".
+    var status = d.status || 'active';
+    var banner = document.getElementById('statusBanner');
+    if(banner){
+      if(status === 'canceled'){
+        banner.className = 'status ended';
+        banner.textContent = 'Membership ended';
+      } else if(status === 'canceling'){
+        banner.className = 'status ending';
+        banner.textContent = "Canceling — you're protected until your billing period ends";
+      } else {
+        banner.className = 'status';
+        banner.innerHTML = '<span class="dot"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span> You\'re protected';
+      }
+    }
+    var statusWord = status==='canceled' ? 'canceled' : (status==='canceling' ? 'canceling' : 'active');
+    var pl=document.getElementById('acctPlanLine'); if(pl) pl.textContent = MY_PLAN ? (MY_PLAN+' plan, '+statusWord) : '';
     setUnread(d.unread||0);
   }
   function loadMe(t){
