@@ -68,6 +68,18 @@ header.bar{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px so
 .bar .btn{min-height:48px;padding:.6rem 1.25rem;font-size:.98rem}
 .hamb{display:none;background:none;border:none;cursor:pointer;flex-direction:column;gap:5px;padding:.4rem}
 .hamb span{display:block;width:28px;height:3px;border-radius:2px;background:var(--ink)}
+.menu-wrap{position:relative}
+.menu-btn{display:inline-flex;align-items:center;gap:.5rem;background:#fff;border:1px solid var(--border-strong);border-radius:999px;padding:.5rem .7rem .5rem .85rem;cursor:pointer;color:var(--ink);min-height:46px}
+.menu-btn:hover{border-color:var(--ink)}
+.menu-btn .person{width:22px;height:22px;display:block;color:var(--ink)}
+.menu-btn .bars{display:flex;flex-direction:column;gap:4px}
+.menu-btn .bars span{display:block;width:20px;height:2px;border-radius:2px;background:var(--ink)}
+.menu-pop{position:absolute;right:0;top:calc(100% + 8px);min-width:208px;background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.12);padding:.4rem;display:none;z-index:60}
+.menu-pop.open{display:block}
+.menu-pop a{display:block;padding:.7rem .85rem;border-radius:8px;color:var(--ink);text-decoration:none;font-weight:600;font-size:1rem}
+.menu-pop a:hover{background:var(--surface)}
+.menu-pop a.primary{color:var(--accent)}
+.menu-pop .sep{height:1px;background:var(--border);margin:.35rem .3rem}
 .hero{background:var(--surface);padding:clamp(44px,7vw,84px) 0 clamp(48px,7vw,88px)}
 .hero .display{max-width:18ch;margin:0 auto 1.3rem;text-align:center}
 .hero .lead{max-width:40ch;margin:0 auto 2rem;text-align:center}
@@ -237,9 +249,29 @@ footer{background:#0C0C0E;color:#8C8C94;padding:48px 0;font-size:.97rem}
 <header class="bar">
   <div class="bar-in">
     <a href="#top" aria-label="SpamCallStop.com home" style="text-decoration:none;display:inline-flex;align-items:center;gap:9px"><img src="logo.png" alt="" width="38" height="38" style="height:38px;width:38px;display:block"><span class="word" style="font-weight:800;font-size:1.35rem;color:var(--ink);letter-spacing:-.01em">Spam<span style="color:var(--accent)">Call</span>Stop<span style="color:var(--muted)">.com</span></span></a>
-    <nav class="nav"></nav>
+    <nav class="nav">
+      <div class="menu-wrap">
+        <button class="menu-btn" id="menuBtn" aria-label="Menu" aria-haspopup="true" aria-expanded="false" onclick="toggleMenu(event)">
+          <svg class="person" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"></path></svg>
+          <span class="bars"><span></span><span></span><span></span></span>
+        </button>
+        <div class="menu-pop" id="menuPop" role="menu">
+          <a href="account.html" class="primary" role="menuitem">Sign in</a>
+          <div class="sep"></div>
+          <a href="#scan" role="menuitem">Free scan</a>
+          <a href="offer.html" role="menuitem">Pricing</a>
+          <a href="about.html" role="menuitem">About us</a>
+          <a href="contact.html" role="menuitem">Contact</a>
+        </div>
+      </div>
+    </nav>
   </div>
 </header>
+<script>
+  function toggleMenu(e){ if(e) e.stopPropagation(); var p=document.getElementById('menuPop'),b=document.getElementById('menuBtn'); var open=p.classList.toggle('open'); b.setAttribute('aria-expanded', open?'true':'false'); }
+  document.addEventListener('click', function(e){ var w=e.target.closest && e.target.closest('.menu-wrap'); if(!w){ var p=document.getElementById('menuPop'),b=document.getElementById('menuBtn'); if(p){p.classList.remove('open'); if(b) b.setAttribute('aria-expanded','false');} } });
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ var p=document.getElementById('menuPop'),b=document.getElementById('menuBtn'); if(p){p.classList.remove('open'); if(b) b.setAttribute('aria-expanded','false');} } });
+</script>
 <a id="top"></a>
 <section class="hero">
   <div class="container">

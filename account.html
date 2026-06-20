@@ -340,7 +340,7 @@
     ['loading','dash','signin'].forEach(function(x){ var el=document.getElementById(x); if(el) el.style.display=(x===id)?'block':'none'; });
     var bn=document.getElementById('botnav'); if(bn) bn.hidden = (id!=='dash');
   }
-  function signOut(){ try{ sessionStorage.removeItem('scstop_ctoken'); }catch(e){} location.href='account.html'; }
+  function signOut(){ try{ sessionStorage.removeItem('scstop_ctoken'); }catch(e){} location.href='/'; }
   function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
   var MY_PLAN = '';
