@@ -64,6 +64,19 @@
   .lstage{font-size:.78rem;font-weight:700}
   .lwhen{font-size:.78rem;color:var(--muted2)}
 
+  .revwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table.rev{border-collapse:collapse;width:100%;min-width:820px}
+  .rev th{color:var(--muted);font-size:.66rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:.5rem .35rem;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap}
+  .rev td{padding:.5rem .35rem;border-bottom:1px solid var(--line);text-align:center;font-size:.85rem}
+  .rev tbody tr:last-child td{border-bottom:none}
+  .rev .lft{text-align:left}
+  .rev .rwhen{color:var(--muted2);font-size:.78rem;white-space:nowrap}
+  .rev .rphone{color:#fff;font-weight:700;font-variant-numeric:tabular-nums;font-size:.86rem;white-space:nowrap}
+  .cy{color:var(--green);font-weight:800}
+  .cn{color:var(--accent);font-weight:800}
+  .cd{color:var(--muted);font-weight:700}
+  .revmeta{font-size:.82rem;color:var(--muted2);margin-bottom:.7rem}
+
   @media (max-width:900px){
     .grid2{grid-template-columns:1fr}
     .frow{grid-template-columns:96px 1fr 92px}
@@ -110,6 +123,12 @@
   <div class="card"><h2>Customers</h2><div id="customers"></div></div>
 
   <div class="card"><h2>People (phone &amp; email entered)</h2><div id="leads"></div></div>
+
+  <div class="card">
+    <h2>Data reveals</h2>
+    <div class="revmeta" id="revealsMeta"></div>
+    <div class="revwrap"><div id="reveals"></div></div>
+  </div>
 </div>
 
 <script>
@@ -145,6 +164,42 @@
         setRibbon('Range <b>'+d.range+'</b> &middot; updated '+fmtWhen(d.generatedAt), true);
       })
       .catch(function(){ setRibbon('Could not reach the server.'); });
+    loadReveals();
+  }
+
+  function loadReveals(){
+    var key=(document.getElementById('key').value||'').trim();
+    var opts = key ? { headers: { 'x-admin-key': key } } : {};
+    var meta=document.getElementById('revealsMeta'), box=document.getElementById('reveals');
+    fetch('/api/analytics/reveals?range='+RANGE+'&tz='+(new Date().getTimezoneOffset()), opts)
+      .then(function(r){ return r.json().catch(function(){ return null; }); })
+      .then(function(d){
+        if(!d || !d.ok){ meta.textContent=''; box.innerHTML='<div class="muted">'+((d&&d.error==='unauthorized')?'Enter your admin key, then Reload.':'Could not load reveals.')+'</div>'; return; }
+        renderReveals(d);
+      })
+      .catch(function(){ meta.textContent=''; box.innerHTML='<div class="muted">Could not reach the server.</div>'; });
+  }
+
+  function revCell(v){ if(v==='y') return '<span class="cy">&#10003;</span>'; if(v==='n') return '<span class="cn">&#10007;</span>'; return '<span class="cd">&mdash;</span>'; }
+
+  function renderReveals(d){
+    var cols=d.columns||[], rv=d.reveals||[], t=d.totals||{};
+    var meta=document.getElementById('revealsMeta'), box=document.getElementById('reveals');
+    meta.innerHTML = (t.reveals||0)+' number'+((t.reveals===1)?'':'s')+' shown'+
+      ' &middot; <span class="cy">'+(t.full||0)+' full</span>'+
+      ' &middot; <span class="cd">'+(t.nameOnly||0)+' name-only</span>'+
+      ' &nbsp;&nbsp;<span class="muted">(<span class="cy">&#10003;</span> shown &middot; <span class="cn">&#10007;</span> none &middot; <span class="cd">&mdash;</span> not reached)</span>';
+    if(!rv.length){ box.innerHTML='<div class="muted">No reveals yet in this range.</div>'; return; }
+    var head='<tr><th class="lft">First seen</th><th class="lft">Phone</th>'+
+      cols.map(function(c){ return '<th>'+esc(c.label)+'</th>'; }).join('')+'<th>Source</th></tr>';
+    var body=rv.map(function(r){
+      var tds=cols.map(function(c){ return '<td>'+revCell(r.cells[c.key])+'</td>'; }).join('');
+      var sc = r.source==='Full' ? 'cy' : (r.source==='Name only' ? 'cd' : '');
+      return '<tr><td class="lft rwhen">'+fmtWhen(r.firstSeen)+'</td>'+
+        '<td class="lft rphone">'+esc(fmtPhone(r.phone))+'</td>'+tds+
+        '<td class="'+sc+'">'+esc(r.source)+'</td></tr>';
+    }).join('');
+    box.innerHTML='<table class="rev"><thead>'+head+'</thead><tbody>'+body+'</tbody></table>';
   }
 
   function render(d){

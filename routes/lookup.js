@@ -19,7 +19,7 @@ const token = require('../lib/token');
 const ratelimit = require('../lib/ratelimit');
 const { lookupIdentity } = require('../lib/lookup');
 const { phoneHash } = require('../lib/crypto');
-const { getCachedLookup, setCachedLookup } = require('../lib/customers');
+const { getCachedLookup, setCachedLookup, logReveal } = require('../lib/customers');
 
 function ipOf(req) {
   const xff = req.headers['x-forwarded-for'];
@@ -42,7 +42,7 @@ router.post('/lookup', express.json(), async (req, res) => {
   const ph = phoneHash(digits);
   if (ph) {
     const cached = await getCachedLookup(ph);
-    if (cached) return res.json(cached);
+    if (cached) { logReveal(cached); return res.json(cached); }
   }
 
   // Cost guard: a verified user can't spin the paid lookup endlessly.
@@ -63,6 +63,9 @@ router.post('/lookup', express.json(), async (req, res) => {
   if (ph && out.source === 'enformion-callerid-plus') {
     await setCachedLookup(ph, out);
   }
+  // Log every successful reveal (rich Enformion AND name-only fallbacks) so the
+  // admin reveals table can show what level each number reached.
+  logReveal(out);
   return res.json(out);
 });
 

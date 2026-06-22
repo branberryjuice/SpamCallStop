@@ -74,6 +74,43 @@ test('database critical paths', async (t) => {
     assert.strictEqual(s.threatPct, 0);                                 // all confirmed
   });
 
+  await t.test('reveal log: rich Enformion reveal records all field presence', async () => {
+    await db.logReveal({
+      ok: true, phone: '+14243860093', source: 'enformion-callerid-plus',
+      name: 'Pat Doe', age: '40', dob: '**/1985', gender: 'F', ethnicity: 'X',
+      language: 'English', children: 'No', hasAddress: true,
+      address: { city: 'LA', state: 'CA' }, email: 'a@b.com', relatives: [{ name: 'Q Doe' }],
+    });
+    const rows = await db.listReveals('1970-01-01', 100);
+    const r = rows.find((x) => x.phone === '+14243860093');
+    assert.ok(r, 'reveal row exists');
+    assert.strictEqual(r.source, 'enformion-callerid-plus');
+    assert.strictEqual(r.fields.name, true);
+    assert.strictEqual(r.fields.ethnicity, true);
+    assert.strictEqual(r.fields.address, true);
+    assert.strictEqual(r.fields.relatives, true);
+  });
+
+  await t.test('reveal log: name-only Twilio reveal marks rich fields absent (-> dash upstream)', async () => {
+    await db.logReveal({ ok: true, phone: '+12125559999', source: 'twilio', name: 'Cee Cee', relatives: [] });
+    const rows = await db.listReveals('1970-01-01', 100);
+    const r = rows.find((x) => x.phone === '+12125559999');
+    assert.ok(r && r.source === 'twilio');
+    assert.strictEqual(r.fields.name, true);
+    assert.strictEqual(r.fields.age, false);
+    assert.strictEqual(r.fields.ethnicity, false);
+    assert.strictEqual(r.fields.relatives, false);
+  });
+
+  await t.test('reveal log: re-logging a number keeps a single row', async () => {
+    // Re-log the same number with DIFFERENT formatting; phoneHash collapses both
+    // to one key, so the row count must not grow (the payload is overwritten).
+    const before = (await db.listReveals('1970-01-01', 200)).length;
+    await db.logReveal({ ok: true, phone: '+1 (424) 386-0093', source: 'enformion-callerid-plus', name: 'Pat Doe' });
+    const after = (await db.listReveals('1970-01-01', 200)).length;
+    assert.strictEqual(after, before);
+  });
+
   await t.test('removal cadence: pending due, in-cooldown not, elapsed due, suppressed terminal', () => {
     const now = new Date();
     const future = new Date(Date.now() + 5 * 86400000).toISOString();

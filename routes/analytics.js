@@ -146,4 +146,66 @@ router.get('/analytics/funnel', async (req, res) => {
   }
 });
 
+// Data reveals: which numbers we've shown identity data for, what fields, and how
+// far the lookup got. Each cell is 'y' (shown), 'n' (reached that level but empty),
+// or '-' (never reached that level — e.g. fell back to name-only Twilio).
+//
+//   GET /api/analytics/reveals?range=today|24h|7d|30d|90d|all   (admin-gated)
+const REVEAL_COLUMNS = [
+  ['name', 'Name'], ['age', 'Age'], ['dob', 'DOB'], ['gender', 'Gender'],
+  ['ethnicity', 'Ethnicity'], ['language', 'Language'], ['children', 'Children'],
+  ['address', 'Address'], ['email', 'Email'], ['relatives', 'Relatives'],
+];
+// 'name' is attempted by every source; everything else is rich (Enformion only).
+const RICH_KEYS = { age: 1, dob: 1, gender: 1, ethnicity: 1, language: 1, children: 1, address: 1, email: 1, relatives: 1 };
+
+router.get('/analytics/reveals', async (req, res) => {
+  if (!authed(req)) return res.status(401).json({ ok: false, error: 'unauthorized' });
+
+  const now = Date.now();
+  let sinceISO = '1970-01-01T00:00:00.000Z';
+  const range = req.query.range || 'all';
+  if (range !== 'all' && RANGES[range]) {
+    let sinceMs;
+    if (range === 'today') {
+      const off = parseInt(req.query.tz, 10);
+      const tzMin = Number.isFinite(off) ? off : 0;
+      const localNow = now - tzMin * 60000;
+      sinceMs = Math.floor(localNow / DAY) * DAY + tzMin * 60000;
+    } else {
+      sinceMs = now - RANGES[range].ms;
+    }
+    sinceISO = new Date(sinceMs).toISOString();
+  }
+
+  try {
+    const rows = await db.listReveals(sinceISO, 500);
+    let full = 0, nameOnly = 0;
+    const reveals = rows.map((r) => {
+      const reachedRich = r.source === 'enformion-callerid-plus';
+      if (reachedRich) full++; else nameOnly++;
+      const f = r.fields || {};
+      const cells = {};
+      for (const [key] of REVEAL_COLUMNS) {
+        if (RICH_KEYS[key] && !reachedRich) cells[key] = '-';
+        else cells[key] = f[key] ? 'y' : 'n';
+      }
+      const sourceLabel = reachedRich ? 'Full' : (r.source === 'twilio' ? 'Name only' : (r.source || '—'));
+      return { phone: r.phone || '', firstSeen: r.firstSeen, source: sourceLabel, cells };
+    });
+
+    res.json({
+      ok: true,
+      range,
+      generatedAt: new Date().toISOString(),
+      columns: REVEAL_COLUMNS.map(([key, label]) => ({ key, label })),
+      totals: { reveals: reveals.length, full, nameOnly },
+      reveals,
+    });
+  } catch (e) {
+    console.error('[analytics] reveals error:', e && e.message);
+    res.status(500).json({ ok: false, error: 'reveals_failed' });
+  }
+});
+
 module.exports = router;
