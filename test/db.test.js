@@ -89,6 +89,12 @@ test('database critical paths', async (t) => {
     assert.strictEqual(r.fields.ethnicity, true);
     assert.strictEqual(r.fields.address, true);
     assert.strictEqual(r.fields.relatives, true);
+    // actual values stored for inline display
+    assert.strictEqual(r.values.name, 'Pat Doe');
+    assert.strictEqual(r.values.age, '40');
+    assert.strictEqual(r.values.ethnicity, 'X');
+    assert.strictEqual(r.values.address, 'LA, CA');
+    assert.strictEqual(r.values.relatives, 'Q Doe');
   });
 
   await t.test('reveal log: name-only Twilio reveal marks rich fields absent (-> dash upstream)', async () => {
@@ -100,6 +106,9 @@ test('database critical paths', async (t) => {
     assert.strictEqual(r.fields.age, false);
     assert.strictEqual(r.fields.ethnicity, false);
     assert.strictEqual(r.fields.relatives, false);
+    assert.strictEqual(r.values.name, 'Cee Cee');
+    assert.strictEqual(r.values.age, '');
+    assert.strictEqual(r.values.relatives, '');
   });
 
   await t.test('reveal log: re-logging a number keeps a single row', async () => {

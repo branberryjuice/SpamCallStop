@@ -65,7 +65,7 @@
   .lwhen{font-size:.78rem;color:var(--muted2)}
 
   .revwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
-  table.rev{border-collapse:collapse;width:100%;min-width:820px}
+  table.rev{border-collapse:collapse;width:100%;min-width:1120px}
   .rev th{color:var(--muted);font-size:.66rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:.5rem .35rem;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap}
   .rev td{padding:.5rem .35rem;border-bottom:1px solid var(--line);text-align:center;font-size:.85rem}
   .rev tbody tr:last-child td{border-bottom:none}
@@ -75,6 +75,7 @@
   .cy{color:var(--green);font-weight:800}
   .cn{color:var(--accent);font-weight:800}
   .cd{color:var(--muted);font-weight:700}
+  .rev .cval{color:#e8eef6;font-weight:600;display:inline-block;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom}
   .revmeta{font-size:.82rem;color:var(--muted2);margin-bottom:.7rem}
 
   @media (max-width:900px){
@@ -180,7 +181,16 @@
       .catch(function(){ meta.textContent=''; box.innerHTML='<div class="muted">Could not reach the server.</div>'; });
   }
 
-  function revCell(v){ if(v==='y') return '<span class="cy">&#10003;</span>'; if(v==='n') return '<span class="cn">&#10007;</span>'; return '<span class="cd">&mdash;</span>'; }
+  function revCell(v){
+    // Back-compat: a bare 'y'/'n'/'-' still renders the old check/X/dash.
+    if(v==='y') return '<span class="cy">&#10003;</span>';
+    if(v==='n') return '<span class="cn">&#10007;</span>';
+    if(v==='-'||v==null) return '<span class="cd">&mdash;</span>';
+    if(typeof v==='string') return '<span class="cval">'+esc(v)+'</span>';
+    if(v.state==='val') return '<span class="cval" title="'+esc(v.text)+'">'+esc(v.text)+'</span>';
+    if(v.state==='empty') return '<span class="cn">&#10007;</span>';
+    return '<span class="cd">&mdash;</span>';
+  }
 
   function renderReveals(d){
     var cols=d.columns||[], rv=d.reveals||[], t=d.totals||{};
@@ -188,7 +198,7 @@
     meta.innerHTML = (t.reveals||0)+' number'+((t.reveals===1)?'':'s')+' shown'+
       ' &middot; <span class="cy">'+(t.full||0)+' full</span>'+
       ' &middot; <span class="cd">'+(t.nameOnly||0)+' name-only</span>'+
-      ' &nbsp;&nbsp;<span class="muted">(<span class="cy">&#10003;</span> shown &middot; <span class="cn">&#10007;</span> none &middot; <span class="cd">&mdash;</span> not reached)</span>';
+      ' &nbsp;&nbsp;<span class="muted">(<span class="cval">value</span> shown &middot; <span class="cn">&#10007;</span> none &middot; <span class="cd">&mdash;</span> not reached)</span>';
     if(!rv.length){ box.innerHTML='<div class="muted">No reveals yet in this range.</div>'; return; }
     var head='<tr><th class="lft">First seen</th><th class="lft">Phone</th>'+
       cols.map(function(c){ return '<th>'+esc(c.label)+'</th>'; }).join('')+'<th>Source</th></tr>';

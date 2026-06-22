@@ -184,11 +184,12 @@ router.get('/analytics/reveals', async (req, res) => {
     const reveals = rows.map((r) => {
       const reachedRich = r.source === 'enformion-callerid-plus';
       if (reachedRich) full++; else nameOnly++;
-      const f = r.fields || {};
+      const vals = r.values || {};
       const cells = {};
       for (const [key] of REVEAL_COLUMNS) {
-        if (RICH_KEYS[key] && !reachedRich) cells[key] = '-';
-        else cells[key] = f[key] ? 'y' : 'n';
+        if (RICH_KEYS[key] && !reachedRich) cells[key] = { state: 'dash' };
+        else if (vals[key]) cells[key] = { state: 'val', text: vals[key] };
+        else cells[key] = { state: 'empty' };
       }
       const sourceLabel = reachedRich ? 'Full' : (r.source === 'twilio' ? 'Name only' : (r.source || '—'));
       return { phone: r.phone || '', firstSeen: r.firstSeen, source: sourceLabel, cells };
