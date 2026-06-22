@@ -77,7 +77,7 @@ test('database critical paths', async (t) => {
   await t.test('reveal log: rich Enformion reveal records all field presence', async () => {
     await db.logReveal({
       ok: true, phone: '+14243860093', source: 'enformion-callerid-plus',
-      name: 'Pat Doe', age: '40', dob: '**/1985', gender: 'F', ethnicity: 'X',
+      name: 'Pat Doe', age: '40', dob: '**/1985', gender: 'F',
       language: 'English', children: 'No', hasAddress: true,
       address: { city: 'LA', state: 'CA' }, email: 'a@b.com', relatives: [{ name: 'Q Doe' }],
     });
@@ -86,13 +86,11 @@ test('database critical paths', async (t) => {
     assert.ok(r, 'reveal row exists');
     assert.strictEqual(r.source, 'enformion-callerid-plus');
     assert.strictEqual(r.fields.name, true);
-    assert.strictEqual(r.fields.ethnicity, true);
     assert.strictEqual(r.fields.address, true);
     assert.strictEqual(r.fields.relatives, true);
     // actual values stored for inline display
     assert.strictEqual(r.values.name, 'Pat Doe');
     assert.strictEqual(r.values.age, '40');
-    assert.strictEqual(r.values.ethnicity, 'X');
     assert.strictEqual(r.values.address, 'LA, CA');
     assert.strictEqual(r.values.relatives, 'Q Doe');
   });
@@ -104,7 +102,6 @@ test('database critical paths', async (t) => {
     assert.ok(r && r.source === 'twilio');
     assert.strictEqual(r.fields.name, true);
     assert.strictEqual(r.fields.age, false);
-    assert.strictEqual(r.fields.ethnicity, false);
     assert.strictEqual(r.fields.relatives, false);
     assert.strictEqual(r.values.name, 'Cee Cee');
     assert.strictEqual(r.values.age, '');

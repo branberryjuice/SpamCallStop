@@ -153,11 +153,11 @@ router.get('/analytics/funnel', async (req, res) => {
 //   GET /api/analytics/reveals?range=today|24h|7d|30d|90d|all   (admin-gated)
 const REVEAL_COLUMNS = [
   ['name', 'Name'], ['age', 'Age'], ['dob', 'DOB'], ['gender', 'Gender'],
-  ['ethnicity', 'Ethnicity'], ['language', 'Language'], ['children', 'Children'],
+  ['language', 'Language'], ['children', 'Children'],
   ['address', 'Address'], ['email', 'Email'], ['relatives', 'Relatives'],
 ];
 // 'name' is attempted by every source; everything else is rich (Enformion only).
-const RICH_KEYS = { age: 1, dob: 1, gender: 1, ethnicity: 1, language: 1, children: 1, address: 1, email: 1, relatives: 1 };
+const RICH_KEYS = { age: 1, dob: 1, gender: 1, language: 1, children: 1, address: 1, email: 1, relatives: 1 };
 
 router.get('/analytics/reveals', async (req, res) => {
   if (!authed(req)) return res.status(401).json({ ok: false, error: 'unauthorized' });
