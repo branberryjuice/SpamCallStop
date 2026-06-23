@@ -86,6 +86,15 @@
   .srow b{color:var(--ink);font-weight:800;font-size:.98rem}
   .srow span{display:block;color:var(--muted);font-size:.88rem;margin-top:.1rem;line-height:1.4}
 
+  /* what to expect (timing) */
+  .expecthead{display:flex;align-items:center;gap:.6rem;margin-bottom:.3rem}
+  .expecthead .eic{flex:0 0 auto;width:34px;height:34px;border-radius:10px;background:#E8F0FB;color:#2C6FB5;display:flex;align-items:center;justify-content:center}
+  .estep{display:flex;gap:.75rem;align-items:flex-start;padding:.55rem 0}
+  .edot{flex:0 0 auto;width:10px;height:10px;border-radius:50%;background:var(--green);margin-top:.42rem}
+  .edot.soon{background:var(--amber)}.edot.later{background:var(--line2)}
+  .estep b{display:block;font-size:.97rem;font-weight:700;color:var(--ink)}
+  .estep span{font-size:.88rem;color:var(--muted);line-height:1.42}
+
   /* alerts / activity */
   .alertrow{display:flex;gap:.8rem;align-items:flex-start;padding:.85rem 0;border-top:1px solid var(--line)}
   .alertrow:first-child{border-top:none;padding-top:0}
@@ -98,6 +107,38 @@
   .alert-body{color:var(--muted2);font-size:.93rem;margin-top:.12rem}
   .alert-time{color:var(--muted);font-size:.8rem;margin-top:.25rem}
   .emptynote{color:var(--muted);text-align:center;padding:1.3rem .5rem;font-size:.96rem}
+
+  /* report a spam call */
+  .reportcard .rdesc{color:var(--muted);font-size:.92rem;margin:.15rem 0 0}
+  .reportbtn{display:inline-flex;align-items:center;gap:.5rem;background:var(--green);color:#fff;border:none;border-radius:11px;padding:.7rem 1.05rem;font-family:var(--font);font-weight:800;font-size:.98rem;cursor:pointer;margin-top:.9rem}
+  .reportbtn:hover{background:var(--green2)}
+  .reportbtn svg{width:17px;height:17px}
+  .reportform{margin-top:.4rem}
+  .reportform[hidden]{display:none}
+  .reportcard .fl{display:block;font-size:.78rem;font-weight:800;color:var(--muted2);text-transform:uppercase;letter-spacing:.04em;margin:.9rem 0 .35rem}
+  .reportcard .f{width:100%;background:#fff;border:1.5px solid var(--line);color:var(--ink);border-radius:11px;padding:.8rem .95rem;font-size:1.02rem;font-family:var(--font)}
+  .reportcard .f:focus{outline:none;border-color:var(--green)}
+  .reportcard textarea.f{min-height:64px;resize:vertical}
+  .chips{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.15rem}
+  .chip{border:1.5px solid var(--line);background:#fff;color:var(--muted2);border-radius:999px;padding:.45rem .9rem;font-size:.9rem;font-weight:700;cursor:pointer;font-family:var(--font)}
+  .chip.on{border-color:var(--green);background:var(--green-soft);color:var(--green)}
+  .reportsubmit{width:100%;background:var(--green);color:#fff;border:none;border-radius:11px;padding:.9rem;font-weight:800;font-size:1.02rem;cursor:pointer;margin-top:1rem;font-family:var(--font)}
+  .reportsubmit:hover{background:var(--green2)}
+  .reportsubmit:disabled{opacity:.6;cursor:default}
+  .reportcancel{display:inline-block;margin-top:.7rem;color:var(--muted);font-weight:600;font-size:.92rem;cursor:pointer;text-decoration:underline}
+  .reportmsg{font-size:.9rem;color:var(--muted2);margin-top:.6rem;min-height:1em}
+  .rdone{background:var(--green-soft);border:1px solid var(--gline);border-radius:12px;padding:.9rem 1rem;margin-top:.9rem;color:var(--muted2);font-size:.95rem}
+  .rdone[hidden]{display:none}
+  .rdone b{color:var(--ink)}
+  .rplist .rptitle{font-size:.78rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.2rem}
+  .rprow{display:flex;align-items:center;gap:.7rem;padding:.7rem 0;border-top:1px solid var(--line)}
+  .rprow:first-child{border-top:none}
+  .rpic{flex:0 0 auto;width:32px;height:32px;border-radius:9px;background:var(--red-soft);color:var(--red);display:flex;align-items:center;justify-content:center}
+  .rpbd{flex:1;min-width:0}
+  .rpbd b{display:block;font-size:.96rem;font-weight:700;color:var(--ink)}
+  .rpbd span{font-size:.82rem;color:var(--muted)}
+  .rptag{font-size:.7rem;font-weight:800;padding:3px 9px;border-radius:999px;color:var(--amber);background:var(--amber-soft);white-space:nowrap}
+  .rptag.scam{color:var(--red);background:var(--red-soft)}
 
   .reassure{background:var(--green-soft);border:1px solid var(--gline);border-radius:18px;padding:1.2rem 1.4rem;margin-top:1.05rem;display:flex;gap:.9rem;align-items:flex-start}
   .reassure .ic{width:40px;height:40px;border-radius:50%;background:#fff;border:1px solid var(--gline)}
@@ -222,12 +263,52 @@
       </div>
 
       <div class="card">
+        <div class="expecthead">
+          <span class="eic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <h2>What to expect</h2>
+        </div>
+        <div style="margin-top:.3rem">
+          <div class="estep"><span class="edot"></span><div><b>Right now, your requests are out</b><span>We&rsquo;ve already asked the data brokers to remove your number. This first step is fast.</span></div></div>
+          <div class="estep"><span class="edot soon"></span><div><b>Over the next few weeks, confirmations roll in</b><span>Brokers are allowed time to process removals. We follow up with each one until it confirms, so this part takes a little patience.</span></div></div>
+          <div class="estep"><span class="edot later"></span><div><b>Always, we keep watching</b><span>Even after you&rsquo;re removed, we keep scanning and take your number back down any time it reappears.</span></div></div>
+        </div>
+      </div>
+
+      <div class="card">
         <h2>How we're protecting you</h2>
         <div class="plist" style="margin-top:.5rem">
           <div class="prow"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7l8-4z" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div class="pt"><b>Removals</b><span>Across the broker lists, checking again</span></div><span class="pill">Active</span></div>
           <div class="prow"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/></svg></span><div class="pt"><b>24/7 monitoring</b><span>Watching for your number to reappear</span></div><span class="pill">On</span></div>
           <div class="prow"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12a8 8 0 0114-5l2 2M20 12a8 8 0 01-14 5l-2-2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 4v4h-4M4 20v-4h4" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div class="pt"><b>Weekly checks</b><span>We keep scanning and take it down again</span></div><span class="pill">On</span></div>
         </div>
+      </div>
+
+      <div class="card reportcard">
+        <div class="cardhead"><h2>Got a spam call?</h2></div>
+        <p class="rdesc">Drop the number here. We log it, watch for it, and use it to protect you and other members.</p>
+        <button class="reportbtn" id="reportToggle" onclick="toggleReportForm()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 5l4-1 2 5-2.5 1.5a12 12 0 005.5 5.5L19 18l-1 4a16 16 0 01-15-15z" stroke-linejoin="round"/><path d="M15 9l5-5M20 9l-5-5" stroke-linecap="round"/></svg>
+          Report a spam call
+        </button>
+        <div class="reportform" id="reportForm" hidden>
+          <label class="fl">Spam number</label>
+          <input class="f" id="reportPhone" type="tel" inputmode="tel" placeholder="(555) 555-5555">
+          <label class="fl">What kind of call was it?</label>
+          <div class="chips" id="reportChips">
+            <span class="chip on" data-cat="Robocall" onclick="pickCat(this)">Robocall</span>
+            <span class="chip" data-cat="Scam or fraud" onclick="pickCat(this)">Scam or fraud</span>
+            <span class="chip" data-cat="Telemarketer" onclick="pickCat(this)">Telemarketer</span>
+            <span class="chip" data-cat="Debt or collections" onclick="pickCat(this)">Debt or collections</span>
+            <span class="chip" data-cat="Other" onclick="pickCat(this)">Other</span>
+          </div>
+          <label class="fl">Anything else? (optional)</label>
+          <textarea class="f" id="reportNote" placeholder="A quick note, like what they said or how often they call."></textarea>
+          <button class="reportsubmit" id="reportSubmit" onclick="submitReport()">Report this number</button>
+          <span class="reportcancel" onclick="toggleReportForm()">Cancel</span>
+          <div class="reportmsg" id="reportMsg"></div>
+        </div>
+        <div class="rdone" id="reportDone" hidden></div>
+        <div class="rplist" id="reportedList" style="margin-top:1rem"></div>
       </div>
 
       <div class="card">
@@ -457,6 +538,74 @@
   }
   function markAllRead(){ loadAlerts(true); }
 
+  /* ---- report a spam call ---- */
+  var REPORT_CAT = 'Robocall';
+  function toggleReportForm(){
+    var f = document.getElementById('reportForm');
+    if(!f) return;
+    var opening = f.hidden;
+    f.hidden = !opening;
+    if(opening){
+      var done = document.getElementById('reportDone'); if(done) done.hidden = true;
+      var p = document.getElementById('reportPhone'); if(p) p.focus();
+    }
+  }
+  function pickCat(el){
+    if(!el) return;
+    REPORT_CAT = el.getAttribute('data-cat') || 'Other';
+    var chips = document.querySelectorAll('#reportChips .chip');
+    for(var i=0;i<chips.length;i++){ chips[i].classList.toggle('on', chips[i]===el); }
+  }
+  function fmtPhoneLocal(p){
+    var d = String(p==null?'':p).replace(/\D/g,''); if(d.length===11 && d[0]==='1') d = d.slice(1);
+    if(d.length!==10) return String(p==null?'':p);
+    return '('+d.slice(0,3)+') '+d.slice(3,6)+'-'+d.slice(6);
+  }
+  function submitReport(){
+    var t = getToken(); if(!t) return;
+    var phoneEl=document.getElementById('reportPhone'), noteEl=document.getElementById('reportNote');
+    var msg=document.getElementById('reportMsg'), btn=document.getElementById('reportSubmit');
+    var raw=((phoneEl&&phoneEl.value)||'').replace(/\D/g,'').slice(-10);
+    if(raw.length!==10){ if(msg) msg.textContent='Enter the 10 digit number that called you.'; return; }
+    if(btn){ btn.disabled=true; btn.textContent='Reporting...'; }
+    if(msg) msg.textContent='';
+    fetch('/api/report-spam', { method:'POST', headers:{'Content-Type':'application/json','x-customer-token':t},
+      body: JSON.stringify({ phone: raw, category: REPORT_CAT, note: ((noteEl&&noteEl.value)||'').slice(0,500) }) })
+      .then(function(r){ return r.json().catch(function(){return null;}); })
+      .then(function(d){
+        if(btn){ btn.disabled=false; btn.textContent='Report this number'; }
+        if(d && d.ok){
+          var f=document.getElementById('reportForm'); if(f) f.hidden=true;
+          var done=document.getElementById('reportDone');
+          if(done){ done.hidden=false; done.innerHTML='<b>Thanks, we logged it.</b> We added '+esc(fmtPhoneLocal(raw))+' to your reported numbers and flagged it on our end. We will keep an eye out for it.'; }
+          if(phoneEl) phoneEl.value=''; if(noteEl) noteEl.value='';
+          pickCat(document.querySelector('#reportChips .chip[data-cat="Robocall"]'));
+          loadReports();
+          loadAlerts(false);
+        } else {
+          if(msg) msg.textContent = (d && d.error==='bad_phone') ? 'That does not look like a valid US number.' : 'We could not log that just now. Please try again.';
+        }
+      })
+      .catch(function(){ if(btn){ btn.disabled=false; btn.textContent='Report this number'; } if(msg) msg.textContent='Something went wrong. Please try again.'; });
+  }
+  function reportedHTML(r){
+    var scam = (r.category==='Scam or fraud');
+    return '<div class="rprow"><span class="rpic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 5l4-1 2 5-2.5 1.5a12 12 0 005.5 5.5L19 18l-1 4a16 16 0 01-15-15z" stroke-linejoin="round"/></svg></span>'
+      + '<div class="rpbd"><b>'+esc(fmtPhoneLocal(r.phone))+'</b><span>Reported '+timeAgo(r.created_at)+'</span></div>'
+      + '<span class="rptag'+(scam?' scam':'')+'">'+esc(r.category||'Other')+'</span></div>';
+  }
+  function loadReports(){
+    var t=getToken(); if(!t) return;
+    fetch('/api/report-spam', { headers:{'x-customer-token':t} })
+      .then(function(r){ return r.json().catch(function(){return null;}); })
+      .then(function(d){
+        var box=document.getElementById('reportedList'); if(!box) return;
+        if(d && d.ok && d.reports && d.reports.length){
+          box.innerHTML='<div class="rptitle">Numbers you\'ve reported</div>'+d.reports.map(reportedHTML).join('');
+        } else { box.innerHTML=''; }
+      }).catch(function(){});
+  }
+
   /* ---- account modal (membership + settings) ---- */
   function openModal(title){
     document.getElementById('panelTitle').textContent = title;
@@ -570,7 +719,7 @@
         banner.textContent = 'Membership ended';
       } else if(status === 'canceling'){
         banner.className = 'status ending';
-        banner.textContent = "Canceling — you're protected until your billing period ends";
+        banner.textContent = "Canceling. You're protected until your billing period ends";
       } else {
         banner.className = 'status';
         banner.innerHTML = '<span class="dot"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span> You\'re protected';
@@ -597,6 +746,7 @@
           show('dash');
           switchTab('home');
           loadAlerts(false);
+          loadReports();
         } else if(!ME_CACHE){ showSignin(''); }
       })
       .catch(function(){ if(!ME_CACHE) showSignin(''); });

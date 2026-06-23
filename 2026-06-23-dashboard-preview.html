@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard preview | SpamCallStop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F4F6F4; --card:#FFFFFF; --line:#E4E7E4; --line2:#D3D7D3; --ink:#1A1A1A; --muted:#6B6B72; --muted2:#4A4A50;
+    --green:#1F7A4D; --green2:#2A9D63; --green-soft:#E7F1EB; --gline:rgba(31,122,77,.22);
+    --red:#C0392B; --amber:#C9871A; --amber-soft:#FAF1DF; --info:#2C6FB5; --info-soft:#E8F0FB;
+    --font:'Libre Franklin',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#E9ECE9;color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased;padding:1.4rem 0 3rem}
+  .note{max-width:720px;margin:0 auto 1rem;padding:0 1.3rem;color:var(--muted2);font-size:.92rem}
+  .note b{color:var(--ink)}
+  .frame{max-width:720px;margin:0 auto;background:var(--bg);border:1px solid var(--line);border-radius:22px;padding:1.2rem 1.3rem 2rem}
+  .bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem}
+  .word{font-weight:800;font-size:1.2rem;color:var(--ink);text-decoration:none}
+  .word .cr{color:#B52A2A}.word .cg{color:var(--muted)}
+  .tophead{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin:.3rem 0 1.1rem}
+  .hi{font-size:1.7rem;font-weight:800;color:var(--ink);letter-spacing:-.02em}
+  .status{display:inline-flex;align-items:center;gap:.45rem;color:var(--green);font-weight:700;font-size:.98rem;margin-top:.3rem}
+  .status .dot{flex:0 0 auto;width:19px;height:19px;border-radius:50%;background:var(--green);display:inline-flex;align-items:center;justify-content:center}
+  .radarwrap{flex:0 0 auto;text-align:center}
+  .radar{position:relative;width:92px;height:92px;border-radius:50%;background:var(--green-soft);border:1.5px solid var(--gline);overflow:hidden}
+  .ring{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);border:1px solid rgba(31,122,77,.26);border-radius:50%}
+  .ring.r1{width:70%;height:70%}.ring.r2{width:42%;height:42%}
+  .cross{position:absolute;background:rgba(31,122,77,.16)}
+  .cross.h{top:50%;left:0;right:0;height:1px}.cross.v{left:50%;top:0;bottom:0;width:1px}
+  .sweep{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,rgba(31,122,77,.5),rgba(31,122,77,.08) 45deg,rgba(31,122,77,0) 85deg);animation:spin 5.5s linear infinite}
+  @keyframes spin{to{transform:rotate(-360deg)}}
+  .rcenter{position:absolute;top:50%;left:50%;width:10px;height:10px;border-radius:50%;background:var(--green);transform:translate(-50%,-50%)}
+  .radarlabel{margin-top:.35rem;font-size:.66rem;font-weight:800;color:var(--green);letter-spacing:.03em;text-transform:uppercase}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:1.3rem 1.4rem;margin-top:1.05rem}
+  .card h2{font-size:1.15rem;font-weight:800;color:var(--ink)}
+  .cardhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem}
+  .viewall{color:var(--green);font-weight:700;font-size:.95rem;cursor:pointer;text-decoration:none}
+  .newtag{color:var(--green);font-weight:800;font-size:.85rem}
+  .scorecard{text-align:center}
+  .kick{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin-bottom:.1rem}
+  .gwrap{position:relative;width:230px;margin:.1rem auto 0}
+  .num{position:absolute;left:0;right:0;top:50px;text-align:center}
+  .num b{font-size:3.1rem;font-weight:900;letter-spacing:-.03em;line-height:1;color:var(--amber)}
+  .num span{display:block;font-size:.7rem;color:var(--muted);font-weight:700;margin-top:-2px}
+  .slabel{font-size:1.05rem;font-weight:800;margin-top:-2px;color:var(--amber)}
+  .delta{display:inline-flex;align-items:center;gap:6px;font-size:.85rem;font-weight:800;color:var(--amber);background:var(--amber-soft);padding:5px 13px;border-radius:999px;margin-top:9px}
+  .ssub{color:var(--muted);font-size:.86rem;margin:.7rem auto 0;max-width:42ch;line-height:1.45}
+
+  /* NEW: What to expect timing card */
+  .expecthead{display:flex;align-items:center;gap:.6rem;margin-bottom:.3rem}
+  .expecthead .eic{width:34px;height:34px;border-radius:10px;background:var(--info-soft);color:var(--info);display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+  .expecthead h2{font-size:1.15rem;font-weight:800;color:var(--ink)}
+  .estep{display:flex;gap:.75rem;align-items:flex-start;padding:.55rem 0}
+  .edot{flex:0 0 auto;width:10px;height:10px;border-radius:50%;background:var(--green);margin-top:.42rem}
+  .edot.soon{background:var(--amber)}.edot.later{background:var(--line2)}
+  .estep b{display:block;font-size:.97rem;font-weight:700;color:var(--ink)}
+  .estep span{font-size:.88rem;color:var(--muted);line-height:1.42}
+
+  /* alerts */
+  .alertrow{display:flex;gap:.8rem;align-items:flex-start;padding:.85rem 0;border-top:1px solid var(--line)}
+  .alertrow:first-child{border-top:none;padding-top:0}
+  .alert-ic{flex:0 0 auto;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1rem}
+  .alert-ic.good{background:var(--green-soft);color:var(--green)}
+  .alert-ic.info{background:var(--info-soft);color:var(--info)}
+  .alert-title{font-weight:700;color:var(--ink);font-size:1rem}
+  .alert-body{color:var(--muted2);font-size:.93rem;margin-top:.12rem;line-height:1.42}
+  .alert-time{color:var(--muted);font-size:.8rem;margin-top:.25rem}
+
+  .reassure{background:var(--green-soft);border:1px solid var(--gline);border-radius:18px;padding:1.2rem 1.4rem;margin-top:1.05rem;display:flex;gap:.9rem;align-items:flex-start}
+  .reassure .ic{width:40px;height:40px;border-radius:50%;background:#fff;border:1px solid var(--gline);display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+  .reassure b{display:block;font-size:1.08rem;font-weight:800;margin-bottom:.2rem;color:var(--ink)}
+  .reassure p{color:var(--muted2);font-size:.98rem;line-height:1.45}
+  .tag{display:inline-block;font-size:.62rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#fff;background:var(--info);padding:3px 8px;border-radius:6px;margin-left:.5rem;vertical-align:middle}
+</style>
+</head>
+<body>
+  <div class="note"><b>Preview only.</b> This is your customer Home dashboard with the three proposed additions. The cards marked <span class="tag">new</span> are what would be added. Nothing here is live until you push.</div>
+  <div class="frame">
+    <div class="bar">
+      <a href="#" class="word">Spam<span class="cr">Call</span>Stop<span class="cg">.com</span></a>
+    </div>
+
+    <div class="tophead">
+      <div>
+        <div class="hi">Hi, Jordan</div>
+        <div class="status"><span class="dot"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span> You're protected</div>
+      </div>
+      <div class="radarwrap">
+        <div class="radar">
+          <span class="ring r1"></span><span class="ring r2"></span>
+          <span class="cross h"></span><span class="cross v"></span>
+          <span class="sweep"></span><span class="rcenter"></span>
+        </div>
+        <div class="radarlabel">Scanning</div>
+      </div>
+    </div>
+
+    <div class="card scorecard">
+      <div class="kick">Your protection score</div>
+      <div class="gwrap">
+        <svg viewBox="0 0 230 134" width="230" height="134" aria-hidden="true">
+          <defs><linearGradient id="grad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="#C0392B"/><stop offset="0.27" stop-color="#E2701B"/><stop offset="0.5" stop-color="#E8B10A"/><stop offset="0.73" stop-color="#7CB342"/><stop offset="1" stop-color="#1F7A4D"/>
+          </linearGradient></defs>
+          <path d="M20 115 A95 95 0 0 1 210 115" fill="none" stroke="url(#grad)" stroke-width="15" stroke-linecap="round"/>
+          <circle cx="70" cy="44" r="11" fill="#fff" stroke="#C9871A" stroke-width="4"/>
+          <text x="12" y="131" font-size="10.5" fill="#A6A6AD" font-weight="600">0</text>
+          <text x="208" y="131" font-size="10.5" fill="#A6A6AD" font-weight="600" text-anchor="end">100</text>
+        </svg>
+        <div class="num"><b>34</b><span>out of 100</span></div>
+      </div>
+      <div class="slabel">Building</div>
+      <div class="delta">Day 1. The climb starts here.</div>
+      <div class="ssub">This rises as we clear your number from the broker lists, and keeps climbing the longer you stay protected. We never stop at &ldquo;done.&rdquo;</div>
+    </div>
+
+    <div class="card">
+      <div class="expecthead">
+        <span class="eic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <h2>What to expect<span class="tag">new</span></h2>
+      </div>
+      <div style="margin-top:.3rem">
+        <div class="estep"><span class="edot"></span><div><b>Right now, your requests are out</b><span>We've already asked the data brokers to remove your number. This first step is fast.</span></div></div>
+        <div class="estep"><span class="edot soon"></span><div><b>Over the next few weeks, confirmations roll in</b><span>Brokers are allowed time to process removals. We follow up with each one until it confirms, so this part takes a little patience.</span></div></div>
+        <div class="estep"><span class="edot later"></span><div><b>Always, we keep watching</b><span>Even after you're removed, we keep scanning and take your number back down any time it reappears.</span></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="cardhead"><h2>Latest activity</h2><span class="newtag">3 new</span></div>
+      <div>
+        <div class="alertrow"><div class="alert-ic info">&#8599;</div><div><div class="alert-title">Still working for you<span class="tag">new</span></div><div class="alert-body">We have 12 removal requests in progress. Brokers can take a few weeks to confirm, and we follow up until they do.</div><div class="alert-time">4h ago</div></div></div>
+        <div class="alertrow"><div class="alert-ic info">&#8599;</div><div><div class="alert-title">Removal request sent</div><div class="alert-body">We sent a request to a data broker to remove your number from their lists.</div><div class="alert-time">1d ago</div></div></div>
+        <div class="alertrow"><div class="alert-ic info">&#8599;</div><div><div class="alert-title">Removal request sent</div><div class="alert-body">We sent a request to a data broker to remove your number from their lists.</div><div class="alert-time">1d ago</div></div></div>
+        <div class="alertrow"><div class="alert-ic good">&#10003;</div><div><div class="alert-title">Protection started<span class="tag">new</span></div><div class="alert-body">We've received your details and filed removals across 12 data brokers. You're all set, and we'll keep you posted right here.</div><div class="alert-time">2d ago</div></div></div>
+      </div>
+      <div style="text-align:center;margin-top:.6rem"><a class="viewall">View all activity &rarr;</a></div>
+    </div>
+
+    <div class="reassure">
+      <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v5c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V6l7-3z" stroke="#1F7A4D" stroke-width="2" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="#1F7A4D" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <div>
+        <b>We never stop.</b>
+        <p>As long as you're a member, we keep checking these lists and take your number back down any time it shows up again.</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

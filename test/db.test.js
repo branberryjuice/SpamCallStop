@@ -117,6 +117,43 @@ test('database critical paths', async (t) => {
     assert.strictEqual(after, before);
   });
 
+  await t.test('spam report: insert stores phone/note encrypted, reads back decrypted', async () => {
+    const c = await db.getCustomerByEmail('a@b.com');
+    const r = await db.insertSpamReport({ customerId: c.id, phone: '8005551234', category: 'Robocall', note: 'Pretended to be the IRS' });
+    assert.ok(r && r.id, 'report row created');
+    assert.strictEqual(r.phone, '8005551234');     // decrypted on the way out
+    assert.strictEqual(r.category, 'Robocall');
+    assert.strictEqual(r.note, 'Pretended to be the IRS');
+  });
+
+  await t.test('spam report: unknown category coerces to Other', async () => {
+    const c = await db.getCustomerByEmail('a@b.com');
+    const r = await db.insertSpamReport({ customerId: c.id, phone: '8005550000', category: 'NotARealCategory', note: null });
+    assert.strictEqual(r.category, 'Other');
+  });
+
+  await t.test('spam report: list + count for a customer (newest first), isolated per customer', async () => {
+    const a = await db.getCustomerByEmail('a@b.com');
+    const other = await db.getCustomerByEmail('c@d.com');
+    assert.strictEqual(await db.countSpamReportsForCustomer(a.id), 2);
+    assert.strictEqual(await db.countSpamReportsForCustomer(other.id), 0);
+    const list = await db.listSpamReportsForCustomer(a.id, 10);
+    assert.strictEqual(list.length, 2);
+    assert.strictEqual(list[0].phone, '8005550000');   // most recent insert first
+  });
+
+  await t.test('spam report: admin list joins customer name/email, since-filter works', async () => {
+    const all = await db.listSpamReports(100);
+    const mine = all.filter((r) => r.phone === '8005551234')[0];
+    assert.ok(mine, 'admin row present');
+    assert.strictEqual(mine.cust_name, 'Pat Doe');     // joined + decrypted
+    assert.strictEqual(mine.cust_email, 'a@b.com');
+    const recent = await db.listSpamReportsSince('1970-01-01T00:00:00.000Z');
+    assert.ok(recent.length >= 2, 'since-window returns reports');
+    const none = await db.listSpamReportsSince(new Date(Date.now() + 86400000).toISOString());
+    assert.strictEqual(none.length, 0);                // nothing in the future
+  });
+
   await t.test('removal cadence: pending due, in-cooldown not, elapsed due, suppressed terminal', () => {
     const now = new Date();
     const future = new Date(Date.now() + 5 * 86400000).toISOString();

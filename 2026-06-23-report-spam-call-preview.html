@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Report a spam call (preview) | SpamCallStop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F4F6F4; --card:#FFFFFF; --line:#E4E7E4; --line2:#D3D7D3; --ink:#1A1A1A; --muted:#6B6B72; --muted2:#4A4A50;
+    --green:#1F7A4D; --green2:#2A9D63; --green-soft:#E7F1EB; --gline:rgba(31,122,77,.22);
+    --red:#C0392B; --red-soft:#FBEAE7; --amber:#C9871A; --amber-soft:#FAF1DF; --info:#2C6FB5; --info-soft:#E8F0FB;
+    --font:'Libre Franklin',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#E9ECE9;color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased;padding:1.4rem 0 3rem}
+  .note{max-width:720px;margin:0 auto 1rem;padding:0 1.3rem;color:var(--muted2);font-size:.92rem}
+  .note b{color:var(--ink)}
+  .frame{max-width:720px;margin:0 auto;background:var(--bg);border:1px solid var(--line);border-radius:22px;padding:1.2rem 1.3rem 2rem}
+  .bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem}
+  .word{font-weight:800;font-size:1.2rem;color:var(--ink);text-decoration:none}
+  .word .cr{color:#B52A2A}.word .cg{color:var(--muted)}
+  .seg{max-width:720px;margin:1.4rem auto .1rem;padding:0 .2rem;font-size:.72rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#9A9AA2}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:1.3rem 1.4rem;margin-top:1rem}
+  .reporthead{display:flex;align-items:center;gap:.6rem;margin-bottom:.2rem}
+  .reporthead .ric{flex:0 0 auto;width:36px;height:36px;border-radius:10px;background:var(--red-soft);color:var(--red);display:flex;align-items:center;justify-content:center}
+  .reporthead h2{font-size:1.15rem;font-weight:800;color:var(--ink)}
+  .sub{color:var(--muted);font-size:.92rem;margin:.2rem 0 1rem}
+
+  label.fl{display:block;font-size:.8rem;font-weight:800;color:var(--muted2);text-transform:uppercase;letter-spacing:.04em;margin:.9rem 0 .35rem}
+  input.f,select.f,textarea.f{width:100%;background:#fff;border:1.5px solid var(--line);color:var(--ink);border-radius:11px;padding:.8rem .95rem;font-size:1.02rem;font-family:var(--font)}
+  input.f:focus,select.f:focus,textarea.f:focus{outline:none;border-color:var(--green)}
+  textarea.f{min-height:70px;resize:vertical}
+  .chips{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.15rem}
+  .chip{border:1.5px solid var(--line);background:#fff;color:var(--muted2);border-radius:999px;padding:.45rem .9rem;font-size:.9rem;font-weight:700;cursor:pointer;font-family:var(--font)}
+  .chip.on{border-color:var(--green);background:var(--green-soft);color:var(--green)}
+  .submit{width:100%;background:var(--green);color:#fff;border:none;border-radius:11px;padding:.95rem;font-weight:800;font-size:1.05rem;cursor:pointer;margin-top:1.1rem;font-family:var(--font)}
+  .submit:hover{background:var(--green2)}
+  .fineprint{color:var(--muted);font-size:.82rem;margin-top:.7rem;line-height:1.4}
+
+  /* confirmation */
+  .confirm{background:var(--green-soft);border:1px solid var(--gline);border-radius:18px;padding:1.2rem 1.4rem;margin-top:1rem;display:flex;gap:.9rem;align-items:flex-start}
+  .confirm .ic{flex:0 0 auto;width:40px;height:40px;border-radius:50%;background:#fff;border:1px solid var(--gline);display:flex;align-items:center;justify-content:center}
+  .confirm b{display:block;font-size:1.08rem;font-weight:800;color:var(--ink);margin-bottom:.15rem}
+  .confirm p{color:var(--muted2);font-size:.95rem;line-height:1.45}
+
+  /* reported list */
+  .rrow{display:flex;align-items:center;gap:.8rem;padding:.8rem 0;border-top:1px solid var(--line)}
+  .rrow:first-child{border-top:none}
+  .rnum{flex:0 0 auto;width:34px;height:34px;border-radius:10px;background:var(--red-soft);color:var(--red);display:flex;align-items:center;justify-content:center}
+  .rbd{flex:1;min-width:0}
+  .rbd b{display:block;font-size:1rem;font-weight:700;color:var(--ink)}
+  .rbd span{font-size:.84rem;color:var(--muted)}
+  .rtag{font-size:.72rem;font-weight:800;padding:3px 10px;border-radius:999px;color:var(--amber);background:var(--amber-soft);white-space:nowrap}
+  .rtag.scam{color:var(--red);background:var(--red-soft)}
+
+  /* admin email mock */
+  .email{max-width:720px;margin:1rem auto 0;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .email .eh{background:#F7F8F7;border-bottom:1px solid var(--line);padding:.8rem 1.1rem;font-size:.86rem;color:var(--muted2)}
+  .email .eh b{color:var(--ink)}
+  .email .eb{padding:1rem 1.1rem;font-size:.95rem;color:var(--ink);line-height:1.5}
+  .email .eb .kv{color:var(--muted)}
+</style>
+</head>
+<body>
+  <div class="note"><b>Preview only.</b> Two customer states (the report form and the confirmation after submitting), plus a mock of the alert email you would get on the backend. Nothing here is live.</div>
+
+  <div class="frame">
+    <div class="bar"><a href="#" class="word">Spam<span class="cr">Call</span>Stop<span class="cg">.com</span></a></div>
+
+    <div class="card">
+      <div class="reporthead">
+        <span class="ric"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 5l4-1 2 5-2.5 1.5a12 12 0 005.5 5.5L19 18l-1 4a16 16 0 01-15-15z" stroke-linejoin="round"/><path d="M15 9l5-5M20 9l-5-5" stroke-linecap="round"/></svg></span>
+        <h2>Report a spam call</h2>
+      </div>
+      <div class="sub">Got an unwanted call? Drop the number here. We log it, watch for it, and use it to protect you and other members.</div>
+
+      <label class="fl">Spam number</label>
+      <input class="f" type="tel" inputmode="tel" placeholder="(555) 555-5555" value="(702) 555-0148">
+
+      <label class="fl">What kind of call was it?</label>
+      <div class="chips">
+        <span class="chip on">Robocall</span>
+        <span class="chip">Scam or fraud</span>
+        <span class="chip">Telemarketer</span>
+        <span class="chip">Debt or collections</span>
+        <span class="chip">Other</span>
+      </div>
+
+      <label class="fl">Anything else? (optional)</label>
+      <textarea class="f" placeholder="A quick note, like what they said or how often they call.">Called 3 times today claiming to be from my bank.</textarea>
+
+      <button class="submit">Report this number</button>
+      <div class="fineprint">We never call this number back or share your info. Reports help us build protection against known spam callers.</div>
+    </div>
+
+    <div class="seg" style="margin-top:1.6rem">After submitting</div>
+    <div class="confirm">
+      <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="#1F7A4D" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <div>
+        <b>Thanks, we logged it.</b>
+        <p>We added (702) 555-0148 to your reported numbers and flagged it on our end. We will keep an eye out for it.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="font-size:1.12rem;font-weight:800">Numbers you've reported</h2>
+      <div style="margin-top:.6rem">
+        <div class="rrow"><span class="rnum"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 5l4-1 2 5-2.5 1.5a12 12 0 005.5 5.5L19 18l-1 4a16 16 0 01-15-15z" stroke-linejoin="round"/></svg></span><div class="rbd"><b>(702) 555-0148</b><span>Reported just now</span></div><span class="rtag scam">Scam or fraud</span></div>
+        <div class="rrow"><span class="rnum"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 5l4-1 2 5-2.5 1.5a12 12 0 005.5 5.5L19 18l-1 4a16 16 0 01-15-15z" stroke-linejoin="round"/></svg></span><div class="rbd"><b>(800) 555-0199</b><span>Reported 2 days ago</span></div><span class="rtag">Robocall</span></div>
+        <div class="rrow"><span class="rnum"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 5l4-1 2 5-2.5 1.5a12 12 0 005.5 5.5L19 18l-1 4a16 16 0 01-15-15z" stroke-linejoin="round"/></svg></span><div class="rbd"><b>(312) 555-0166</b><span>Reported last week</span></div><span class="rtag">Telemarketer</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="seg">Backend: the alert you would get</div>
+  <div class="email">
+    <div class="eh"><b>New spam report</b> &nbsp;to company@spamcallstop.com</div>
+    <div class="eb">
+      <div><span class="kv">Customer:</span> Jordan M. (member #1)</div>
+      <div><span class="kv">Reported number:</span> (702) 555-0148</div>
+      <div><span class="kv">Category:</span> Scam or fraud</div>
+      <div><span class="kv">Note:</span> Called 3 times today claiming to be from my bank.</div>
+      <div><span class="kv">When:</span> Jun 23, 2026, 2:14 PM</div>
+    </div>
+  </div>
+</body>
+</html>

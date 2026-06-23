@@ -33,6 +33,24 @@
   .ribbon.ok{color:var(--green)}
   .ribbon b{color:#fff}
 
+  .tabs{display:flex;gap:.4rem;border-bottom:1px solid var(--line);margin-bottom:1.4rem;flex-wrap:wrap}
+  .tab{font-family:var(--font);font-weight:700;font-size:.9rem;color:var(--muted2);background:none;border:none;border-bottom:2px solid transparent;padding:.6rem .9rem;margin-bottom:-1px;cursor:pointer}
+  .tab:hover{color:var(--ink)}
+  .tab.active{color:#fff;border-bottom-color:var(--accent)}
+  .tab .cnt{font-size:.72rem;color:var(--muted);font-weight:700;margin-left:.35rem}
+  .tabpanel[hidden]{display:none}
+
+  .pill{display:inline-block;font-size:.68rem;font-weight:800;letter-spacing:.03em;text-transform:uppercase;padding:.18rem .5rem;border-radius:999px;white-space:nowrap}
+  .pill.active{background:rgba(51,192,141,.14);color:var(--green)}
+  .pill.trial{background:rgba(44,111,224,.16);color:#5B8DEF}
+  .pill.canceling{background:rgba(181,42,42,.16);color:#E07A7A}
+  .pill.canceled{background:#1C1C20;color:var(--muted)}
+  .rev .num{font-variant-numeric:tabular-nums;font-weight:700;color:#e8eef6}
+  .rev .num.zero{color:var(--muted);font-weight:600}
+  .rtag{display:inline-block;font-size:.7rem;font-weight:700;padding:.16rem .48rem;border-radius:999px;background:#1C1C20;color:var(--muted2);white-space:nowrap}
+  .rtag.scam{background:rgba(181,42,42,.16);color:#E07A7A}
+  .rtag.robo{background:rgba(224,169,60,.16);color:var(--amber,#E0A93C)}
+
   .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.8rem;margin-bottom:1.4rem}
   .stat{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:1rem 1.05rem}
   .stat .n{font-size:1.7rem;font-weight:800;letter-spacing:-.02em;line-height:1}
@@ -104,6 +122,13 @@
 
   <div class="ribbon" id="ribbon">Loading&hellip;</div>
 
+  <div class="tabs">
+    <button class="tab active" id="tabFunnel" onclick="switchTab('funnel',this)">Funnel</button>
+    <button class="tab" id="tabCustomers" onclick="switchTab('customers',this)">Customers<span class="cnt" id="tabCustomersCnt"></span></button>
+    <button class="tab" id="tabSpam" onclick="switchTab('spam',this)">Spam reports<span class="cnt" id="tabSpamCnt"></span></button>
+  </div>
+
+  <div class="tabpanel" id="tab-funnel">
   <div class="stats">
     <div class="stat"><div class="n" id="sVisitors">0</div><div class="l">Visitors</div></div>
     <div class="stat blue"><div class="n" id="sPhones">0</div><div class="l">Phones entered</div></div>
@@ -130,6 +155,31 @@
     <div class="revmeta" id="revealsMeta"></div>
     <div class="revwrap"><div id="reveals"></div></div>
   </div>
+  </div><!-- /tab-funnel -->
+
+  <div class="tabpanel" id="tab-customers" hidden>
+    <div class="stats">
+      <div class="stat good"><div class="n" id="cActive">0</div><div class="l">Active customers</div></div>
+      <div class="stat blue"><div class="n" id="cTrial">0</div><div class="l">On trial</div></div>
+      <div class="stat"><div class="n" id="cNumbers">0</div><div class="l">Numbers protected</div></div>
+      <div class="stat"><div class="n" id="cProgress">0</div><div class="l">Removals in progress</div></div>
+      <div class="stat accent"><div class="n" id="cReports">0</div><div class="l">Spam reports filed</div></div>
+    </div>
+    <div class="card">
+      <h2>Active customers</h2>
+      <div class="revmeta" id="custMeta"></div>
+      <div class="revwrap"><div id="custTable"><div class="muted">Loading&hellip;</div></div></div>
+    </div>
+  </div><!-- /tab-customers -->
+
+  <div class="tabpanel" id="tab-spam" hidden>
+    <div class="stats" id="spamStats"></div>
+    <div class="card">
+      <h2>Spam calls reported by customers</h2>
+      <div class="revmeta" id="spamMeta"></div>
+      <div class="revwrap"><div id="spamTable"><div class="muted">Loading&hellip;</div></div></div>
+    </div>
+  </div><!-- /tab-spam -->
 </div>
 
 <script>
@@ -303,6 +353,138 @@
           '<span class="lwhen">'+fmtWhen(p.when)+'</span></div>';
       }).join('');
   }
+
+  // --- Tabs --------------------------------------------------------------
+  var TAB = 'funnel';
+  var loaded = { customers:false, spam:false };
+
+  function adminOpts(){
+    var key=(document.getElementById('key').value||'').trim();
+    return key ? { headers: { 'x-admin-key': key } } : {};
+  }
+
+  function switchTab(name, btn){
+    TAB = name;
+    ['funnel','customers','spam'].forEach(function(t){
+      var p=document.getElementById('tab-'+t); if(p){ p.hidden = (t!==name); }
+    });
+    var tabs=document.querySelectorAll('.tab');
+    for(var i=0;i<tabs.length;i++) tabs[i].classList.remove('active');
+    if(btn) btn.classList.add('active');
+    if(name==='customers' && !loaded.customers) loadCustomers();
+    if(name==='spam' && !loaded.spam) loadSpam();
+  }
+
+  function plan(p){ return p ? esc(p) : '—'; }
+
+  function statusPill(row){
+    var s = row.status || 'active';
+    if(row.trialDaysLeft!=null && row.trialDaysLeft>0)
+      return '<span class="pill trial">Trial &middot; '+row.trialDaysLeft+'d left</span>';
+    if(s==='canceling') return '<span class="pill canceling">Canceling</span>';
+    if(s==='canceled')  return '<span class="pill canceled">Canceled</span>';
+    return '<span class="pill active">Active</span>';
+  }
+
+  function loadCustomers(){
+    var box=document.getElementById('custTable'), meta=document.getElementById('custMeta');
+    box.innerHTML='<div class="muted">Loading&hellip;</div>';
+    fetch('/api/analytics/customers', adminOpts())
+      .then(function(r){ return r.json().catch(function(){ return null; }); })
+      .then(function(d){
+        if(!d || !d.ok){ meta.textContent=''; box.innerHTML='<div class="muted">'+((d&&d.error==='unauthorized')?'Enter your admin key, then Reload.':'Could not load customers.')+'</div>'; return; }
+        loaded.customers=true;
+        renderCustomerTable(d);
+      })
+      .catch(function(){ meta.textContent=''; box.innerHTML='<div class="muted">Could not reach the server.</div>'; });
+  }
+
+  function renderCustomerTable(d){
+    var rows=d.customers||[], t=d.totals||{};
+    document.getElementById('cActive').textContent=(t.active||0).toLocaleString();
+    document.getElementById('cTrial').textContent=(t.trialing||0).toLocaleString();
+    document.getElementById('cNumbers').textContent=(t.numbers||0).toLocaleString();
+    document.getElementById('cProgress').textContent=(t.inProgress||0).toLocaleString();
+    document.getElementById('cReports').textContent=(t.reports||0).toLocaleString();
+    var c = rows.length;
+    var cntEl=document.getElementById('tabCustomersCnt'); if(cntEl) cntEl.textContent='('+c+')';
+    document.getElementById('custMeta').innerHTML = c+' customer'+(c===1?'':'s')+' &middot; <span class="cy">'+(t.active||0)+' active</span> &middot; <span style="color:#5B8DEF">'+(t.trialing||0)+' on trial</span>';
+    if(!c){ document.getElementById('custTable').innerHTML='<div class="muted">No customers yet.</div>'; return; }
+    var num=function(v){ return '<span class="num'+(v?'':' zero')+'">'+(v||0)+'</span>'; };
+    var head='<tr><th class="lft">Customer</th><th class="lft">Phone</th><th>Plan</th><th>Status</th><th>Joined</th><th>In progress</th><th>Confirmed</th><th>Reports</th></tr>';
+    var body=rows.map(function(r){
+      var name = r.name ? esc(r.name) : '<span class="muted">(no name)</span>';
+      var phone = r.phone ? esc(fmtPhone(r.phone)) : '<span class="cd">&mdash;</span>';
+      var more = (r.numbers > 1) ? ' <span class="muted" style="font-weight:600">+'+(r.numbers-1)+' more</span>' : '';
+      return '<tr>'+
+        '<td class="lft"><div class="rphone" style="font-weight:700">'+name+'</div><div class="lemail">'+esc(r.email||'')+'</div></td>'+
+        '<td class="lft rphone">'+phone+more+'</td>'+
+        '<td>'+plan(r.plan)+'</td>'+
+        '<td>'+statusPill(r)+'</td>'+
+        '<td class="rwhen">'+(r.joined?fmtWhen(r.joined):'&mdash;')+'</td>'+
+        '<td>'+num(r.inProgress)+'</td>'+
+        '<td><span class="num'+(r.confirmed?' ':' zero')+'" style="'+(r.confirmed?'color:#33C08D':'')+'">'+(r.confirmed||0)+'</span></td>'+
+        '<td>'+num(r.reports)+'</td>'+
+        '</tr>';
+    }).join('');
+    document.getElementById('custTable').innerHTML='<table class="rev"><thead>'+head+'</thead><tbody>'+body+'</tbody></table>';
+  }
+
+  function catTag(cat){
+    var c = String(cat||'Other');
+    var cls = /scam|fraud/i.test(c) ? ' scam' : (/robocall/i.test(c) ? ' robo' : '');
+    return '<span class="rtag'+cls+'">'+esc(c)+'</span>';
+  }
+
+  function loadSpam(){
+    var box=document.getElementById('spamTable'), meta=document.getElementById('spamMeta');
+    box.innerHTML='<div class="muted">Loading&hellip;</div>';
+    fetch('/api/analytics/spam-reports', adminOpts())
+      .then(function(r){ return r.json().catch(function(){ return null; }); })
+      .then(function(d){
+        if(!d || !d.ok){ meta.textContent=''; box.innerHTML='<div class="muted">'+((d&&d.error==='unauthorized')?'Enter your admin key, then Reload.':'Could not load spam reports.')+'</div>'; return; }
+        loaded.spam=true;
+        renderSpamTable(d);
+      })
+      .catch(function(){ meta.textContent=''; box.innerHTML='<div class="muted">Could not reach the server.</div>'; });
+  }
+
+  function renderSpamTable(d){
+    var rows=d.reports||[], t=d.totals||{};
+    var c = rows.length;
+    var cntEl=document.getElementById('tabSpamCnt'); if(cntEl) cntEl.textContent='('+(t.total||c)+')';
+    var byCat = t.byCat || {};
+    var statsEl=document.getElementById('spamStats');
+    var tiles='<div class="stat accent"><div class="n">'+(t.total||c)+'</div><div class="l">Total reports</div></div>';
+    Object.keys(byCat).forEach(function(k){
+      tiles += '<div class="stat"><div class="n">'+byCat[k]+'</div><div class="l">'+esc(k)+'</div></div>';
+    });
+    statsEl.innerHTML=tiles;
+    document.getElementById('spamMeta').innerHTML = (t.total||c)+' report'+((t.total||c)===1?'':'s')+' from customers';
+    if(!c){ document.getElementById('spamTable').innerHTML='<div class="muted">No spam reports yet.</div>'; return; }
+    var head='<tr><th class="lft">Reported number</th><th>Category</th><th class="lft">From customer</th><th class="lft">Note</th><th class="lft">When</th></tr>';
+    var body=rows.map(function(r){
+      var who = r.customerName ? esc(r.customerName) : (r.customerEmail ? esc(r.customerEmail) : ('member #'+esc(r.customerId)));
+      var sub = r.customerName && r.customerEmail ? '<div class="lemail">'+esc(r.customerEmail)+'</div>' : '';
+      return '<tr>'+
+        '<td class="lft rphone">'+esc(fmtPhone(r.phone))+'</td>'+
+        '<td>'+catTag(r.category)+'</td>'+
+        '<td class="lft"><div style="font-weight:700;color:#e8eef6">'+who+'</div>'+sub+'</td>'+
+        '<td class="lft"><span class="cval" title="'+esc(r.note||'')+'">'+(r.note?esc(r.note):'<span class="cd">&mdash;</span>')+'</span></td>'+
+        '<td class="lft rwhen">'+(r.when?fmtWhen(r.when):'&mdash;')+'</td>'+
+        '</tr>';
+    }).join('');
+    document.getElementById('spamTable').innerHTML='<table class="rev"><thead>'+head+'</thead><tbody>'+body+'</tbody></table>';
+  }
+
+  // Reload button: refresh whatever tab is showing (plus the funnel data).
+  var _origLoad = load;
+  load = function(){
+    _origLoad();
+    loaded.customers=false; loaded.spam=false;
+    if(TAB==='customers') loadCustomers();
+    if(TAB==='spam') loadSpam();
+  };
 
   try{ var k=localStorage.getItem('scstop_admin_key'); if(k){ document.getElementById('key').value=k; } }catch(e){}
   load();

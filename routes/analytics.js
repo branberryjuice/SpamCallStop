@@ -209,4 +209,84 @@ router.get('/analytics/reveals', async (req, res) => {
   }
 });
 
+// Parse a DB timestamp (PG Date, or zone-less SQLite string) into millis as UTC.
+function tsMillis(v) {
+  if (!v) return 0;
+  if (v instanceof Date) return v.getTime();
+  let s = String(v).replace(' ', 'T');
+  if (!/[zZ]|[+\-]\d\d:?\d\d$/.test(s)) s += 'Z';
+  const t = new Date(s).getTime();
+  return isNaN(t) ? 0 : t;
+}
+
+// Active customers tab: everyone currently protected, with the business columns
+// that matter at a glance. Trial days left is ESTIMATED from signup date + the
+// trial length (real trial end lives in Stripe); only shown while still active
+// and inside the trial window.
+//   GET /api/analytics/customers   (admin-gated)
+router.get('/analytics/customers', async (req, res) => {
+  if (!authed(req)) return res.status(401).json({ ok: false, error: 'unauthorized' });
+  const TRIAL_DAYS = parseInt(process.env.TRIAL_DAYS || '7', 10);
+  try {
+    const customers = await db.listCustomersWithNumbers();
+    const out = [];
+    let active = 0, trialing = 0, numbersTotal = 0, inProgressTotal = 0, reportsTotal = 0;
+    for (const c of customers) {
+      const status = c.status || 'active';
+      const stats = await db.getRemovalStats(c.id);
+      let reports = 0;
+      try { reports = await db.countSpamReportsForCustomer(c.id); } catch (e) {}
+      let trialDaysLeft = null;
+      const joinedMs = tsMillis(c.created_at);
+      if (status === 'active' && joinedMs) {
+        const elapsedDays = (Date.now() - joinedMs) / 86400000;
+        if (elapsedDays < TRIAL_DAYS) trialDaysLeft = Math.max(0, Math.ceil(TRIAL_DAYS - elapsedDays));
+      }
+      const firstNumber = (c.numbers && c.numbers[0] && c.numbers[0].phone) || c.phone || '';
+      const row = {
+        id: c.id, name: c.name || '', email: c.email || '', phone: firstNumber,
+        numbers: (c.numbers ? c.numbers.length : 0), plan: c.plan || '', status: status,
+        trialDaysLeft: trialDaysLeft, joined: c.created_at,
+        inProgress: stats.inProgress, confirmed: stats.confirmedRemoved, reports: reports,
+      };
+      out.push(row);
+      reportsTotal += reports;
+      if (status === 'active' || status === 'canceling') {
+        active++;
+        if (trialDaysLeft != null) trialing++;
+        numbersTotal += row.numbers;
+        inProgressTotal += stats.inProgress;
+      }
+    }
+    res.json({
+      ok: true, generatedAt: new Date().toISOString(),
+      totals: { active, trialing, numbers: numbersTotal, inProgress: inProgressTotal, reports: reportsTotal, total: out.length },
+      customers: out,
+    });
+  } catch (e) {
+    console.error('[analytics] customers error:', e && e.message);
+    res.status(500).json({ ok: false, error: 'customers_failed' });
+  }
+});
+
+// Spam reports tab: numbers customers submitted from their dashboard.
+//   GET /api/analytics/spam-reports   (admin-gated)
+router.get('/analytics/spam-reports', async (req, res) => {
+  if (!authed(req)) return res.status(401).json({ ok: false, error: 'unauthorized' });
+  try {
+    const rows = await db.listSpamReports(500);
+    const reports = rows.map((r) => ({
+      id: r.id, phone: r.phone, category: r.category || 'Other', note: r.note || '',
+      customerId: r.customer_id, customerName: r.cust_name || '', customerEmail: r.cust_email || '',
+      when: r.created_at,
+    }));
+    const byCat = {};
+    for (const r of reports) byCat[r.category] = (byCat[r.category] || 0) + 1;
+    res.json({ ok: true, generatedAt: new Date().toISOString(), totals: { total: reports.length, byCat }, reports });
+  } catch (e) {
+    console.error('[analytics] spam-reports error:', e && e.message);
+    res.status(500).json({ ok: false, error: 'spam_reports_failed' });
+  }
+});
+
 module.exports = router;

@@ -70,6 +70,7 @@ app.use('/api', require('./routes/lookup'));
 app.use('/api', require('./routes/admin'));
 app.use('/api', require('./routes/inbound'));
 app.use('/api', require('./routes/account'));
+app.use('/api', require('./routes/report'));
 app.use('/api', require('./routes/track'));
 app.use('/api', require('./routes/analytics'));
 app.use('/api', require('./routes/alerts'));
@@ -168,6 +169,23 @@ if (process.env.REMOVALS_PAUSED !== '1') {
       .catch((e) => console.error('[verify-sweep] error:', e && e.message))
       .finally(() => { sweepBusy = false; });
   }, 6 * 60 * 60 * 1000);
+}
+
+// Heartbeat alerts: every hour, post a "still working for you" note to any
+// protected customer whose feed has gone quiet for HEARTBEAT_DAYS while removals
+// are still in flight. Per-customer cadence + live counts live in removal.js, so
+// this loop just pokes it; it never fabricates a "removed" result.
+if (process.env.REMOVALS_PAUSED !== '1') {
+  const removal = require('./lib/removal');
+  let heartbeatBusy = false;
+  setInterval(() => {
+    if (heartbeatBusy) return;
+    heartbeatBusy = true;
+    removal.sendHeartbeats()
+      .then((r) => { if (r.sent) console.log('[heartbeat]', JSON.stringify(r)); })
+      .catch((e) => console.error('[heartbeat] loop error:', e && e.message))
+      .finally(() => { heartbeatBusy = false; });
+  }, 60 * 60 * 1000);
 }
 
 // Order reconciliation: every 10 min, scan recent paid Checkout Sessions and

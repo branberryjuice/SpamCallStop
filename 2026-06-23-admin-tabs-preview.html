@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin tabs (preview) | SpamCallStop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0B0D; --panel:#141417; --line:#26262B; --ink:#FFFFFF; --muted:#8A8A93; --muted2:#B6B6BE;
+    --accent:#B52A2A; --green:#33C08D; --blue:#2C6FE0; --amber:#E0A93C;
+    --font:'Libre Franklin',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+    --r:14px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#000;color:var(--ink);font-family:var(--font);-webkit-font-smoothing:antialiased;font-size:15px;line-height:1.5;padding:1.2rem 0 3rem}
+  .note{max-width:1140px;margin:0 auto 1rem;padding:0 1.6rem;color:var(--muted2);font-size:.9rem}
+  .note b{color:#fff}
+  .wrap{max-width:1140px;margin:0 auto;padding:1.5rem 1.6rem 2rem;background:var(--bg);border:1px solid var(--line);border-radius:18px}
+
+  .top{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:1.1rem}
+  .brand{font-weight:800;font-size:1.4rem;letter-spacing:-.01em}
+  .brand .cr{color:var(--accent)}.brand .cg{color:var(--muted)}
+  .brand .tag{font-size:.66rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted2);border:1px solid var(--line);padding:.28rem .55rem;border-radius:999px;vertical-align:3px;margin-left:.55rem}
+
+  /* tab nav */
+  .tabs{display:flex;gap:.4rem;flex-wrap:wrap;border-bottom:1px solid var(--line);margin-bottom:1.3rem}
+  .tab{font-family:var(--font);font-weight:700;font-size:.9rem;color:var(--muted2);background:none;border:none;border-bottom:2px solid transparent;padding:.7rem .9rem;cursor:pointer;margin-bottom:-1px}
+  .tab.on{color:#fff;border-bottom-color:var(--accent)}
+  .tab .ct{font-size:.7rem;font-weight:800;color:var(--muted);background:#1C1C20;border-radius:999px;padding:.1rem .45rem;margin-left:.4rem;vertical-align:1px}
+  .tab.on .ct{color:#fff;background:var(--accent)}
+
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.8rem;margin-bottom:1.3rem}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:1rem 1.05rem}
+  .stat .n{font-size:1.7rem;font-weight:800;letter-spacing:-.02em;line-height:1}
+  .stat .l{color:var(--muted);font-weight:600;font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;margin-top:.4rem}
+  .stat.good .n{color:var(--green)} .stat.blue .n{color:#5B8DEF} .stat.accent .n{color:var(--accent)} .stat.amber .n{color:var(--amber)}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:1.2rem 1.3rem;margin-bottom:1rem}
+  .card h2{font-size:1.02rem;font-weight:800;letter-spacing:-.01em;margin-bottom:.3rem}
+  .card .csub{color:var(--muted);font-size:.84rem;margin-bottom:1rem}
+
+  .revwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table.rev{border-collapse:collapse;width:100%;min-width:980px}
+  .rev th{color:var(--muted);font-size:.66rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:.55rem .55rem;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+  .rev td{padding:.62rem .55rem;border-bottom:1px solid var(--line);text-align:left;font-size:.86rem;vertical-align:middle}
+  .rev tbody tr:last-child td{border-bottom:none}
+  .rev tbody tr:hover{background:#17171b}
+  .cname{color:#fff;font-weight:700}
+  .cemail{color:var(--muted2);font-weight:600;font-size:.8rem}
+  .cphone{color:#e8eef6;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .cnum{font-weight:800;font-variant-numeric:tabular-nums}
+  .cwhen{color:var(--muted2);font-size:.8rem;white-space:nowrap}
+  .pill{font-size:.72rem;font-weight:800;padding:.18rem .55rem;border-radius:999px;white-space:nowrap}
+  .pill.active{color:var(--green);background:rgba(51,192,141,.13)}
+  .pill.trial{color:var(--amber);background:rgba(224,169,60,.14)}
+  .pill.cancel{color:var(--accent);background:rgba(181,42,42,.16)}
+  .pill.new{color:#5B8DEF;background:rgba(44,111,224,.14)}
+  .catpill{font-size:.72rem;font-weight:800;padding:.18rem .55rem;border-radius:999px;white-space:nowrap;color:var(--amber);background:rgba(224,169,60,.14)}
+  .catpill.scam{color:var(--accent);background:rgba(181,42,42,.16)}
+  .cnote{color:var(--muted2);font-size:.82rem;max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;vertical-align:bottom}
+</style>
+</head>
+<body>
+  <div class="note"><b>Preview only.</b> Two new tabs for your admin analytics page: <b>Customers</b> (everyone currently protected, with the business columns that matter) and <b>Spam reports</b> (numbers customers submit). The existing page becomes the first tab, "Funnel". Mock data, nothing live.</div>
+
+  <div class="wrap">
+    <div class="top">
+      <div class="brand">Spam<span class="cr">Call</span>Stop<span class="cg">.com</span><span class="tag">Analytics</span></div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab">Funnel</button>
+      <button class="tab on">Customers <span class="ct">7</span></button>
+      <button class="tab">Spam reports <span class="ct">5</span></button>
+    </div>
+
+    <!-- ===== CUSTOMERS TAB ===== -->
+    <div class="stats">
+      <div class="stat good"><div class="n">7</div><div class="l">Active customers</div></div>
+      <div class="stat amber"><div class="n">2</div><div class="l">On trial</div></div>
+      <div class="stat blue"><div class="n">41</div><div class="l">Numbers protected</div></div>
+      <div class="stat"><div class="n">128</div><div class="l">Removals in progress</div></div>
+      <div class="stat good"><div class="n">$104</div><div class="l">MRR</div></div>
+    </div>
+
+    <div class="card">
+      <h2>Active customers</h2>
+      <div class="csub">Everyone currently protected. Trial shows days left before the first charge.</div>
+      <div class="revwrap">
+        <table class="rev">
+          <thead>
+            <tr>
+              <th>Customer</th><th>Phone</th><th>Plan</th><th>Status</th>
+              <th>Joined</th><th>In progress</th><th>Confirmed</th><th>Reports</th><th>Last activity</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><div class="cname">Jordan M.</div><div class="cemail">jordan.m@gmail.com</div></td>
+              <td class="cphone">(702) 555-0148</td>
+              <td>Annual</td>
+              <td><span class="pill trial">Trial &middot; 5d left</span></td>
+              <td class="cwhen">Jun 23, 2026</td>
+              <td class="cnum">19</td><td class="cnum" style="color:var(--green)">2</td><td class="cnum">1</td>
+              <td class="cwhen">2 min ago</td>
+            </tr>
+            <tr>
+              <td><div class="cname">Maria S.</div><div class="cemail">maria.s@outlook.com</div></td>
+              <td class="cphone">(312) 555-0166</td>
+              <td>Annual</td>
+              <td><span class="pill active">Active</span></td>
+              <td class="cwhen">Jun 11, 2026</td>
+              <td class="cnum">17</td><td class="cnum" style="color:var(--green)">6</td><td class="cnum">0</td>
+              <td class="cwhen">1 day ago</td>
+            </tr>
+            <tr>
+              <td><div class="cname">Dev P.</div><div class="cemail">dev.p@icloud.com</div></td>
+              <td class="cphone">(415) 555-0132</td>
+              <td>Monthly</td>
+              <td><span class="pill active">Active</span></td>
+              <td class="cwhen">Jun 6, 2026</td>
+              <td class="cnum">21</td><td class="cnum" style="color:var(--green)">9</td><td class="cnum">2</td>
+              <td class="cwhen">3 days ago</td>
+            </tr>
+            <tr>
+              <td><div class="cname">Aisha K.</div><div class="cemail">aisha.k@gmail.com</div></td>
+              <td class="cphone">(646) 555-0177</td>
+              <td>Monthly</td>
+              <td><span class="pill trial">Trial &middot; 2d left</span></td>
+              <td class="cwhen">Jun 20, 2026</td>
+              <td class="cnum">15</td><td class="cnum" style="color:var(--green)">1</td><td class="cnum">0</td>
+              <td class="cwhen">5 hours ago</td>
+            </tr>
+            <tr>
+              <td><div class="cname">Tom R.</div><div class="cemail">tom.r@yahoo.com</div></td>
+              <td class="cphone">(214) 555-0119</td>
+              <td>Annual</td>
+              <td><span class="pill cancel">Canceling</span></td>
+              <td class="cwhen">May 28, 2026</td>
+              <td class="cnum">12</td><td class="cnum" style="color:var(--green)">11</td><td class="cnum">0</td>
+              <td class="cwhen">6 days ago</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ===== SPAM REPORTS TAB ===== -->
+    <div class="card" style="margin-top:1.6rem;border-color:#3a2a2a">
+      <h2>Spam reports from customers</h2>
+      <div class="csub">Numbers your members submit from their dashboard. You also get an instant email on each one, and they roll up in the daily digest.</div>
+      <div class="revwrap">
+        <table class="rev">
+          <thead>
+            <tr>
+              <th>Reported number</th><th>Category</th><th>From customer</th><th>Note</th><th>When</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="cphone">(702) 555-0148</td>
+              <td><span class="catpill scam">Scam or fraud</span></td>
+              <td><div class="cname">Jordan M.</div><div class="cemail">member #1</div></td>
+              <td><span class="cnote">Called 3 times today claiming to be from my bank.</span></td>
+              <td class="cwhen">2 min ago</td>
+            </tr>
+            <tr>
+              <td class="cphone">(800) 555-0199</td>
+              <td><span class="catpill">Robocall</span></td>
+              <td><div class="cname">Maria S.</div><div class="cemail">member #2</div></td>
+              <td><span class="cnote">Auto warranty robocall, daily.</span></td>
+              <td class="cwhen">4 hours ago</td>
+            </tr>
+            <tr>
+              <td class="cphone">(469) 555-0143</td>
+              <td><span class="catpill">Telemarketer</span></td>
+              <td><div class="cname">Dev P.</div><div class="cemail">member #3</div></td>
+              <td><span class="cnote">Solar panels.</span></td>
+              <td class="cwhen">Yesterday</td>
+            </tr>
+            <tr>
+              <td class="cphone">(305) 555-0188</td>
+              <td><span class="catpill scam">Scam or fraud</span></td>
+              <td><div class="cname">Aisha K.</div><div class="cemail">member #4</div></td>
+              <td><span class="cnote">Said my SSN was suspended.</span></td>
+              <td class="cwhen">2 days ago</td>
+            </tr>
+            <tr>
+              <td class="cphone">(877) 555-0123</td>
+              <td><span class="catpill">Debt or collections</span></td>
+              <td><div class="cname">Tom R.</div><div class="cemail">member #5</div></td>
+              <td><span class="cnote">Wrong person, kept calling.</span></td>
+              <td class="cwhen">3 days ago</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
